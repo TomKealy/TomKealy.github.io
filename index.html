@@ -81,7 +81,53 @@
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is a test post about Gradient Descent</p>
+<h2 id="Gradient-Descent">Gradient Descent<a class="anchor-link" href="blog/gradient-descent/#Gradient-Descent">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Gradient Descent is the simplest learning algorithm. Suppose you have a set of observations of some process, and you have good reason to belive that the process and the meseurements are linear:</p>
+<p>$$ y = Ax + n $$</p>
+<p>Where $n$ is some, well behaved, noise process. Say you also had good reason to believe that the best reconstruction of $ x $ you could possilby hope to achieve was to minimise the following (mean squared) error measure:</p>
+<p>$$ \frac{1}{2} \lVert Ax - y \rVert_2^2 $$</p>
+<p>Then there are a couple of ways you could find such an $ \hat{x} $: you can compute it analytically via</p>
+<p>$$ (A^T A)^{-1} A^Ty $$</p>
+<p>or you can use the following recursion:</p>
+<p>$$ x_{k+1} = x_{k} - A^T y $$</p>
+<p>with $ x_0 = 0 $. This last algorithm is an example of gradient descent.</p>
+<p>In python this algorithm can be described as</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>However, often we have prior knowledge of the kind of solutions we desire, and so instead we seek to minimise functions like:</p>
+<p>$$ (A^T A)^{-1} A^Ty + \lambda r(x) $$</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>where $ r $ is some function encoding our prior knowledge of the solutions we expect, and $ \lambda $ is a parameter which trades off how well we want the reconstruction to be with how much much we insist the reconstruction conforms to our knowledge. For example, we might desire that the length of $ x $, $ \lVert x \rVert_2^2 $, constrained, and so we minimise</p>
+<p>$$ (A^T A)^{-1} A^Ty + \lambda \lVert x \rVert_2^2 $$</p>
+<p>or, we might know that $ x $ is sparse, and so we would like to minimise:</p>
+<p>$$ (A^T A)^{-1} A^Ty + \lambda \lVert x \rVert_1 $$</p>
+<p>Both of these functions can be minimised through the same procedure as the previous example, by using a modifed gradient descent:</p>
+<p>$$ x_{k+1} = x_k - S_{\lambda}(A^T y) $$</p>
+<p>with $ S_{\lambda}(z) = \frac{1}{1+\lambda}(z) $ for $ \lVert x \rVert_2^2 $ and $ S_{\lambda}(z) = (A^Ty - \lambda)^+ $ for $ \lVert x \rVert_1 $</p>
 
 </div>
 </div>

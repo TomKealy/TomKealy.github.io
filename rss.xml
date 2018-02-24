@@ -1,12 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataTom</title><link>https://TomKealy.github.io/</link><description>Data Blog</description><atom:link href="https://TomKealy.github.io/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>en</language><copyright>Contents © 2018 &lt;a href="mailto:tom.kealy.tk@gamil.com"&gt;Tom Kealy&lt;/a&gt; </copyright><lastBuildDate>Sat, 24 Feb 2018 12:00:05 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Gradient Descent</title><link>https://TomKealy.github.io/blog/gradient-descent/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div tabindex="-1" id="notebook" class="border-box-sizing"&gt;
+<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataTom</title><link>https://TomKealy.github.io/</link><description>Data Blog</description><atom:link href="https://TomKealy.github.io/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>en</language><copyright>Contents © 2018 &lt;a href="mailto:tom.kealy.tk@gamil.com"&gt;Tom Kealy&lt;/a&gt; </copyright><lastBuildDate>Sat, 24 Feb 2018 12:05:31 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Gradient Descent</title><link>https://TomKealy.github.io/blog/gradient-descent/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div tabindex="-1" id="notebook" class="border-box-sizing"&gt;
     &lt;div class="container" id="notebook-container"&gt;
 
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;This is a test post about Gradient Descent&lt;/p&gt;
+&lt;h2 id="Gradient-Descent"&gt;Gradient Descent&lt;a class="anchor-link" href="https://TomKealy.github.io/blog/gradient-descent/#Gradient-Descent"&gt;¶&lt;/a&gt;&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Gradient Descent is the simplest learning algorithm. Suppose you have a set of observations of some process, and you have good reason to belive that the process and the meseurements are linear:&lt;/p&gt;
+&lt;p&gt;$$ y = Ax + n $$&lt;/p&gt;
+&lt;p&gt;Where $n$ is some, well behaved, noise process. Say you also had good reason to believe that the best reconstruction of $ x $ you could possilby hope to achieve was to minimise the following (mean squared) error measure:&lt;/p&gt;
+&lt;p&gt;$$ \frac{1}{2} \lVert Ax - y \rVert_2^2 $$&lt;/p&gt;
+&lt;p&gt;Then there are a couple of ways you could find such an $ \hat{x} $: you can compute it analytically via&lt;/p&gt;
+&lt;p&gt;$$ (A^T A)^{-1} A^Ty $$&lt;/p&gt;
+&lt;p&gt;or you can use the following recursion:&lt;/p&gt;
+&lt;p&gt;$$ x_{k+1} = x_{k} - A^T y $$&lt;/p&gt;
+&lt;p&gt;with $ x_0 = 0 $. This last algorithm is an example of gradient descent.&lt;/p&gt;
+&lt;p&gt;In python this algorithm can be described as&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;However, often we have prior knowledge of the kind of solutions we desire, and so instead we seek to minimise functions like:&lt;/p&gt;
+&lt;p&gt;$$ (A^T A)^{-1} A^Ty + \lambda r(x) $$&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;where $ r $ is some function encoding our prior knowledge of the solutions we expect, and $ \lambda $ is a parameter which trades off how well we want the reconstruction to be with how much much we insist the reconstruction conforms to our knowledge. For example, we might desire that the length of $ x $, $ \lVert x \rVert_2^2 $, constrained, and so we minimise&lt;/p&gt;
+&lt;p&gt;$$ (A^T A)^{-1} A^Ty + \lambda \lVert x \rVert_2^2 $$&lt;/p&gt;
+&lt;p&gt;or, we might know that $ x $ is sparse, and so we would like to minimise:&lt;/p&gt;
+&lt;p&gt;$$ (A^T A)^{-1} A^Ty + \lambda \lVert x \rVert_1 $$&lt;/p&gt;
+&lt;p&gt;Both of these functions can be minimised through the same procedure as the previous example, by using a modifed gradient descent:&lt;/p&gt;
+&lt;p&gt;$$ x_{k+1} = x_k - S_{\lambda}(A^T y) $$&lt;/p&gt;
+&lt;p&gt;with $ S_{\lambda}(z) = \frac{1}{1+\lambda}(z) $ for $ \lVert x \rVert_2^2 $ and $ S_{\lambda}(z) = (A^Ty - \lambda)^+ $ for $ \lVert x \rVert_1 $&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
