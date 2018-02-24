@@ -1,0 +1,4 @@
+Sitemap: https://TomKealy.github.io/sitemapindex.xml
+
+User-Agent: *
+Host: TomKealy.github.io
