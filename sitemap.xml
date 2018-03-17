@@ -15,7 +15,7 @@
  </url>
  <url>
   <loc>https://TomKealy.github.io/archive.html</loc>
-  <lastmod>2018-03-08T20:37:00Z</lastmod>
+  <lastmod>2018-03-17T12:14:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/gradient-descent/</loc>
@@ -24,6 +24,10 @@
  <url>
   <loc>https://TomKealy.github.io/blog/gradient-free-gradient-descent/</loc>
   <lastmod>2018-03-08T20:37:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://TomKealy.github.io/blog/variants-of-gradient-descent-which-are-useful-to-know/</loc>
+  <lastmod>2018-03-17T12:14:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/categories/</loc>
