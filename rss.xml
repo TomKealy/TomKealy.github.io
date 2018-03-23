@@ -1,5 +1,557 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataTom</title><link>https://TomKealy.github.io/</link><description>Data Blog</description><atom:link href="https://TomKealy.github.io/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>en</language><copyright>Contents © 2018 &lt;a href="mailto:tom.kealy.tk@gamil.com"&gt;Tom Kealy&lt;/a&gt; </copyright><lastBuildDate>Sat, 17 Mar 2018 12:14:57 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Variants of Gradient Descent which are useful to know</title><link>https://TomKealy.github.io/blog/variants-of-gradient-descent-which-are-useful-to-know/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div tabindex="-1" id="notebook" class="border-box-sizing"&gt;
+<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataTom</title><link>https://TomKealy.github.io/</link><description>Data Blog</description><atom:link href="https://TomKealy.github.io/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>en</language><copyright>Contents © 2018 &lt;a href="mailto:tom.kealy.tk@gamil.com"&gt;Tom Kealy&lt;/a&gt; </copyright><lastBuildDate>Fri, 23 Mar 2018 09:55:55 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Breaking it all down</title><link>https://TomKealy.github.io/blog/breaking-it-all-down/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div tabindex="-1" id="notebook" class="border-box-sizing"&gt;
+    &lt;div class="container" id="notebook-container"&gt;
+
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Breaking-it-all-down"&gt;Breaking it all down&lt;a class="anchor-link" href="https://TomKealy.github.io/blog/breaking-it-all-down/#Breaking-it-all-down"&gt;¶&lt;/a&gt;&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Since it's Joseph Fourier's birthday, I'll write a little about his central idea and why it's so important.&lt;/p&gt;
+&lt;p&gt;One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I'm talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we're interested in.&lt;/p&gt;
+&lt;p&gt;As an example, consider the plane $ \mathrm{R}^2 $ and the two vectors $ e_1 = (1, 0)^T $ and $ e_2 = (0, 1)^T $. We can write &lt;em&gt;any&lt;/em&gt; vector in that plane as a sum  of those two vectors:&lt;/p&gt;
+&lt;p&gt;$$ (40.2, 3.0)^T = 40.2 * e_1 + 3.0 e_2 $$&lt;/p&gt;
+&lt;p&gt;This idea extends to any dimension $ n &amp;gt; 2 $. What's more amazing, is that this idea can also work for spaces with infinite dimensions! In these infinite spaces, a vector is now a function, and we seek to express the function in terms of simpler ones.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;In school (and university) we were taught about the functions $ \mathrm{sin}(x) $ and $ \mathrm{cos}(x) $, these functions have the usefull properties that:&lt;/p&gt;
+&lt;p&gt;$$ \int_0^{2\pi} cos(x) dx  = 0 $$&lt;/p&gt;
+&lt;p&gt;$$ \int_0^{2\pi} sin(x) dx  = 0 $$&lt;/p&gt;
+&lt;p&gt;and that&lt;/p&gt;
+&lt;p&gt;$$ \int_0^{2\pi} cos(x) sin(x) dx  = 0 $$&lt;/p&gt;
+&lt;p&gt;Because of these (admittedly quite arbitrary properties) $ sin $ and $ cos $ can play the role for functions that $ e_1 $ and $ e_2 $ played for vectors. This was Joseph Fourier's insight, and there's not a part of Science/Engineering that has been left untouched (mainly because if you're out of ideas about what to do in a data analysis, taking a Fourier Transform will seldom be  a bad one).&lt;/p&gt;
+&lt;p&gt;In the rest of this post, we'll consider an effcient way of computing a discrete version of the Fourier Tansform&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;If we have a vector $ x  \in \mathcal{R}^N $ which we can write it's Fourier Transform as:&lt;/p&gt;
+&lt;p&gt;$$ X_k = \sum_{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$&lt;/p&gt;
+&lt;p&gt;Or, more compactly in matrix notation:&lt;/p&gt;
+&lt;p&gt;$$ X_k = W x_n $$&lt;/p&gt;
+&lt;p&gt;with $$ W_{kn} = e^{-i2\pi kn/N} $$&lt;/p&gt;
+&lt;p&gt;Naively, we could simply compute the FT by doing some matrix multiplication:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [1]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
+
+&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;DFT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+
+    &lt;span class="n"&gt;X&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;zeros_like&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;reshape&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="n"&gt;W&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pi&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="n"&gt;X&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;W&lt;/span&gt; &lt;span class="o"&gt;@&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;X&lt;/span&gt;
+
+&lt;span class="n"&gt;X&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;DFT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;We can check to see if we're right:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [2]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allclose&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;X&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fft&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fft&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[2]:&lt;/div&gt;
+
+
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;True&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;However, there's a much better way of computing the FT by exploiting some symmetries of W. First of all we'll show that $ X_{k + N} = X_k $ and then how this insight can be turned into a recursive algorithm for computing $X_k$.&lt;/p&gt;
+&lt;p&gt;Firstly&lt;/p&gt;
+&lt;p&gt;$$ X_{k + N} = \sum_{n=0}^{N-1} x_n e^{-i2\pi (k+N)n/N}  $$&lt;/p&gt;
+&lt;p&gt;$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi n} e^{-i2\pi kn/N} $$&lt;/p&gt;
+&lt;p&gt;$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$&lt;/p&gt;
+&lt;p&gt;because $ e^{i2\pi n} = 1 $ for any $ n $.&lt;/p&gt;
+&lt;p&gt;The trick for computing the FT, which makes use of this symmetry, is to perform an FT on the odd and even parts of $ x $ respectively:&lt;/p&gt;
+&lt;p&gt;$$ X_{k} = \sum_{m=0}^{N/2-1} x_{2m} e^{-i2\pi (2m)n/N} + \sum_{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m+1)n/N} $$&lt;/p&gt;
+&lt;p&gt;$$ X_{k} = \sum_{m=0}^{N/2-1} x_{2m} e^{-i2\pi (2m)n/N} + e^{-i 2\pi k/N} \sum_{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m)n/N} $$&lt;/p&gt;
+&lt;p&gt;What that these two lines show, is that we can split an $ N $ length FT into two $ N/2 $ length Fts, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to $ m = 1 $, which is what this graphic shows&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://TomKealy.github.io/blog/breaking-it-all-down/radix2fft.png"&gt;&lt;/p&gt;
+&lt;p&gt;In python, we can write the FFT as like so:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [3]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;FFT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;X_even&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FFT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[::&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+        &lt;span class="n"&gt;X_odd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FFT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+        &lt;span class="n"&gt;factor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pi&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;concatenate&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;X_even&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;[:(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;//&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;X_odd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;X_even&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;//&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;):]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;X_odd&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [4]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;X&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FFT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allclose&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;X&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fft&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fft&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[4]:&lt;/div&gt;
+
+
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;True&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+</description><guid>https://TomKealy.github.io/blog/breaking-it-all-down/</guid><pubDate>Fri, 23 Mar 2018 09:48:42 GMT</pubDate></item><item><title>Distributed Averaging</title><link>https://TomKealy.github.io/blog/distributed-averaging/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div tabindex="-1" id="notebook" class="border-box-sizing"&gt;
+    &lt;div class="container" id="notebook-container"&gt;
+
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Distributed-Averaging"&gt;Distributed Averaging&lt;a class="anchor-link" href="https://TomKealy.github.io/blog/distributed-averaging/#Distributed-Averaging"&gt;¶&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;This code simulates a distributed averaging protocol. There is a network of nodes, and at the clicks of a Poisson process:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;A node wakes up&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Transmits it's current average to all the nodes it is connected to&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;These nodes have a coroutine which waits to accept new values and compute the average.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [11]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;numpy.random&lt;/span&gt; &lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="n"&gt;exponential&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;uniform&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;time&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;itertools&lt;/span&gt; &lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="n"&gt;combinations&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [20]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;number&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;friends&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;num_friends&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;friends&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;num_friends&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;number&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;average&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;number&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;avg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;averager&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;avg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__next__&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;averager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;term&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;average&lt;/span&gt;
+            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;average&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="n"&gt;term&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;num_friends&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [23]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Network&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;num_nodes&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numbers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# [randint(1, 10) for _ in range(num_nodes)]&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numbers&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;avg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numbers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;combinations&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+            &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;friends&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;friends&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;mainloop&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;num_nodes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;num_iters&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;
+        &lt;span class="n"&gt;_iter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;_iter&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;num_iters&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"iter: "&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_iter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;friend&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;friends&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;friend&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;avg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;send&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;friend&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;average&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;_iter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_iter&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [24]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Network&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;0
+0
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [25]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;friends&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;friends&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;None
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_text output_error"&gt;
+&lt;pre&gt;
+&lt;span class="ansi-red-fg"&gt;---------------------------------------------------------------------------&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;TypeError&lt;/span&gt;                                 Traceback (most recent call last)
+&lt;span class="ansi-green-fg"&gt;&amp;lt;ipython-input-25-558bf1b77799&amp;gt;&lt;/span&gt; in &lt;span class="ansi-cyan-fg"&gt;&amp;lt;module&amp;gt;&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;()&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;      1&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;for&lt;/span&gt; node &lt;span class="ansi-green-fg"&gt;in&lt;/span&gt; n&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;nodes&lt;span class="ansi-blue-fg"&gt;:&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;      2&lt;/span&gt;     print&lt;span class="ansi-blue-fg"&gt;(&lt;/span&gt;node&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;friends&lt;span class="ansi-blue-fg"&gt;)&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;----&amp;gt; 3&lt;/span&gt;&lt;span class="ansi-red-fg"&gt;     &lt;/span&gt;print&lt;span class="ansi-blue-fg"&gt;(&lt;/span&gt;len&lt;span class="ansi-blue-fg"&gt;(&lt;/span&gt;node&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;friends&lt;span class="ansi-blue-fg"&gt;)&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;)&lt;/span&gt;
+
+&lt;span class="ansi-red-fg"&gt;TypeError&lt;/span&gt;: object of type 'NoneType' has no len()&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [26]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;avg&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[26]:&lt;/div&gt;
+
+
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;1.5&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [17]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numbers&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[17]:&lt;/div&gt;
+
+
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;[1, 2]&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [18]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;average&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;1
+2
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [19]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mainloop&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;iter:  0
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_text output_error"&gt;
+&lt;pre&gt;
+&lt;span class="ansi-red-fg"&gt;---------------------------------------------------------------------------&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;ZeroDivisionError&lt;/span&gt;                         Traceback (most recent call last)
+&lt;span class="ansi-green-fg"&gt;&amp;lt;ipython-input-19-ec0cafcb1cee&amp;gt;&lt;/span&gt; in &lt;span class="ansi-cyan-fg"&gt;&amp;lt;module&amp;gt;&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;()&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;----&amp;gt; 1&lt;/span&gt;&lt;span class="ansi-red-fg"&gt; &lt;/span&gt;n&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;mainloop&lt;span class="ansi-blue-fg"&gt;(&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;)&lt;/span&gt;
+
+&lt;span class="ansi-green-fg"&gt;&amp;lt;ipython-input-13-b81f4dba45f5&amp;gt;&lt;/span&gt; in &lt;span class="ansi-cyan-fg"&gt;mainloop&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;(self)&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;     17&lt;/span&gt;             &lt;span class="ansi-green-fg"&gt;for&lt;/span&gt; node &lt;span class="ansi-green-fg"&gt;in&lt;/span&gt; self&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;nodes&lt;span class="ansi-blue-fg"&gt;:&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;     18&lt;/span&gt;                 &lt;span class="ansi-green-fg"&gt;for&lt;/span&gt; friend &lt;span class="ansi-green-fg"&gt;in&lt;/span&gt; node&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;friends&lt;span class="ansi-blue-fg"&gt;:&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;---&amp;gt; 19&lt;/span&gt;&lt;span class="ansi-red-fg"&gt;                     &lt;/span&gt;friend&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;avg&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;send&lt;span class="ansi-blue-fg"&gt;(&lt;/span&gt;node&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;val&lt;span class="ansi-blue-fg"&gt;)&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;     20&lt;/span&gt;                     print&lt;span class="ansi-blue-fg"&gt;(&lt;/span&gt;friend&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;average&lt;span class="ansi-blue-fg"&gt;)&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;     21&lt;/span&gt;             _iter &lt;span class="ansi-blue-fg"&gt;=&lt;/span&gt; _iter &lt;span class="ansi-blue-fg"&gt;+&lt;/span&gt; &lt;span class="ansi-cyan-fg"&gt;1&lt;/span&gt;
+
+&lt;span class="ansi-green-fg"&gt;&amp;lt;ipython-input-12-91e145967d2b&amp;gt;&lt;/span&gt; in &lt;span class="ansi-cyan-fg"&gt;averager&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;(self)&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;     11&lt;/span&gt;         &lt;span class="ansi-green-fg"&gt;while&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;True&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;:&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;     12&lt;/span&gt;             term &lt;span class="ansi-blue-fg"&gt;=&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;yield&lt;/span&gt; self&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;average
+&lt;span class="ansi-green-fg"&gt;---&amp;gt; 13&lt;/span&gt;&lt;span class="ansi-red-fg"&gt;             &lt;/span&gt;self&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;average &lt;span class="ansi-blue-fg"&gt;=&lt;/span&gt;  term &lt;span class="ansi-blue-fg"&gt;/&lt;/span&gt; self&lt;span class="ansi-blue-fg"&gt;.&lt;/span&gt;num_friends
+
+&lt;span class="ansi-red-fg"&gt;ZeroDivisionError&lt;/span&gt;: division by zero&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [ ]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;average&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+</description><guid>https://TomKealy.github.io/blog/distributed-averaging/</guid><pubDate>Sat, 17 Mar 2018 12:23:37 GMT</pubDate></item><item><title>Variants of Gradient Descent which are useful to know</title><link>https://TomKealy.github.io/blog/variants-of-gradient-descent-which-are-useful-to-know/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div tabindex="-1" id="notebook" class="border-box-sizing"&gt;
     &lt;div class="container" id="notebook-container"&gt;
 
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
