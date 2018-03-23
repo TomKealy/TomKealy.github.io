@@ -142,7 +142,7 @@ One of the most important ideas in mathematics, is that you can">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>If we have a vector $ x  \in \mathcal{R}^N $ which we can write it's Fourier Transform as:</p>
+<p>If we have a vector $ x  \in \mathrm{R}^N $ which we can write it's Fourier Transform as:</p>
 <p>$$ X_k = \sum_{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$</p>
 <p>Or, more compactly in matrix notation:</p>
 <p>$$ X_k = W x_n $$</p>
@@ -236,7 +236,7 @@ One of the most important ideas in mathematics, is that you can">
 <p>The trick for computing the FT, which makes use of this symmetry, is to perform an FT on the odd and even parts of $ x $ respectively:</p>
 <p>$$ X_{k} = \sum_{m=0}^{N/2-1} x_{2m} e^{-i2\pi (2m)n/N} + \sum_{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m+1)n/N} $$</p>
 <p>$$ X_{k} = \sum_{m=0}^{N/2-1} x_{2m} e^{-i2\pi (2m)n/N} + e^{-i 2\pi k/N} \sum_{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m)n/N} $$</p>
-<p>What that these two lines show, is that we can split an $ N $ length FT into two $ N/2 $ length Fts, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to $ m = 1 $, which is what this graphic shows</p>
+<p>What that these two lines show, is that we can split an $ N $ length FT into two $ N/2 \)) length Fts, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to \\( m = 1 $, which is what this graphic shows</p>
 <p><img src="radix2fft.png"></p>
 <p>In python, we can write the FFT as like so:</p>
 
