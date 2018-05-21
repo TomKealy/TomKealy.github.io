@@ -15,7 +15,11 @@
  </url>
  <url>
   <loc>https://TomKealy.github.io/archive.html</loc>
-  <lastmod>2018-05-21T10:47:00Z</lastmod>
+  <lastmod>2018-05-21T13:21:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://TomKealy.github.io/blog/ames-iowa/</loc>
+  <lastmod>2018-05-21T13:21:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/breaking-it-all-down/</loc>
@@ -44,6 +48,10 @@
  <url>
   <loc>https://TomKealy.github.io/blog/r/</loc>
   <lastmod>2018-05-21T10:47:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://TomKealy.github.io/blog/time-series-with-gams/</loc>
+  <lastmod>2018-05-21T13:21:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/variants-of-gradient-descent-which-are-useful-to-know/</loc>
