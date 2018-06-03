@@ -83,13 +83,14 @@
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The last part of moddeling with (univariate spline) GAMs is choosing the smoothing parameter $ \lambda $. This post will elaborate on this, using the <code>scikit-learn</code> <code>GriddSearchCV</code> functionality to do this.</p>
+<p>We'll use the same data as the last post</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [3]:</div>
+<div class="prompt input_prompt">In [19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -104,9 +105,364 @@
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'mcycle.csv'</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">'Unnamed: 0'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">min_time</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="n">max_time</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">blue</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">accel</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'time'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Acceleration'</span><span class="p">)</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[19]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Text(0,0.5,'Acceleration')</pre>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [32]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span>
+
+<span class="k">class</span> <span class="nc">SimpleGAM</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_knots</span> <span class="o">=</span> <span class="n">n_knots</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span>
+    
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_knots</span>
+        
+        <span class="n">df_X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">df_y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">knots</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">patsy</span><span class="o">.</span><span class="n">dmatrices</span><span class="p">(</span><span class="s1">'y ~ X + self.R_(X)'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+         
+        
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_</span><span class="p">(</span><span class="n">knots</span><span class="p">)</span>
+        
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="n">B</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]),</span> <span class="n">tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+        
+        <span class="n">y_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">B</span><span class="p">))</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span> <span class="n">X_</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">z</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">-</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">240</span><span class="p">)</span> <span class="o">/</span> <span class="mi">24</span>
+
+    <span class="k">def</span> <span class="nf">R_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">knots</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">plot_X</span> <span class="o">=</span> <span class="n">patsy</span><span class="o">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s1">'times + R_(times)'</span><span class="p">,</span> <span class="p">{</span><span class="s1">'times'</span><span class="p">:</span> <span class="n">X</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">plot_X</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [33]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gam</span> <span class="o">=</span> <span class="n">SimpleGAM</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [34]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gam</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">accel</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">call_and_wrap_exc</span><span class="ansi-blue-fg">(msg, origin, f, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     35</span>     <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 36</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> f<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     37</span>     <span class="ansi-green-fg">except</span> Exception <span class="ansi-green-fg">as</span> e<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">eval</span><span class="ansi-blue-fg">(self, expr, source_name, inner_namespace)</span>
+<span class="ansi-green-intense-fg ansi-bold">    165</span>         return eval(code, {}, VarLookupDict([inner_namespace]
+<span class="ansi-green-fg">--&gt; 166</span><span class="ansi-red-fg">                                             + self._namespaces))
+</span><span class="ansi-green-intense-fg ansi-bold">    167</span> 
+
+<span class="ansi-green-fg">&lt;string&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-32-2e1401fc88d4&gt;</span> in <span class="ansi-cyan-fg">R_</span><span class="ansi-blue-fg">(self, x)</span>
+<span class="ansi-green-intense-fg ansi-bold">     39</span>     <span class="ansi-green-fg">def</span> R_<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> x<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 40</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>R<span class="ansi-blue-fg">.</span>outer<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">,</span> knots<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>astype<span class="ansi-blue-fg">(</span>np<span class="ansi-blue-fg">.</span>float64<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     41</span> 
+
+<span class="ansi-red-fg">AttributeError</span>: 'function' object has no attribute 'outer'
+
+The above exception was the direct cause of the following exception:
+
+<span class="ansi-red-fg">PatsyError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-34-2e435ed1a679&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>gam<span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">.</span>times<span class="ansi-blue-fg">,</span> df<span class="ansi-blue-fg">.</span>accel<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-32-2e1401fc88d4&gt;</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     19</span>         df <span class="ansi-blue-fg">=</span> pd<span class="ansi-blue-fg">.</span>concat<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> axis<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     20</span>         knots <span class="ansi-blue-fg">=</span> df<span class="ansi-blue-fg">.</span>times<span class="ansi-blue-fg">.</span>quantile<span class="ansi-blue-fg">(</span>np<span class="ansi-blue-fg">.</span>linspace<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span> q<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">---&gt; 21</span><span class="ansi-red-fg">         </span>y<span class="ansi-blue-fg">,</span> X <span class="ansi-blue-fg">=</span> patsy<span class="ansi-blue-fg">.</span>dmatrices<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">'y ~ X + self.R_(X)'</span><span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">=</span>df<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     22</span> 
+<span class="ansi-green-intense-fg ansi-bold">     23</span> 
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">dmatrices</span><span class="ansi-blue-fg">(formula_like, data, eval_env, NA_action, return_type)</span>
+<span class="ansi-green-intense-fg ansi-bold">    308</span>     eval_env <span class="ansi-blue-fg">=</span> EvalEnvironment<span class="ansi-blue-fg">.</span>capture<span class="ansi-blue-fg">(</span>eval_env<span class="ansi-blue-fg">,</span> reference<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    309</span>     (lhs, rhs) = _do_highlevel_design(formula_like, data, eval_env,
+<span class="ansi-green-fg">--&gt; 310</span><span class="ansi-red-fg">                                       NA_action, return_type)
+</span><span class="ansi-green-intense-fg ansi-bold">    311</span>     <span class="ansi-green-fg">if</span> lhs<span class="ansi-blue-fg">.</span>shape<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">==</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    312</span>         <span class="ansi-green-fg">raise</span> PatsyError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">"model is missing required outcome variables"</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">_do_highlevel_design</span><span class="ansi-blue-fg">(formula_like, data, eval_env, NA_action, return_type)</span>
+<span class="ansi-green-intense-fg ansi-bold">    163</span>         <span class="ansi-green-fg">return</span> iter<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>data<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    164</span>     design_infos = _try_incr_builders(formula_like, data_iter_maker, eval_env,
+<span class="ansi-green-fg">--&gt; 165</span><span class="ansi-red-fg">                                       NA_action)
+</span><span class="ansi-green-intense-fg ansi-bold">    166</span>     <span class="ansi-green-fg">if</span> design_infos <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    167</span>         return build_design_matrices(design_infos, data,
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">_try_incr_builders</span><span class="ansi-blue-fg">(formula_like, data_iter_maker, eval_env, NA_action)</span>
+<span class="ansi-green-intense-fg ansi-bold">     68</span>                                       data_iter_maker<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">     69</span>                                       eval_env<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">---&gt; 70</span><span class="ansi-red-fg">                                       NA_action)
+</span><span class="ansi-green-intense-fg ansi-bold">     71</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     72</span>         <span class="ansi-green-fg">return</span> <span class="ansi-green-fg">None</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/build.py</span> in <span class="ansi-cyan-fg">design_matrix_builders</span><span class="ansi-blue-fg">(termlists, data_iter_maker, eval_env, NA_action)</span>
+<span class="ansi-green-intense-fg ansi-bold">    694</span>                                                    factor_states<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    695</span>                                                    data_iter_maker<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 696</span><span class="ansi-red-fg">                                                    NA_action)
+</span><span class="ansi-green-intense-fg ansi-bold">    697</span>     <span class="ansi-red-fg"># Now we need the factor infos, which encapsulate the knowledge of</span>
+<span class="ansi-green-intense-fg ansi-bold">    698</span>     <span class="ansi-red-fg"># how to turn any given factor into a chunk of data:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/build.py</span> in <span class="ansi-cyan-fg">_examine_factor_types</span><span class="ansi-blue-fg">(factors, factor_states, data_iter_maker, NA_action)</span>
+<span class="ansi-green-intense-fg ansi-bold">    441</span>     <span class="ansi-green-fg">for</span> data <span class="ansi-green-fg">in</span> data_iter_maker<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    442</span>         <span class="ansi-green-fg">for</span> factor <span class="ansi-green-fg">in</span> list<span class="ansi-blue-fg">(</span>examine_needed<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 443</span><span class="ansi-red-fg">             </span>value <span class="ansi-blue-fg">=</span> factor<span class="ansi-blue-fg">.</span>eval<span class="ansi-blue-fg">(</span>factor_states<span class="ansi-blue-fg">[</span>factor<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    444</span>             <span class="ansi-green-fg">if</span> factor <span class="ansi-green-fg">in</span> cat_sniffers <span class="ansi-green-fg">or</span> guess_categorical<span class="ansi-blue-fg">(</span>value<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    445</span>                 <span class="ansi-green-fg">if</span> factor <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">in</span> cat_sniffers<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">eval</span><span class="ansi-blue-fg">(self, memorize_state, data)</span>
+<span class="ansi-green-intense-fg ansi-bold">    564</span>         return self._eval(memorize_state["eval_code"],
+<span class="ansi-green-intense-fg ansi-bold">    565</span>                           memorize_state<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 566</span><span class="ansi-red-fg">                           data)
+</span><span class="ansi-green-intense-fg ansi-bold">    567</span> 
+<span class="ansi-green-intense-fg ansi-bold">    568</span>     __getstate__ <span class="ansi-blue-fg">=</span> no_pickling
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">_eval</span><span class="ansi-blue-fg">(self, code, memorize_state, data)</span>
+<span class="ansi-green-intense-fg ansi-bold">    549</span>                                  memorize_state<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">"eval_env"</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">.</span>eval<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    550</span>                                  code<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 551</span><span class="ansi-red-fg">                                  inner_namespace=inner_namespace)
+</span><span class="ansi-green-intense-fg ansi-bold">    552</span> 
+<span class="ansi-green-intense-fg ansi-bold">    553</span>     <span class="ansi-green-fg">def</span> memorize_chunk<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> state<span class="ansi-blue-fg">,</span> which_pass<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">call_and_wrap_exc</span><span class="ansi-blue-fg">(msg, origin, f, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     41</span>                                  origin)
+<span class="ansi-green-intense-fg ansi-bold">     42</span>             <span class="ansi-red-fg"># Use 'exec' to hide this syntax from the Python 2 parser:</span>
+<span class="ansi-green-fg">---&gt; 43</span><span class="ansi-red-fg">             </span>exec<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">"raise new_exc from e"</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     44</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     45</span>             <span class="ansi-red-fg"># In python 2, we just let the original exception escape -- better</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-red-fg">PatsyError</span>: Error evaluating factor: AttributeError: 'function' object has no attribute 'outer'
+    y ~ X + self.R_(X)
+            ^^^^^^^^^^</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [35]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">gam</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">plot_x</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">call_and_wrap_exc</span><span class="ansi-blue-fg">(msg, origin, f, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     35</span>     <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 36</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> f<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     37</span>     <span class="ansi-green-fg">except</span> Exception <span class="ansi-green-fg">as</span> e<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">eval</span><span class="ansi-blue-fg">(self, expr, source_name, inner_namespace)</span>
+<span class="ansi-green-intense-fg ansi-bold">    165</span>         return eval(code, {}, VarLookupDict([inner_namespace]
+<span class="ansi-green-fg">--&gt; 166</span><span class="ansi-red-fg">                                             + self._namespaces))
+</span><span class="ansi-green-intense-fg ansi-bold">    167</span> 
+
+<span class="ansi-green-fg">&lt;string&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-red-fg">NameError</span>: name 'R_' is not defined
+
+The above exception was the direct cause of the following exception:
+
+<span class="ansi-red-fg">PatsyError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-35-a5e50dec4ee7&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> plot_x <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>linspace<span class="ansi-blue-fg">(</span>min_time<span class="ansi-blue-fg">,</span> max_time<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">100</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">----&gt; 2</span><span class="ansi-red-fg"> </span>preds <span class="ansi-blue-fg">=</span> gam<span class="ansi-blue-fg">.</span>predict<span class="ansi-blue-fg">(</span>plot_x<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-32-2e1401fc88d4&gt;</span> in <span class="ansi-cyan-fg">predict</span><span class="ansi-blue-fg">(self, X)</span>
+<span class="ansi-green-intense-fg ansi-bold">     41</span> 
+<span class="ansi-green-intense-fg ansi-bold">     42</span>     <span class="ansi-green-fg">def</span> predict<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> X<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 43</span><span class="ansi-red-fg">         </span>plot_X <span class="ansi-blue-fg">=</span> patsy<span class="ansi-blue-fg">.</span>dmatrix<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">'times + R_(times)'</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">'times'</span><span class="ansi-blue-fg">:</span> X<span class="ansi-blue-fg">}</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     44</span>         <span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>results<span class="ansi-blue-fg">.</span>predict<span class="ansi-blue-fg">(</span>plot_X<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">dmatrix</span><span class="ansi-blue-fg">(formula_like, data, eval_env, NA_action, return_type)</span>
+<span class="ansi-green-intense-fg ansi-bold">    289</span>     eval_env <span class="ansi-blue-fg">=</span> EvalEnvironment<span class="ansi-blue-fg">.</span>capture<span class="ansi-blue-fg">(</span>eval_env<span class="ansi-blue-fg">,</span> reference<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    290</span>     (lhs, rhs) = _do_highlevel_design(formula_like, data, eval_env,
+<span class="ansi-green-fg">--&gt; 291</span><span class="ansi-red-fg">                                       NA_action, return_type)
+</span><span class="ansi-green-intense-fg ansi-bold">    292</span>     <span class="ansi-green-fg">if</span> lhs<span class="ansi-blue-fg">.</span>shape<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">!=</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    293</span>         raise PatsyError("encountered outcome variables for a model "
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">_do_highlevel_design</span><span class="ansi-blue-fg">(formula_like, data, eval_env, NA_action, return_type)</span>
+<span class="ansi-green-intense-fg ansi-bold">    163</span>         <span class="ansi-green-fg">return</span> iter<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>data<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    164</span>     design_infos = _try_incr_builders(formula_like, data_iter_maker, eval_env,
+<span class="ansi-green-fg">--&gt; 165</span><span class="ansi-red-fg">                                       NA_action)
+</span><span class="ansi-green-intense-fg ansi-bold">    166</span>     <span class="ansi-green-fg">if</span> design_infos <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    167</span>         return build_design_matrices(design_infos, data,
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">_try_incr_builders</span><span class="ansi-blue-fg">(formula_like, data_iter_maker, eval_env, NA_action)</span>
+<span class="ansi-green-intense-fg ansi-bold">     68</span>                                       data_iter_maker<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">     69</span>                                       eval_env<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">---&gt; 70</span><span class="ansi-red-fg">                                       NA_action)
+</span><span class="ansi-green-intense-fg ansi-bold">     71</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     72</span>         <span class="ansi-green-fg">return</span> <span class="ansi-green-fg">None</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/build.py</span> in <span class="ansi-cyan-fg">design_matrix_builders</span><span class="ansi-blue-fg">(termlists, data_iter_maker, eval_env, NA_action)</span>
+<span class="ansi-green-intense-fg ansi-bold">    694</span>                                                    factor_states<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    695</span>                                                    data_iter_maker<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 696</span><span class="ansi-red-fg">                                                    NA_action)
+</span><span class="ansi-green-intense-fg ansi-bold">    697</span>     <span class="ansi-red-fg"># Now we need the factor infos, which encapsulate the knowledge of</span>
+<span class="ansi-green-intense-fg ansi-bold">    698</span>     <span class="ansi-red-fg"># how to turn any given factor into a chunk of data:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/build.py</span> in <span class="ansi-cyan-fg">_examine_factor_types</span><span class="ansi-blue-fg">(factors, factor_states, data_iter_maker, NA_action)</span>
+<span class="ansi-green-intense-fg ansi-bold">    441</span>     <span class="ansi-green-fg">for</span> data <span class="ansi-green-fg">in</span> data_iter_maker<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    442</span>         <span class="ansi-green-fg">for</span> factor <span class="ansi-green-fg">in</span> list<span class="ansi-blue-fg">(</span>examine_needed<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 443</span><span class="ansi-red-fg">             </span>value <span class="ansi-blue-fg">=</span> factor<span class="ansi-blue-fg">.</span>eval<span class="ansi-blue-fg">(</span>factor_states<span class="ansi-blue-fg">[</span>factor<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    444</span>             <span class="ansi-green-fg">if</span> factor <span class="ansi-green-fg">in</span> cat_sniffers <span class="ansi-green-fg">or</span> guess_categorical<span class="ansi-blue-fg">(</span>value<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    445</span>                 <span class="ansi-green-fg">if</span> factor <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">in</span> cat_sniffers<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">eval</span><span class="ansi-blue-fg">(self, memorize_state, data)</span>
+<span class="ansi-green-intense-fg ansi-bold">    564</span>         return self._eval(memorize_state["eval_code"],
+<span class="ansi-green-intense-fg ansi-bold">    565</span>                           memorize_state<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 566</span><span class="ansi-red-fg">                           data)
+</span><span class="ansi-green-intense-fg ansi-bold">    567</span> 
+<span class="ansi-green-intense-fg ansi-bold">    568</span>     __getstate__ <span class="ansi-blue-fg">=</span> no_pickling
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">_eval</span><span class="ansi-blue-fg">(self, code, memorize_state, data)</span>
+<span class="ansi-green-intense-fg ansi-bold">    549</span>                                  memorize_state<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">"eval_env"</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">.</span>eval<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    550</span>                                  code<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 551</span><span class="ansi-red-fg">                                  inner_namespace=inner_namespace)
+</span><span class="ansi-green-intense-fg ansi-bold">    552</span> 
+<span class="ansi-green-intense-fg ansi-bold">    553</span>     <span class="ansi-green-fg">def</span> memorize_chunk<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> state<span class="ansi-blue-fg">,</span> which_pass<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">call_and_wrap_exc</span><span class="ansi-blue-fg">(msg, origin, f, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     41</span>                                  origin)
+<span class="ansi-green-intense-fg ansi-bold">     42</span>             <span class="ansi-red-fg"># Use 'exec' to hide this syntax from the Python 2 parser:</span>
+<span class="ansi-green-fg">---&gt; 43</span><span class="ansi-red-fg">             </span>exec<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">"raise new_exc from e"</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     44</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     45</span>             <span class="ansi-red-fg"># In python 2, we just let the original exception escape -- better</span>
+
+<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-red-fg">PatsyError</span>: Error evaluating factor: NameError: name 'R_' is not defined
+    times + R_(times)
+            ^^^^^^^^^</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -1273,10 +1629,3494 @@ We build the $f_i$ using a type of function called a spline. Since our data is 1
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Write your post here.</p>
+<h2 id="Pipelines-and-Pandas">Pipelines and Pandas<a class="anchor-link" href="blog/ames-iowa/#Pipelines-and-Pandas">¶</a>
+</h2>
+<p>This is a short post about how to use Scikit-Learn Pipelines so that you have 'Pandas in, pandas out'. I'll build a small data pipeline on the Ames Iowa housing dataset. The first thing is to import the dataset, and inspect it! The data has 82 columns which include 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables (and 2 additional observation identifiers).</p>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ames</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'ames.csv'</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ames</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[3]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead><tr style="text-align: right;">
+<th></th>
+      <th>Order</th>
+      <th>PID</th>
+      <th>MS.SubClass</th>
+      <th>MS.Zoning</th>
+      <th>Lot.Frontage</th>
+      <th>Lot.Area</th>
+      <th>Street</th>
+      <th>Alley</th>
+      <th>Lot.Shape</th>
+      <th>Land.Contour</th>
+      <th>...</th>
+      <th>Pool.Area</th>
+      <th>Pool.QC</th>
+      <th>Fence</th>
+      <th>Misc.Feature</th>
+      <th>Misc.Val</th>
+      <th>Mo.Sold</th>
+      <th>Yr.Sold</th>
+      <th>Sale.Type</th>
+      <th>Sale.Condition</th>
+      <th>SalePrice</th>
+    </tr></thead>
+<tbody>
+<tr>
+<th>0</th>
+      <td>1</td>
+      <td>526301100</td>
+      <td>20</td>
+      <td>RL</td>
+      <td>141.0</td>
+      <td>31770</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>5</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>215000</td>
+    </tr>
+<tr>
+<th>1</th>
+      <td>2</td>
+      <td>526350040</td>
+      <td>20</td>
+      <td>RH</td>
+      <td>80.0</td>
+      <td>11622</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>Reg</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>MnPrv</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>6</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>105000</td>
+    </tr>
+<tr>
+<th>2</th>
+      <td>3</td>
+      <td>526351010</td>
+      <td>20</td>
+      <td>RL</td>
+      <td>81.0</td>
+      <td>14267</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Gar2</td>
+      <td>12500</td>
+      <td>6</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>172000</td>
+    </tr>
+<tr>
+<th>3</th>
+      <td>4</td>
+      <td>526353030</td>
+      <td>20</td>
+      <td>RL</td>
+      <td>93.0</td>
+      <td>11160</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>Reg</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>4</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>244000</td>
+    </tr>
+<tr>
+<th>4</th>
+      <td>5</td>
+      <td>527105010</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>74.0</td>
+      <td>13830</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>MnPrv</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>3</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>189900</td>
+    </tr>
+<tr>
+<th>5</th>
+      <td>6</td>
+      <td>527105030</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>78.0</td>
+      <td>9978</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>6</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>195500</td>
+    </tr>
+<tr>
+<th>6</th>
+      <td>7</td>
+      <td>527127150</td>
+      <td>120</td>
+      <td>RL</td>
+      <td>41.0</td>
+      <td>4920</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>Reg</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>4</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>213500</td>
+    </tr>
+<tr>
+<th>7</th>
+      <td>8</td>
+      <td>527145080</td>
+      <td>120</td>
+      <td>RL</td>
+      <td>43.0</td>
+      <td>5005</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>HLS</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>1</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>191500</td>
+    </tr>
+<tr>
+<th>8</th>
+      <td>9</td>
+      <td>527146030</td>
+      <td>120</td>
+      <td>RL</td>
+      <td>39.0</td>
+      <td>5389</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>3</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>236500</td>
+    </tr>
+<tr>
+<th>9</th>
+      <td>10</td>
+      <td>527162130</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>60.0</td>
+      <td>7500</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>Reg</td>
+      <td>Lvl</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>6</td>
+      <td>2010</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>189000</td>
+    </tr>
+</tbody>
+</table>
+<p>10 rows × 82 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It's always a good idea to set an index on a DataFrame if you have one. In this case, the <code>PID</code> column is a unique identifier.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ames</span> <span class="o">=</span> <span class="n">ames</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'PID'</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ames</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[5]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead><tr style="text-align: right;">
+<th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr></thead>
+<tbody>
+<tr>
+<th>Order</th>
+      <td>2930.0</td>
+      <td>1465.500000</td>
+      <td>845.962470</td>
+      <td>1.0</td>
+      <td>733.25</td>
+      <td>1465.5</td>
+      <td>2197.75</td>
+      <td>2930.0</td>
+    </tr>
+<tr>
+<th>MS.SubClass</th>
+      <td>2930.0</td>
+      <td>57.387372</td>
+      <td>42.638025</td>
+      <td>20.0</td>
+      <td>20.00</td>
+      <td>50.0</td>
+      <td>70.00</td>
+      <td>190.0</td>
+    </tr>
+<tr>
+<th>Lot.Frontage</th>
+      <td>2440.0</td>
+      <td>69.224590</td>
+      <td>23.365335</td>
+      <td>21.0</td>
+      <td>58.00</td>
+      <td>68.0</td>
+      <td>80.00</td>
+      <td>313.0</td>
+    </tr>
+<tr>
+<th>Lot.Area</th>
+      <td>2930.0</td>
+      <td>10147.921843</td>
+      <td>7880.017759</td>
+      <td>1300.0</td>
+      <td>7440.25</td>
+      <td>9436.5</td>
+      <td>11555.25</td>
+      <td>215245.0</td>
+    </tr>
+<tr>
+<th>Overall.Qual</th>
+      <td>2930.0</td>
+      <td>6.094881</td>
+      <td>1.411026</td>
+      <td>1.0</td>
+      <td>5.00</td>
+      <td>6.0</td>
+      <td>7.00</td>
+      <td>10.0</td>
+    </tr>
+<tr>
+<th>Overall.Cond</th>
+      <td>2930.0</td>
+      <td>5.563140</td>
+      <td>1.111537</td>
+      <td>1.0</td>
+      <td>5.00</td>
+      <td>5.0</td>
+      <td>6.00</td>
+      <td>9.0</td>
+    </tr>
+<tr>
+<th>Year.Built</th>
+      <td>2930.0</td>
+      <td>1971.356314</td>
+      <td>30.245361</td>
+      <td>1872.0</td>
+      <td>1954.00</td>
+      <td>1973.0</td>
+      <td>2001.00</td>
+      <td>2010.0</td>
+    </tr>
+<tr>
+<th>Year.Remod.Add</th>
+      <td>2930.0</td>
+      <td>1984.266553</td>
+      <td>20.860286</td>
+      <td>1950.0</td>
+      <td>1965.00</td>
+      <td>1993.0</td>
+      <td>2004.00</td>
+      <td>2010.0</td>
+    </tr>
+<tr>
+<th>Mas.Vnr.Area</th>
+      <td>2907.0</td>
+      <td>101.896801</td>
+      <td>179.112611</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>164.00</td>
+      <td>1600.0</td>
+    </tr>
+<tr>
+<th>BsmtFin.SF.1</th>
+      <td>2929.0</td>
+      <td>442.629566</td>
+      <td>455.590839</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>370.0</td>
+      <td>734.00</td>
+      <td>5644.0</td>
+    </tr>
+<tr>
+<th>BsmtFin.SF.2</th>
+      <td>2929.0</td>
+      <td>49.722431</td>
+      <td>169.168476</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>1526.0</td>
+    </tr>
+<tr>
+<th>Bsmt.Unf.SF</th>
+      <td>2929.0</td>
+      <td>559.262547</td>
+      <td>439.494153</td>
+      <td>0.0</td>
+      <td>219.00</td>
+      <td>466.0</td>
+      <td>802.00</td>
+      <td>2336.0</td>
+    </tr>
+<tr>
+<th>Total.Bsmt.SF</th>
+      <td>2929.0</td>
+      <td>1051.614544</td>
+      <td>440.615067</td>
+      <td>0.0</td>
+      <td>793.00</td>
+      <td>990.0</td>
+      <td>1302.00</td>
+      <td>6110.0</td>
+    </tr>
+<tr>
+<th>X1st.Flr.SF</th>
+      <td>2930.0</td>
+      <td>1159.557679</td>
+      <td>391.890885</td>
+      <td>334.0</td>
+      <td>876.25</td>
+      <td>1084.0</td>
+      <td>1384.00</td>
+      <td>5095.0</td>
+    </tr>
+<tr>
+<th>X2nd.Flr.SF</th>
+      <td>2930.0</td>
+      <td>335.455973</td>
+      <td>428.395715</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>703.75</td>
+      <td>2065.0</td>
+    </tr>
+<tr>
+<th>Low.Qual.Fin.SF</th>
+      <td>2930.0</td>
+      <td>4.676792</td>
+      <td>46.310510</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>1064.0</td>
+    </tr>
+<tr>
+<th>Gr.Liv.Area</th>
+      <td>2930.0</td>
+      <td>1499.690444</td>
+      <td>505.508887</td>
+      <td>334.0</td>
+      <td>1126.00</td>
+      <td>1442.0</td>
+      <td>1742.75</td>
+      <td>5642.0</td>
+    </tr>
+<tr>
+<th>Bsmt.Full.Bath</th>
+      <td>2928.0</td>
+      <td>0.431352</td>
+      <td>0.524820</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>3.0</td>
+    </tr>
+<tr>
+<th>Bsmt.Half.Bath</th>
+      <td>2928.0</td>
+      <td>0.061134</td>
+      <td>0.245254</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>2.0</td>
+    </tr>
+<tr>
+<th>Full.Bath</th>
+      <td>2930.0</td>
+      <td>1.566553</td>
+      <td>0.552941</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>2.0</td>
+      <td>2.00</td>
+      <td>4.0</td>
+    </tr>
+<tr>
+<th>Half.Bath</th>
+      <td>2930.0</td>
+      <td>0.379522</td>
+      <td>0.502629</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>2.0</td>
+    </tr>
+<tr>
+<th>Bedroom.AbvGr</th>
+      <td>2930.0</td>
+      <td>2.854266</td>
+      <td>0.827731</td>
+      <td>0.0</td>
+      <td>2.00</td>
+      <td>3.0</td>
+      <td>3.00</td>
+      <td>8.0</td>
+    </tr>
+<tr>
+<th>Kitchen.AbvGr</th>
+      <td>2930.0</td>
+      <td>1.044369</td>
+      <td>0.214076</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>1.0</td>
+      <td>1.00</td>
+      <td>3.0</td>
+    </tr>
+<tr>
+<th>TotRms.AbvGrd</th>
+      <td>2930.0</td>
+      <td>6.443003</td>
+      <td>1.572964</td>
+      <td>2.0</td>
+      <td>5.00</td>
+      <td>6.0</td>
+      <td>7.00</td>
+      <td>15.0</td>
+    </tr>
+<tr>
+<th>Fireplaces</th>
+      <td>2930.0</td>
+      <td>0.599317</td>
+      <td>0.647921</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>1.0</td>
+      <td>1.00</td>
+      <td>4.0</td>
+    </tr>
+<tr>
+<th>Garage.Yr.Blt</th>
+      <td>2771.0</td>
+      <td>1978.132443</td>
+      <td>25.528411</td>
+      <td>1895.0</td>
+      <td>1960.00</td>
+      <td>1979.0</td>
+      <td>2002.00</td>
+      <td>2207.0</td>
+    </tr>
+<tr>
+<th>Garage.Cars</th>
+      <td>2929.0</td>
+      <td>1.766815</td>
+      <td>0.760566</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>2.0</td>
+      <td>2.00</td>
+      <td>5.0</td>
+    </tr>
+<tr>
+<th>Garage.Area</th>
+      <td>2929.0</td>
+      <td>472.819734</td>
+      <td>215.046549</td>
+      <td>0.0</td>
+      <td>320.00</td>
+      <td>480.0</td>
+      <td>576.00</td>
+      <td>1488.0</td>
+    </tr>
+<tr>
+<th>Wood.Deck.SF</th>
+      <td>2930.0</td>
+      <td>93.751877</td>
+      <td>126.361562</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>168.00</td>
+      <td>1424.0</td>
+    </tr>
+<tr>
+<th>Open.Porch.SF</th>
+      <td>2930.0</td>
+      <td>47.533447</td>
+      <td>67.483400</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>27.0</td>
+      <td>70.00</td>
+      <td>742.0</td>
+    </tr>
+<tr>
+<th>Enclosed.Porch</th>
+      <td>2930.0</td>
+      <td>23.011604</td>
+      <td>64.139059</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>1012.0</td>
+    </tr>
+<tr>
+<th>X3Ssn.Porch</th>
+      <td>2930.0</td>
+      <td>2.592491</td>
+      <td>25.141331</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>508.0</td>
+    </tr>
+<tr>
+<th>Screen.Porch</th>
+      <td>2930.0</td>
+      <td>16.002048</td>
+      <td>56.087370</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>576.0</td>
+    </tr>
+<tr>
+<th>Pool.Area</th>
+      <td>2930.0</td>
+      <td>2.243345</td>
+      <td>35.597181</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>800.0</td>
+    </tr>
+<tr>
+<th>Misc.Val</th>
+      <td>2930.0</td>
+      <td>50.635154</td>
+      <td>566.344288</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>17000.0</td>
+    </tr>
+<tr>
+<th>Mo.Sold</th>
+      <td>2930.0</td>
+      <td>6.216041</td>
+      <td>2.714492</td>
+      <td>1.0</td>
+      <td>4.00</td>
+      <td>6.0</td>
+      <td>8.00</td>
+      <td>12.0</td>
+    </tr>
+<tr>
+<th>Yr.Sold</th>
+      <td>2930.0</td>
+      <td>2007.790444</td>
+      <td>1.316613</td>
+      <td>2006.0</td>
+      <td>2007.00</td>
+      <td>2008.0</td>
+      <td>2009.00</td>
+      <td>2010.0</td>
+    </tr>
+<tr>
+<th>SalePrice</th>
+      <td>2930.0</td>
+      <td>180796.060068</td>
+      <td>79886.692357</td>
+      <td>12789.0</td>
+      <td>129500.00</td>
+      <td>160000.0</td>
+      <td>213500.00</td>
+      <td>755000.0</td>
+    </tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The main comment is that there's a lof of missing data, and that some columns should be dropped entirely (in particular Alley, Pool QC, Fence, Misc Feature, Fireplace QC) - or the dataset documentation needs to be checked to see that N/A isn't a default category in these cases. There's also a mixture of categorical and numerical features, which is a little tricky to handle. Luckily sklearn has the <code>FeatureUnion</code> and <code>Pipeline</code> objects to help us.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ames</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[6]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Order                0
+MS.SubClass          0
+MS.Zoning            0
+Lot.Frontage       490
+Lot.Area             0
+Street               0
+Alley             2732
+Lot.Shape            0
+Land.Contour         0
+Utilities            0
+Lot.Config           0
+Land.Slope           0
+Neighborhood         0
+Condition.1          0
+Condition.2          0
+Bldg.Type            0
+House.Style          0
+Overall.Qual         0
+Overall.Cond         0
+Year.Built           0
+Year.Remod.Add       0
+Roof.Style           0
+Roof.Matl            0
+Exterior.1st         0
+Exterior.2nd         0
+Mas.Vnr.Type        23
+Mas.Vnr.Area        23
+Exter.Qual           0
+Exter.Cond           0
+Foundation           0
+                  ... 
+Bedroom.AbvGr        0
+Kitchen.AbvGr        0
+Kitchen.Qual         0
+TotRms.AbvGrd        0
+Functional           0
+Fireplaces           0
+Fireplace.Qu      1422
+Garage.Type        157
+Garage.Yr.Blt      159
+Garage.Finish      159
+Garage.Cars          1
+Garage.Area          1
+Garage.Qual        159
+Garage.Cond        159
+Paved.Drive          0
+Wood.Deck.SF         0
+Open.Porch.SF        0
+Enclosed.Porch       0
+X3Ssn.Porch          0
+Screen.Porch         0
+Pool.Area            0
+Pool.QC           2917
+Fence             2358
+Misc.Feature      2824
+Misc.Val             0
+Mo.Sold              0
+Yr.Sold              0
+Sale.Type            0
+Sale.Condition       0
+SalePrice            0
+Length: 81, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>First of all, let's build a transformer which drops the columns we suggest. A sklearn compatible transformer is a class which has to have two methods <code>fit</code> (which returns <code>self</code>), and <code>transform</code> (which can return whatever you want). It's a good idea to inherit from <code>sklearn.base.TransformerMixin</code> and <code>sklearn.base.BaseEstimator</code>. The general pattern of a Transformer is:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span>
+
+<span class="k">class</span> <span class="nc">ExampleTransformer</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">do_something_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>These are actually quite simple, and can be quite flexible. Later on, we might see a transformer that uses the <code>fit</code> method. Anyway, here's a column dropper.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">FeatureUnion</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LarsCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span>  <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">mean_squared_log_error</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ColumnDropper</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="sd">'''</span>
+<span class="sd">    Transformer to drop a list of cols</span>
+<span class="sd">    '''</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drop_cols</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drop_cols</span> <span class="o">=</span> <span class="n">drop_cols</span>
+    
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">ames</span><span class="p">[</span><span class="s1">'SalePrice'</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">ames</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">'SalePrice'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">X</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[10]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Index(['Order', 'MS.SubClass', 'MS.Zoning', 'Lot.Frontage', 'Lot.Area',
+       'Street', 'Alley', 'Lot.Shape', 'Land.Contour', 'Utilities',
+       'Lot.Config', 'Land.Slope', 'Neighborhood', 'Condition.1',
+       'Condition.2', 'Bldg.Type', 'House.Style', 'Overall.Qual',
+       'Overall.Cond', 'Year.Built', 'Year.Remod.Add', 'Roof.Style',
+       'Roof.Matl', 'Exterior.1st', 'Exterior.2nd', 'Mas.Vnr.Type',
+       'Mas.Vnr.Area', 'Exter.Qual', 'Exter.Cond', 'Foundation', 'Bsmt.Qual',
+       'Bsmt.Cond', 'Bsmt.Exposure', 'BsmtFin.Type.1', 'BsmtFin.SF.1',
+       'BsmtFin.Type.2', 'BsmtFin.SF.2', 'Bsmt.Unf.SF', 'Total.Bsmt.SF',
+       'Heating', 'Heating.QC', 'Central.Air', 'Electrical', 'X1st.Flr.SF',
+       'X2nd.Flr.SF', 'Low.Qual.Fin.SF', 'Gr.Liv.Area', 'Bsmt.Full.Bath',
+       'Bsmt.Half.Bath', 'Full.Bath', 'Half.Bath', 'Bedroom.AbvGr',
+       'Kitchen.AbvGr', 'Kitchen.Qual', 'TotRms.AbvGrd', 'Functional',
+       'Fireplaces', 'Fireplace.Qu', 'Garage.Type', 'Garage.Yr.Blt',
+       'Garage.Finish', 'Garage.Cars', 'Garage.Area', 'Garage.Qual',
+       'Garage.Cond', 'Paved.Drive', 'Wood.Deck.SF', 'Open.Porch.SF',
+       'Enclosed.Porch', 'X3Ssn.Porch', 'Screen.Porch', 'Pool.Area', 'Pool.QC',
+       'Fence', 'Misc.Feature', 'Misc.Val', 'Mo.Sold', 'Yr.Sold', 'Sale.Type',
+       'Sale.Condition'],
+      dtype='object')</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">'dropper'</span><span class="p">,</span> <span class="n">ColumnDropper</span><span class="p">([</span><span class="s1">'Alley'</span><span class="p">,</span> <span class="s1">'Pool.QC'</span><span class="p">,</span> <span class="s1">'Fence'</span><span class="p">,</span> <span class="s1">'Misc.Feature'</span><span class="p">,</span> <span class="s1">'Fireplace.Qu'</span><span class="p">,</span> <span class="s1">'Order'</span><span class="p">]))])</span>
+<span class="n">X_trans</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X_trans</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[11]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Index(['MS.SubClass', 'MS.Zoning', 'Lot.Frontage', 'Lot.Area', 'Street',
+       'Lot.Shape', 'Land.Contour', 'Utilities', 'Lot.Config', 'Land.Slope',
+       'Neighborhood', 'Condition.1', 'Condition.2', 'Bldg.Type',
+       'House.Style', 'Overall.Qual', 'Overall.Cond', 'Year.Built',
+       'Year.Remod.Add', 'Roof.Style', 'Roof.Matl', 'Exterior.1st',
+       'Exterior.2nd', 'Mas.Vnr.Type', 'Mas.Vnr.Area', 'Exter.Qual',
+       'Exter.Cond', 'Foundation', 'Bsmt.Qual', 'Bsmt.Cond', 'Bsmt.Exposure',
+       'BsmtFin.Type.1', 'BsmtFin.SF.1', 'BsmtFin.Type.2', 'BsmtFin.SF.2',
+       'Bsmt.Unf.SF', 'Total.Bsmt.SF', 'Heating', 'Heating.QC', 'Central.Air',
+       'Electrical', 'X1st.Flr.SF', 'X2nd.Flr.SF', 'Low.Qual.Fin.SF',
+       'Gr.Liv.Area', 'Bsmt.Full.Bath', 'Bsmt.Half.Bath', 'Full.Bath',
+       'Half.Bath', 'Bedroom.AbvGr', 'Kitchen.AbvGr', 'Kitchen.Qual',
+       'TotRms.AbvGrd', 'Functional', 'Fireplaces', 'Garage.Type',
+       'Garage.Yr.Blt', 'Garage.Finish', 'Garage.Cars', 'Garage.Area',
+       'Garage.Qual', 'Garage.Cond', 'Paved.Drive', 'Wood.Deck.SF',
+       'Open.Porch.SF', 'Enclosed.Porch', 'X3Ssn.Porch', 'Screen.Porch',
+       'Pool.Area', 'Misc.Val', 'Mo.Sold', 'Yr.Sold', 'Sale.Type',
+       'Sale.Condition'],
+      dtype='object')</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Another option, especially with columns with missing values, is to impute the value but to include a column telling the model where the imputed values are.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ImputeWithDummy</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols_to_impute</span><span class="p">,</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="s1">'NA'</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols_to_impute</span> <span class="o">=</span> <span class="n">cols_to_impute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fill</span> <span class="o">=</span> <span class="n">fill</span>
+        
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="s1">'mean'</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="s1">'median'</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="s1">'mode'</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">mode</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="s1">'fill'</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fill</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="ow">is</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fill</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">cname</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">cname</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols_to_impute</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">'</span><span class="si">{}</span><span class="s1">_missing'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col</span><span class="p">)]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fill</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">df</span>
+    
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'ames.csv'</span><span class="p">)</span>
+<span class="n">imputer</span> <span class="o">=</span> <span class="n">ImputeWithDummy</span><span class="p">([</span><span class="s1">'Alley'</span><span class="p">],</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">'mode'</span><span class="p">)</span>
+<span class="n">X_transformed</span> <span class="o">=</span> <span class="n">imputer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X_transformed</span><span class="p">[[</span><span class="s1">'Alley'</span><span class="p">,</span> <span class="s1">'Alley_missing'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[12]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead><tr style="text-align: right;">
+<th></th>
+      <th>Alley</th>
+      <th>Alley_missing</th>
+    </tr></thead>
+<tbody>
+<tr>
+<th>0</th>
+      <td>Grvl</td>
+      <td>1</td>
+    </tr>
+<tr>
+<th>1</th>
+      <td>Grvl</td>
+      <td>1</td>
+    </tr>
+<tr>
+<th>2</th>
+      <td>Grvl</td>
+      <td>1</td>
+    </tr>
+<tr>
+<th>3</th>
+      <td>Grvl</td>
+      <td>1</td>
+    </tr>
+<tr>
+<th>4</th>
+      <td>Grvl</td>
+      <td>1</td>
+    </tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Of course, you should always read the data documentation (<a href="https://ww2.amstat.org/publications/jse/v19n3/decock/datadocumentation.txt">https://ww2.amstat.org/publications/jse/v19n3/decock/datadocumentation.txt</a>), and there you'll see for Alley that NaN means No Alley Access, and that we don't need to any imputation at all!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">NaNImpute</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">fill_vals</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fill_vals</span> <span class="o">=</span> <span class="n">fill_vals</span>
+        
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">):</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_vals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The other thing we'll need to consider is that some columns will need to be converted to numeric features first, before an estimator can be fitted. First we'll fit an imputer, and then encode.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">DummyEncoding</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">impute_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Alley'</span><span class="p">,</span> <span class="s1">'Pool.QC'</span><span class="p">,</span> <span class="s1">'Fence'</span><span class="p">,</span> <span class="s1">'Misc.Feature'</span><span class="p">,</span> <span class="s1">'Fireplace.Qu'</span><span class="p">]</span>
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">'impute'</span><span class="p">,</span> <span class="n">ImputeWithDummy</span><span class="p">(</span><span class="n">impute_cols</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">'mode'</span><span class="p">)),</span> <span class="p">(</span><span class="s1">'encode'</span><span class="p">,</span> <span class="n">DummyEncoding</span><span class="p">(</span><span class="n">impute_cols</span><span class="p">))])</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'ames.csv'</span><span class="p">)</span>
+<span class="n">X_trans</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X_trans</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[15]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Index(['Order', 'PID', 'MS.SubClass', 'MS.Zoning', 'Lot.Frontage', 'Lot.Area',
+       'Street', 'Lot.Shape', 'Land.Contour', 'Utilities', 'Lot.Config',
+       'Land.Slope', 'Neighborhood', 'Condition.1', 'Condition.2', 'Bldg.Type',
+       'House.Style', 'Overall.Qual', 'Overall.Cond', 'Year.Built',
+       'Year.Remod.Add', 'Roof.Style', 'Roof.Matl', 'Exterior.1st',
+       'Exterior.2nd', 'Mas.Vnr.Type', 'Mas.Vnr.Area', 'Exter.Qual',
+       'Exter.Cond', 'Foundation', 'Bsmt.Qual', 'Bsmt.Cond', 'Bsmt.Exposure',
+       'BsmtFin.Type.1', 'BsmtFin.SF.1', 'BsmtFin.Type.2', 'BsmtFin.SF.2',
+       'Bsmt.Unf.SF', 'Total.Bsmt.SF', 'Heating', 'Heating.QC', 'Central.Air',
+       'Electrical', 'X1st.Flr.SF', 'X2nd.Flr.SF', 'Low.Qual.Fin.SF',
+       'Gr.Liv.Area', 'Bsmt.Full.Bath', 'Bsmt.Half.Bath', 'Full.Bath',
+       'Half.Bath', 'Bedroom.AbvGr', 'Kitchen.AbvGr', 'Kitchen.Qual',
+       'TotRms.AbvGrd', 'Functional', 'Fireplaces', 'Garage.Type',
+       'Garage.Yr.Blt', 'Garage.Finish', 'Garage.Cars', 'Garage.Area',
+       'Garage.Qual', 'Garage.Cond', 'Paved.Drive', 'Wood.Deck.SF',
+       'Open.Porch.SF', 'Enclosed.Porch', 'X3Ssn.Porch', 'Screen.Porch',
+       'Pool.Area', 'Misc.Val', 'Mo.Sold', 'Yr.Sold', 'Sale.Type',
+       'Sale.Condition', 'SalePrice', 'Alley_missing', 'Pool.QC_missing',
+       'Fence_missing', 'Misc.Feature_missing', 'Fireplace.Qu_missing',
+       'Alley_Pave', 'Pool.QC_Fa', 'Pool.QC_Gd', 'Pool.QC_TA', 'Fence_GdWo',
+       'Fence_MnPrv', 'Fence_MnWw', 'Misc.Feature_Gar2', 'Misc.Feature_Othr',
+       'Misc.Feature_Shed', 'Misc.Feature_TenC', 'Fireplace.Qu_Fa',
+       'Fireplace.Qu_Gd', 'Fireplace.Qu_Po', 'Fireplace.Qu_TA'],
+      dtype='object')</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This dataset has several types of columns - continuous features encoded as ints and floats, but also some ordinal variables have snick in as ints. We'll properly define all the int and float colukmns first:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">float_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Lot.Frontage'</span><span class="p">,</span> 
+              <span class="s1">'Mas.Vnr.Area'</span><span class="p">,</span> 
+              <span class="s1">'BsmtFin.SF.1'</span><span class="p">,</span> 
+              <span class="s1">'BsmtFin.SF.2'</span><span class="p">,</span> 
+              <span class="s1">'Bsmt.Unf.SF'</span><span class="p">,</span>
+              <span class="s1">'Total.Bsmt.SF'</span><span class="p">,</span>
+              <span class="s1">'Garage.Cars'</span><span class="p">,</span>
+              <span class="s1">'Garage.Area'</span>
+             <span class="p">]</span>
+
+<span class="n">int_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'MS.SubClass'</span><span class="p">,</span> 
+            <span class="s1">'Lot.Area'</span><span class="p">,</span>
+            <span class="s1">'X1st.Flr.SF'</span><span class="p">,</span>
+            <span class="s1">'X2nd.Flr.SF'</span><span class="p">,</span> 
+            <span class="s1">'Low.Qual.Fin.SF'</span><span class="p">,</span> 
+            <span class="s1">'Gr.Liv.Area'</span><span class="p">,</span> 
+            <span class="s1">'Full.Bath'</span><span class="p">,</span>
+            <span class="s1">'Half.Bath'</span><span class="p">,</span> 
+            <span class="s1">'Bedroom.AbvGr'</span><span class="p">,</span> 
+            <span class="s1">'Kitchen.AbvGr'</span><span class="p">,</span> 
+            <span class="s1">'TotRms.AbvGrd'</span><span class="p">,</span>
+            <span class="s1">'Fireplaces'</span><span class="p">,</span> 
+            <span class="s1">'Wood.Deck.SF'</span><span class="p">,</span> 
+            <span class="s1">'Open.Porch.SF'</span><span class="p">,</span> 
+            <span class="s1">'Enclosed.Porch'</span><span class="p">,</span>
+            <span class="s1">'X3Ssn.Porch'</span><span class="p">,</span> 
+            <span class="s1">'Screen.Porch'</span><span class="p">,</span> 
+            <span class="s1">'Pool.Area'</span><span class="p">,</span> 
+            <span class="s1">'Misc.Val'</span>
+           <span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, we need some way to deal with ordinal features:</p>
+<ul>
+<li>Lot Shape (Ordinal): General shape of property</li>
+<li>Utilities (Ordinal): Type of utilities available</li>
+<li>Land Slope (Ordinal): Slope of property</li>
+<li>Overall Qual (Ordinal): Rates the overall material and finish of the house</li>
+<li>Overall Cond (Ordinal): Rates the overall condition of the house</li>
+<li>Exter Qual (Ordinal): Evaluates the quality of the material on the exterior</li>
+<li>Exter Cond (Ordinal): Evaluates the present condition of the material on the exterior</li>
+<li>Bsmt Qual (Ordinal): Evaluates the height of the basement</li>
+<li>Bsmt Cond (Ordinal): Evaluates the general condition of the basement</li>
+<li>Bsmt Exposure   (Ordinal): Refers to walkout or garden level walls</li>
+<li>BsmtFin Type 1  (Ordinal): Rating of basement finished area</li>
+<li>BsmtFin Type 2  (Ordinal): Rating of basement finished area (if multiple types)</li>
+<li>HeatingQC (Ordinal): Heating quality and condition</li>
+<li>Electrical (Ordinal): Electrical system</li>
+<li>FireplaceQu (Ordinal): Fireplace quality</li>
+<li>Garage Finish (Ordinal) : Interior finish of the garage</li>
+<li>Garage Qual (Ordinal): Garage quality</li>
+<li>Garage Cond (Ordinal): Garage condition</li>
+<li>Paved Drive (Ordinal): Paved driveway</li>
+<li>Pool QC (Ordinal): Pool quality</li>
+<li>Fence (Ordinal): Fence quality</li>
+</ul>
+<p>To do this we could use the OrdinalEncoder from <a href="http://contrib.scikit-learn.org/categorical-encoding/">http://contrib.scikit-learn.org/categorical-encoding/</a>, which will be included in sklearn in a future release  - but I have trouble getting this to work with Pandas. Another choice is just to write our own. What we'll do instead is to mix ordinal and categorical variables, and use the OneHotEncoder from the category_encoders package.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ord_cols</span>     <span class="o">=</span> <span class="p">[</span><span class="s1">'Lot.Shape'</span><span class="p">,</span>
+                <span class="s1">'Utilities'</span><span class="p">,</span>
+                <span class="s1">'Land.Slope'</span><span class="p">,</span>
+                <span class="s1">'Overall.Qual'</span><span class="p">,</span>
+                <span class="s1">'Overall.Cond'</span><span class="p">,</span>
+                <span class="s1">'Exter.Qual'</span><span class="p">,</span> 
+                <span class="s1">'Exter.Cond'</span><span class="p">,</span>
+                <span class="s1">'Bsmt.Qual'</span><span class="p">,</span>
+                <span class="s1">'Bsmt.Cond'</span><span class="p">,</span> 
+                <span class="s1">'Bsmt.Exposure'</span><span class="p">,</span> 
+                <span class="s1">'BsmtFin.Type.1'</span><span class="p">,</span> 
+                <span class="s1">'BsmtFin.SF.1'</span><span class="p">,</span>
+                <span class="s1">'Heating.QC'</span><span class="p">,</span>
+                <span class="s1">'Electrical'</span><span class="p">,</span>
+                <span class="s1">'Fireplace.Qu'</span><span class="p">,</span>
+                <span class="s1">'Garage.Finish'</span><span class="p">,</span>
+                <span class="s1">'Garage.Qual'</span><span class="p">,</span>
+                <span class="s1">'Garage.Cond'</span><span class="p">,</span>
+                <span class="s1">'Paved.Drive'</span><span class="p">,</span>
+                <span class="s1">'Pool.QC'</span><span class="p">,</span>
+                <span class="s1">'Fence'</span><span class="p">,</span>
+               <span class="p">]</span>
+
+<span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'MS.SubClass'</span><span class="p">,</span>
+            <span class="s1">'MS.Zoning'</span><span class="p">,</span>
+            <span class="s1">'Street'</span><span class="p">,</span>
+            <span class="s1">'Alley'</span><span class="p">,</span>
+            <span class="s1">'Land.Contour'</span><span class="p">,</span>
+            <span class="s1">'Lot.Config'</span><span class="p">,</span>
+            <span class="s1">'Neighborhood'</span><span class="p">,</span>
+            <span class="s1">'Condition.1'</span><span class="p">,</span>
+            <span class="s1">'Condition.2'</span><span class="p">,</span>
+            <span class="s1">'Bldg.Type'</span><span class="p">,</span>
+            <span class="s1">'House.Style'</span><span class="p">,</span>
+            <span class="s1">'Roof.Style'</span><span class="p">,</span>
+            <span class="s1">'Exterior.1st'</span><span class="p">,</span> 
+            <span class="s1">'Exterior.2nd'</span><span class="p">,</span>
+            <span class="s1">'Mas.Vnr.Type'</span><span class="p">,</span>
+            <span class="s1">'Foundation'</span><span class="p">,</span>
+            <span class="s1">'Heating'</span><span class="p">,</span>
+            <span class="s1">'Central.Air'</span><span class="p">,</span>
+            <span class="s1">'Garage.Type'</span><span class="p">,</span>
+            <span class="s1">'Misc.Feature'</span><span class="p">,</span>
+            <span class="s1">'Sale.Type'</span><span class="p">,</span>
+            <span class="s1">'Sale.Condition'</span>
+<span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, we define a few useful transforms and put together our first pipeline.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">DataFrameSelector</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="sd">'''</span>
+<span class="sd">    Select columns from pandas dataframe by specifying a list of column names</span>
+<span class="sd">    '''</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_names</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">col_names</span> <span class="o">=</span> <span class="n">col_names</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">col_names</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Scale</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
+        
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">return</span> <span class="bp">self</span>
+        
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.externals.joblib</span> <span class="k">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">FeatureUnion</span><span class="p">,</span> <span class="n">_fit_transform_one</span><span class="p">,</span> <span class="n">_transform_one</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">sparse</span>
+
+
+<span class="k">class</span> <span class="nc">FeatureUnion</span><span class="p">(</span><span class="n">FeatureUnion</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_transformers</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_fit_transform_one</span><span class="p">)(</span><span class="n">trans</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+                                        <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">trans</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+            <span class="c1"># All transformers are None</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">Xs</span><span class="p">,</span> <span class="n">transformers</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">result</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_transformer_list</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">):</span>
+            <span class="n">Xs</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Xs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge_dataframes_by_column</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Xs</span>
+
+    <span class="k">def</span> <span class="nf">merge_dataframes_by_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Xs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">Xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">"columns"</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">Xs</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_transform_one</span><span class="p">)(</span><span class="n">trans</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">trans</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Xs</span><span class="p">:</span>
+            <span class="c1"># All transformers are None</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">):</span>
+            <span class="n">Xs</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Xs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge_dataframes_by_column</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Xs</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">LabelEncoder</span><span class="p">,</span> <span class="n">LabelBinarizer</span>
+<span class="kn">from</span> <span class="nn">category_encoders</span> <span class="k">import</span> <span class="n">OneHotEncoder</span>
+
+<span class="n">numerical_cols</span> <span class="o">=</span> <span class="n">int_cols</span> <span class="o">+</span> <span class="n">float_cols</span>
+
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">'features'</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">transformer_list</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">'numericals'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+             <span class="p">(</span><span class="s1">'selector'</span><span class="p">,</span> <span class="n">DataFrameSelector</span><span class="p">(</span><span class="n">numerical_cols</span><span class="p">)),</span>
+             <span class="p">(</span><span class="s1">'imputer'</span><span class="p">,</span> <span class="n">ImputeWithDummy</span><span class="p">(</span><span class="n">numerical_cols</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">)),</span>
+             <span class="c1">#('scaling', Scale(numerical_cols))</span>
+        <span class="p">])),</span>
+        
+        <span class="c1">#('categoricals', Pipeline([</span>
+        <span class="c1">#     ('selector', DataFrameSelector(cat_cols)), </span>
+        <span class="c1">#     ('encode', OneHotEncoder(cat_cols, return_df=True)),</span>
+        <span class="c1">#])),</span>
+        
+        <span class="c1">#('NanImpute', Pipeline([</span>
+        <span class="c1">##     ('selector', DataFrameSelector(['Alley', 'Pool.QC', 'Fence', 'Misc.Feature', 'Fireplace.Qu'])),</span>
+        <span class="c1">#     ('nan_impute', NaNImpute(['Alley', 'Pool.QC', 'Fence', 'Misc.Feature', 'Fireplace.Qu'], 'Not Applicable'))</span>
+        <span class="c1">#])),</span>
+    <span class="p">])),</span> 
+<span class="p">])</span>  
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'ames.csv'</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'PID'</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_trans</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X_trans</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[23]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+      <th>MS.SubClass</th>
+      <th>Lot.Area</th>
+      <th>X1st.Flr.SF</th>
+      <th>X2nd.Flr.SF</th>
+      <th>Low.Qual.Fin.SF</th>
+      <th>Gr.Liv.Area</th>
+      <th>Full.Bath</th>
+      <th>Half.Bath</th>
+      <th>Bedroom.AbvGr</th>
+      <th>Kitchen.AbvGr</th>
+      <th>...</th>
+      <th>Pool.Area_missing</th>
+      <th>Misc.Val_missing</th>
+      <th>Lot.Frontage_missing</th>
+      <th>Mas.Vnr.Area_missing</th>
+      <th>BsmtFin.SF.1_missing</th>
+      <th>BsmtFin.SF.2_missing</th>
+      <th>Bsmt.Unf.SF_missing</th>
+      <th>Total.Bsmt.SF_missing</th>
+      <th>Garage.Cars_missing</th>
+      <th>Garage.Area_missing</th>
+    </tr>
+<tr>
+<th>PID</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+<th>526301100</th>
+      <td>20</td>
+      <td>31770</td>
+      <td>1656</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1656</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>526350040</th>
+      <td>20</td>
+      <td>11622</td>
+      <td>896</td>
+      <td>0</td>
+      <td>0</td>
+      <td>896</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>526351010</th>
+      <td>20</td>
+      <td>14267</td>
+      <td>1329</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1329</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>526353030</th>
+      <td>20</td>
+      <td>11160</td>
+      <td>2110</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2110</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527105010</th>
+      <td>60</td>
+      <td>13830</td>
+      <td>928</td>
+      <td>701</td>
+      <td>0</td>
+      <td>1629</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527105030</th>
+      <td>60</td>
+      <td>9978</td>
+      <td>926</td>
+      <td>678</td>
+      <td>0</td>
+      <td>1604</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527127150</th>
+      <td>120</td>
+      <td>4920</td>
+      <td>1338</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1338</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527145080</th>
+      <td>120</td>
+      <td>5005</td>
+      <td>1280</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1280</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527146030</th>
+      <td>120</td>
+      <td>5389</td>
+      <td>1616</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1616</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527162130</th>
+      <td>60</td>
+      <td>7500</td>
+      <td>1028</td>
+      <td>776</td>
+      <td>0</td>
+      <td>1804</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527163010</th>
+      <td>60</td>
+      <td>10000</td>
+      <td>763</td>
+      <td>892</td>
+      <td>0</td>
+      <td>1655</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527165230</th>
+      <td>20</td>
+      <td>7980</td>
+      <td>1187</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1187</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527166040</th>
+      <td>60</td>
+      <td>8402</td>
+      <td>789</td>
+      <td>676</td>
+      <td>0</td>
+      <td>1465</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527180040</th>
+      <td>20</td>
+      <td>10176</td>
+      <td>1341</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1341</td>
+      <td>1</td>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527182190</th>
+      <td>120</td>
+      <td>6820</td>
+      <td>1502</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1502</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527216070</th>
+      <td>60</td>
+      <td>53504</td>
+      <td>1690</td>
+      <td>1589</td>
+      <td>0</td>
+      <td>3279</td>
+      <td>3</td>
+      <td>1</td>
+      <td>4</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527225035</th>
+      <td>50</td>
+      <td>12134</td>
+      <td>1080</td>
+      <td>672</td>
+      <td>0</td>
+      <td>1752</td>
+      <td>2</td>
+      <td>0</td>
+      <td>4</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527258010</th>
+      <td>20</td>
+      <td>11394</td>
+      <td>1856</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1856</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527276150</th>
+      <td>20</td>
+      <td>19138</td>
+      <td>864</td>
+      <td>0</td>
+      <td>0</td>
+      <td>864</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527302110</th>
+      <td>20</td>
+      <td>13175</td>
+      <td>2073</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2073</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527358140</th>
+      <td>20</td>
+      <td>11751</td>
+      <td>1844</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1844</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527358200</th>
+      <td>85</td>
+      <td>10625</td>
+      <td>1173</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1173</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527368020</th>
+      <td>60</td>
+      <td>7500</td>
+      <td>814</td>
+      <td>860</td>
+      <td>0</td>
+      <td>1674</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527402200</th>
+      <td>20</td>
+      <td>11241</td>
+      <td>1004</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1004</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527402250</th>
+      <td>20</td>
+      <td>12537</td>
+      <td>1078</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1078</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527403020</th>
+      <td>20</td>
+      <td>8450</td>
+      <td>1056</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1056</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527404120</th>
+      <td>20</td>
+      <td>8400</td>
+      <td>882</td>
+      <td>0</td>
+      <td>0</td>
+      <td>882</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527425090</th>
+      <td>20</td>
+      <td>10500</td>
+      <td>864</td>
+      <td>0</td>
+      <td>0</td>
+      <td>864</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527427230</th>
+      <td>120</td>
+      <td>5858</td>
+      <td>1337</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1337</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>527451180</th>
+      <td>160</td>
+      <td>1680</td>
+      <td>483</td>
+      <td>504</td>
+      <td>0</td>
+      <td>987</td>
+      <td>1</td>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+<tr>
+<th>916477010</th>
+      <td>20</td>
+      <td>13618</td>
+      <td>1960</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1960</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>921205030</th>
+      <td>20</td>
+      <td>11443</td>
+      <td>2028</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2028</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>921205050</th>
+      <td>20</td>
+      <td>11577</td>
+      <td>1838</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1838</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923125030</th>
+      <td>20</td>
+      <td>31250</td>
+      <td>1600</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1600</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923202025</th>
+      <td>90</td>
+      <td>7020</td>
+      <td>1368</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1368</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923203090</th>
+      <td>120</td>
+      <td>4500</td>
+      <td>1216</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1216</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923203100</th>
+      <td>120</td>
+      <td>4500</td>
+      <td>1337</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1337</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923205120</th>
+      <td>20</td>
+      <td>17217</td>
+      <td>1140</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1140</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923225190</th>
+      <td>160</td>
+      <td>2665</td>
+      <td>616</td>
+      <td>688</td>
+      <td>0</td>
+      <td>1304</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923225240</th>
+      <td>160</td>
+      <td>2665</td>
+      <td>925</td>
+      <td>550</td>
+      <td>0</td>
+      <td>1475</td>
+      <td>2</td>
+      <td>0</td>
+      <td>4</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923225260</th>
+      <td>160</td>
+      <td>3964</td>
+      <td>1291</td>
+      <td>1230</td>
+      <td>0</td>
+      <td>2521</td>
+      <td>2</td>
+      <td>1</td>
+      <td>5</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923225510</th>
+      <td>20</td>
+      <td>10172</td>
+      <td>874</td>
+      <td>0</td>
+      <td>0</td>
+      <td>874</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923226150</th>
+      <td>90</td>
+      <td>11836</td>
+      <td>1652</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1652</td>
+      <td>2</td>
+      <td>0</td>
+      <td>4</td>
+      <td>2</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923226180</th>
+      <td>180</td>
+      <td>1470</td>
+      <td>630</td>
+      <td>0</td>
+      <td>0</td>
+      <td>630</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923226290</th>
+      <td>160</td>
+      <td>1484</td>
+      <td>546</td>
+      <td>546</td>
+      <td>0</td>
+      <td>1092</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923227100</th>
+      <td>20</td>
+      <td>13384</td>
+      <td>1360</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1360</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923228130</th>
+      <td>180</td>
+      <td>1533</td>
+      <td>630</td>
+      <td>0</td>
+      <td>0</td>
+      <td>630</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923228180</th>
+      <td>160</td>
+      <td>1533</td>
+      <td>546</td>
+      <td>546</td>
+      <td>0</td>
+      <td>1092</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923228210</th>
+      <td>160</td>
+      <td>1526</td>
+      <td>546</td>
+      <td>546</td>
+      <td>0</td>
+      <td>1092</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923228260</th>
+      <td>160</td>
+      <td>1936</td>
+      <td>546</td>
+      <td>546</td>
+      <td>0</td>
+      <td>1092</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923228310</th>
+      <td>160</td>
+      <td>1894</td>
+      <td>546</td>
+      <td>546</td>
+      <td>0</td>
+      <td>1092</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923229110</th>
+      <td>90</td>
+      <td>12640</td>
+      <td>1728</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1728</td>
+      <td>2</td>
+      <td>0</td>
+      <td>4</td>
+      <td>2</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923230040</th>
+      <td>90</td>
+      <td>9297</td>
+      <td>1728</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1728</td>
+      <td>2</td>
+      <td>0</td>
+      <td>4</td>
+      <td>2</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923250060</th>
+      <td>20</td>
+      <td>17400</td>
+      <td>1126</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1126</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923251180</th>
+      <td>20</td>
+      <td>20000</td>
+      <td>1224</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1224</td>
+      <td>1</td>
+      <td>0</td>
+      <td>4</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923275080</th>
+      <td>80</td>
+      <td>7937</td>
+      <td>1003</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1003</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923276100</th>
+      <td>20</td>
+      <td>8885</td>
+      <td>902</td>
+      <td>0</td>
+      <td>0</td>
+      <td>902</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>923400125</th>
+      <td>85</td>
+      <td>10441</td>
+      <td>970</td>
+      <td>0</td>
+      <td>0</td>
+      <td>970</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>924100070</th>
+      <td>20</td>
+      <td>10010</td>
+      <td>1389</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1389</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+<tr>
+<th>924151050</th>
+      <td>60</td>
+      <td>9627</td>
+      <td>996</td>
+      <td>1004</td>
+      <td>0</td>
+      <td>2000</td>
+      <td>2</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+</tbody>
+</table>
+<p>2930 rows × 54 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">X_trans</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">'pipeline'</span><span class="p">,</span> <span class="n">pipe</span><span class="p">),</span> <span class="p">(</span><span class="s1">'clf'</span><span class="p">,</span> <span class="n">LarsCV</span><span class="p">())])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[25]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Pipeline(memory=None,
+     steps=[('pipeline', Pipeline(memory=None,
+     steps=[('features', FeatureUnion(n_jobs=1,
+       transformer_list=[('numericals', Pipeline(memory=None,
+     steps=[('selector', DataFrameSelector(col_names=['MS.SubClass', 'Lot.Area', 'X1st.Flr.SF', 'X2nd.Flr.SF', 'Low.Qual.Fin.SF', 'Gr.Liv.Area', 'Fu...max_n_alphas=1000, n_jobs=1, normalize=True,
+    positive=False, precompute='auto', verbose=False))])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[26]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Index(['MS.SubClass', 'Lot.Area', 'X1st.Flr.SF', 'X2nd.Flr.SF',
+       'Low.Qual.Fin.SF', 'Gr.Liv.Area', 'Full.Bath', 'Half.Bath',
+       'Bedroom.AbvGr', 'Kitchen.AbvGr', 'TotRms.AbvGrd', 'Fireplaces',
+       'Wood.Deck.SF', 'Open.Porch.SF', 'Enclosed.Porch', 'X3Ssn.Porch',
+       'Screen.Porch', 'Pool.Area', 'Misc.Val', 'Lot.Frontage', 'Mas.Vnr.Area',
+       'BsmtFin.SF.1', 'BsmtFin.SF.2', 'Bsmt.Unf.SF', 'Total.Bsmt.SF',
+       'Garage.Cars', 'Garage.Area', 'MS.SubClass_missing', 'Lot.Area_missing',
+       'X1st.Flr.SF_missing', 'X2nd.Flr.SF_missing', 'Low.Qual.Fin.SF_missing',
+       'Gr.Liv.Area_missing', 'Full.Bath_missing', 'Half.Bath_missing',
+       'Bedroom.AbvGr_missing', 'Kitchen.AbvGr_missing',
+       'TotRms.AbvGrd_missing', 'Fireplaces_missing', 'Wood.Deck.SF_missing',
+       'Open.Porch.SF_missing', 'Enclosed.Porch_missing',
+       'X3Ssn.Porch_missing', 'Screen.Porch_missing', 'Pool.Area_missing',
+       'Misc.Val_missing', 'Lot.Frontage_missing', 'Mas.Vnr.Area_missing',
+       'BsmtFin.SF.1_missing', 'BsmtFin.SF.2_missing', 'Bsmt.Unf.SF_missing',
+       'Total.Bsmt.SF_missing', 'Garage.Cars_missing', 'Garage.Area_missing'],
+      dtype='object')</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">KFold</span>
+
+<span class="k">def</span> <span class="nf">rmse_cv</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">rmse</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s2">"neg_mean_squared_error"</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">rmse</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [29]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rmse_cv</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[29]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([37647.53964453, 71123.27879506])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">r2_score</span>
+
+<span class="k">def</span> <span class="nf">get_score</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'R2: </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r2_score</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_score</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>R2: 0.6208433062823728
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     </div>
   </div>
