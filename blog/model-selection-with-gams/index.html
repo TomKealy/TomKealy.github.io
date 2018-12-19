@@ -7,12 +7,14 @@
 <link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
 <link href="../../assets/css/ipython.min.css" rel="stylesheet" type="text/css">
 <link href="../../assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
 <meta name="theme-color" content="#5670d4">
 <meta name="generator" content="Nikola (getnikola.com)">
 <link rel="alternate" type="application/rss+xml" title="RSS" href="../../rss.xml">
 <link rel="canonical" href="https://TomKealy.github.io/blog/model-selection-with-gams/">
 <!--[if lt IE 9]><script src="../../assets/js/html5.js"></script><![endif]--><meta name="author" content="Tom Kealy">
 <link rel="prev" href="../the-guts-of-gams/" title="The Guts of GAMs" type="text/html">
+<link rel="next" href="../time-series-forecasting-with-sarimax/" title="Time Series Forecasting with Sarimax" type="text/html">
 <meta property="og:site_name" content="DataTom">
 <meta property="og:title" content="Model Selection with GAMs">
 <meta property="og:url" content="https://TomKealy.github.io/blog/model-selection-with-gams/">
@@ -23,61 +25,68 @@
 <body>
 <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 
-<!-- Menubar -->
-
-<nav class="navbar navbar-inverse navbar-static-top"><div class="container">
-<!-- This keeps the margins nice -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+<!-- Header and menu bar -->
+<div class="container">
+      <header class="blog-header py-3"><div class="row nbb-header align-items-center">
+          <div class="col-md-3 col-xs-2 col-sm-2" style="width: auto;">
+            <button class="navbar-toggler navbar-light bg-light nbb-navbar-toggler" type="button" data-toggle="collapse" data-target=".bs-nav-collapsible" aria-controls="bs-navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="https://TomKealy.github.io/">
-
-                <span id="blog-title">DataTom</span>
-            </a>
+            <div class="collapse bs-nav-collapsible bootblog4-search-form-holder">
+                
+            </div>
         </div>
-<!-- /.navbar-header -->
-        <div class="collapse navbar-collapse" id="bs-navbar" aria-expanded="false">
-            <ul class="nav navbar-nav">
-<li>
-<a href="../../archive.html">Archive</a>
+          <div class="col-md-6 col-xs-10 col-sm-10 bootblog4-brand" style="width: auto;">
+            <a class="navbar-brand blog-header-logo text-dark" href="https://TomKealy.github.io/">
+
+            <span id="blog-title">DataTom</span>
+        </a>
+          </div>
+            <div class="col-md-3 justify-content-end align-items-center bs-nav-collapsible collapse flex-collapse bootblog4-right-nav">
+            <nav class="navbar navbar-light bg-white"><ul class="navbar-nav bootblog4-right-nav">
+<li class="nav-item">
+    <a href="index.ipynb" id="sourcelink" class="nav-link">Source</a>
+    </li>
+
+
+                    
+            </ul></nav>
+</div>
+    </div>
+</header><nav class="navbar navbar-expand-md navbar-light bg-white static-top"><div class="collapse navbar-collapse bs-nav-collapsible" id="bs-navbar">
+            <ul class="navbar-nav nav-fill d-flex w-100">
+<li class="nav-item">
+<a href="../../archive.html" class="nav-link">Archive</a>
                 </li>
-<li>
-<a href="../../categories/">Tags</a>
+<li class="nav-item">
+<a href="../../categories/" class="nav-link">Tags</a>
                 </li>
-<li>
-<a href="../../rss.xml">RSS feed</a>
+<li class="nav-item">
+<a href="../../rss.xml" class="nav-link">RSS feed</a>
 
                 
             </li>
 </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-    <a href="index.ipynb" id="sourcelink">Source</a>
-    </li>
-
-                
-            </ul>
 </div>
 <!-- /.navbar-collapse -->
-    </div>
-<!-- /.container -->
-</nav><!-- End of Menubar --><div class="container" id="content" role="main">
+</nav>
+</div>
+
+<div class="container" id="content" role="main">
     <div class="body-content">
         <!--Body content-->
-        <div class="row">
-            
-            
+        
+        
 <article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article"><header><h1 class="p-name entry-title" itemprop="headline name"><a href="." class="u-url">Model Selection with GAMs</a></h1>
 
         <div class="metadata">
             <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
                     Tom Kealy
             </span></p>
-            <p class="dateline"><a href="." rel="bookmark"><time class="published dt-published" datetime="2018-05-27T12:26:08+02:00" itemprop="datePublished" title="2018-05-27 12:26">2018-05-27 12:26</time></a></p>
+            <p class="dateline">
+            <a href="." rel="bookmark">
+            <time class="published dt-published" datetime="2018-05-27T12:26:08+02:00" itemprop="datePublished" title="2018-05-27 12:26">2018-05-27 12:26</time></a>
+            </p>
             
         <p class="sourceline"><a href="index.ipynb" class="sourcelink">Source</a></p>
 
@@ -85,23 +94,20 @@
         
 
     </header><div class="e-content entry-content" itemprop="articleBody text">
-    <div tabindex="-1" id="notebook" class="border-box-sizing">
-    <div class="container" id="notebook-container">
-
+    <div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The last part of moddeling with (univariate spline) GAMs is choosing the smoothing parameter $ \lambda $. This post will elaborate on this, using the <code>scikit-learn</code> <code>GriddSearchCV</code> functionality to do this.</p>
-<p>We'll use the same data as the last post</p>
+<p>The last part of moddeling with (univariate spline) GAMs is choosing the smoothing parameter $ \lambda $. This post will elaborate on this, using the <code>scikit-learn</code> <code>GriddSearchCV</code> functionality to do this. We'll use <code>pyGAM</code> to do the heavy lifting, and we'll use the same data as the last post</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [19]:</div>
+<div class="prompt input_prompt">In [1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -127,7 +133,7 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Acceleration'</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -137,7 +143,7 @@
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[19]:</div>
+    <div class="prompt output_prompt">Out[1]:</div>
 
 
 
@@ -150,13 +156,13 @@
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,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">
+<img src="data:image/png;base64,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">
 </div>
 
 </div>
@@ -167,80 +173,69 @@
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [32]:</div>
+<div class="prompt input_prompt">In [2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">splines</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
 
-<span class="k">class</span> <span class="nc">SimpleGAM</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
-    
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_knots</span> <span class="o">=</span> <span class="n">n_knots</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span>
-    
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
-        
-        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_knots</span>
-        
-        <span class="n">df_X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">df_y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">knots</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
-        <span class="n">y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">patsy</span><span class="o">.</span><span class="n">dmatrices</span><span class="p">(</span><span class="s1">'y ~ X + self.R_(X)'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
-         
-        
-        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_</span><span class="p">(</span><span class="n">knots</span><span class="p">)</span>
-        
-        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
-        <span class="n">B</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]),</span> <span class="n">tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
-        
-        <span class="n">y_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
-        <span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">B</span><span class="p">))</span>
-    
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span> <span class="n">X_</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span>
-    
-    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">((</span><span class="n">z</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">-</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">240</span><span class="p">)</span> <span class="o">/</span> <span class="mi">24</span>
 
-    <span class="k">def</span> <span class="nf">R_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">knots</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">R_</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">R</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">knots</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="n">y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">patsy</span><span class="o">.</span><span class="n">dmatrices</span><span class="p">(</span><span class="s1">'accel ~ times + R_(times)'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">knots</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
     
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="n">plot_X</span> <span class="o">=</span> <span class="n">patsy</span><span class="o">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s1">'times + R_(times)'</span><span class="p">,</span> <span class="p">{</span><span class="s1">'times'</span><span class="p">:</span> <span class="n">X</span><span class="p">})</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">plot_X</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">GAM</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>    
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">R_</span><span class="p">(</span><span class="n">knots</span><span class="p">)</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]),</span> <span class="n">tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="n">gamma</span><span class="p">):</span>
+        <span class="c1"># build the augmented matrices</span>
+        <span class="n">y_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lambda_</span><span class="p">)</span> <span class="o">*</span> <span class="n">B</span><span class="p">))</span>
+    
+        <span class="k">return</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span> <span class="n">X_</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [33]:</div>
+<div class="prompt input_prompt">In [3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gam</span> <span class="o">=</span> <span class="n">SimpleGAM</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">min_time</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="n">max_time</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="n">plot_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plot_X</span> <span class="o">=</span> <span class="n">patsy</span><span class="o">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s1">'times + R_(times)'</span><span class="p">,</span> <span class="p">{</span><span class="s1">'times'</span><span class="p">:</span> <span class="n">plot_x</span><span class="p">})</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">GAM</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">blue</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">accel</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_x</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">plot_X</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'time'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'accel'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\lambda = </span><span class="si">{}</span><span class="s1">$'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
 </pre></div>
 
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [34]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gam</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">accel</span><span class="p">)</span>
-</pre></div>
-
-</div>
+    </div>
 </div>
 </div>
 
@@ -250,133 +245,7 @@
 
 <div class="output_area">
 
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">call_and_wrap_exc</span><span class="ansi-blue-fg">(msg, origin, f, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">     35</span>     <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 36</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> f<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     37</span>     <span class="ansi-green-fg">except</span> Exception <span class="ansi-green-fg">as</span> e<span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">eval</span><span class="ansi-blue-fg">(self, expr, source_name, inner_namespace)</span>
-<span class="ansi-green-intense-fg ansi-bold">    165</span>         return eval(code, {}, VarLookupDict([inner_namespace]
-<span class="ansi-green-fg">--&gt; 166</span><span class="ansi-red-fg">                                             + self._namespaces))
-</span><span class="ansi-green-intense-fg ansi-bold">    167</span> 
-
-<span class="ansi-green-fg">&lt;string&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
-
-<span class="ansi-green-fg">&lt;ipython-input-32-2e1401fc88d4&gt;</span> in <span class="ansi-cyan-fg">R_</span><span class="ansi-blue-fg">(self, x)</span>
-<span class="ansi-green-intense-fg ansi-bold">     39</span>     <span class="ansi-green-fg">def</span> R_<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> x<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 40</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>R<span class="ansi-blue-fg">.</span>outer<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">,</span> knots<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>astype<span class="ansi-blue-fg">(</span>np<span class="ansi-blue-fg">.</span>float64<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     41</span> 
-
-<span class="ansi-red-fg">AttributeError</span>: 'function' object has no attribute 'outer'
-
-The above exception was the direct cause of the following exception:
-
-<span class="ansi-red-fg">PatsyError</span>                                Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-34-2e435ed1a679&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>gam<span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">.</span>times<span class="ansi-blue-fg">,</span> df<span class="ansi-blue-fg">.</span>accel<span class="ansi-blue-fg">)</span>
-
-<span class="ansi-green-fg">&lt;ipython-input-32-2e1401fc88d4&gt;</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">     19</span>         df <span class="ansi-blue-fg">=</span> pd<span class="ansi-blue-fg">.</span>concat<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> axis<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     20</span>         knots <span class="ansi-blue-fg">=</span> df<span class="ansi-blue-fg">.</span>times<span class="ansi-blue-fg">.</span>quantile<span class="ansi-blue-fg">(</span>np<span class="ansi-blue-fg">.</span>linspace<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span> q<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">---&gt; 21</span><span class="ansi-red-fg">         </span>y<span class="ansi-blue-fg">,</span> X <span class="ansi-blue-fg">=</span> patsy<span class="ansi-blue-fg">.</span>dmatrices<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">'y ~ X + self.R_(X)'</span><span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">=</span>df<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     22</span> 
-<span class="ansi-green-intense-fg ansi-bold">     23</span> 
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">dmatrices</span><span class="ansi-blue-fg">(formula_like, data, eval_env, NA_action, return_type)</span>
-<span class="ansi-green-intense-fg ansi-bold">    308</span>     eval_env <span class="ansi-blue-fg">=</span> EvalEnvironment<span class="ansi-blue-fg">.</span>capture<span class="ansi-blue-fg">(</span>eval_env<span class="ansi-blue-fg">,</span> reference<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    309</span>     (lhs, rhs) = _do_highlevel_design(formula_like, data, eval_env,
-<span class="ansi-green-fg">--&gt; 310</span><span class="ansi-red-fg">                                       NA_action, return_type)
-</span><span class="ansi-green-intense-fg ansi-bold">    311</span>     <span class="ansi-green-fg">if</span> lhs<span class="ansi-blue-fg">.</span>shape<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">==</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    312</span>         <span class="ansi-green-fg">raise</span> PatsyError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">"model is missing required outcome variables"</span><span class="ansi-blue-fg">)</span>
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">_do_highlevel_design</span><span class="ansi-blue-fg">(formula_like, data, eval_env, NA_action, return_type)</span>
-<span class="ansi-green-intense-fg ansi-bold">    163</span>         <span class="ansi-green-fg">return</span> iter<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>data<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    164</span>     design_infos = _try_incr_builders(formula_like, data_iter_maker, eval_env,
-<span class="ansi-green-fg">--&gt; 165</span><span class="ansi-red-fg">                                       NA_action)
-</span><span class="ansi-green-intense-fg ansi-bold">    166</span>     <span class="ansi-green-fg">if</span> design_infos <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    167</span>         return build_design_matrices(design_infos, data,
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">_try_incr_builders</span><span class="ansi-blue-fg">(formula_like, data_iter_maker, eval_env, NA_action)</span>
-<span class="ansi-green-intense-fg ansi-bold">     68</span>                                       data_iter_maker<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">     69</span>                                       eval_env<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-fg">---&gt; 70</span><span class="ansi-red-fg">                                       NA_action)
-</span><span class="ansi-green-intense-fg ansi-bold">     71</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     72</span>         <span class="ansi-green-fg">return</span> <span class="ansi-green-fg">None</span>
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/build.py</span> in <span class="ansi-cyan-fg">design_matrix_builders</span><span class="ansi-blue-fg">(termlists, data_iter_maker, eval_env, NA_action)</span>
-<span class="ansi-green-intense-fg ansi-bold">    694</span>                                                    factor_states<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    695</span>                                                    data_iter_maker<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-fg">--&gt; 696</span><span class="ansi-red-fg">                                                    NA_action)
-</span><span class="ansi-green-intense-fg ansi-bold">    697</span>     <span class="ansi-red-fg"># Now we need the factor infos, which encapsulate the knowledge of</span>
-<span class="ansi-green-intense-fg ansi-bold">    698</span>     <span class="ansi-red-fg"># how to turn any given factor into a chunk of data:</span>
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/build.py</span> in <span class="ansi-cyan-fg">_examine_factor_types</span><span class="ansi-blue-fg">(factors, factor_states, data_iter_maker, NA_action)</span>
-<span class="ansi-green-intense-fg ansi-bold">    441</span>     <span class="ansi-green-fg">for</span> data <span class="ansi-green-fg">in</span> data_iter_maker<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    442</span>         <span class="ansi-green-fg">for</span> factor <span class="ansi-green-fg">in</span> list<span class="ansi-blue-fg">(</span>examine_needed<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 443</span><span class="ansi-red-fg">             </span>value <span class="ansi-blue-fg">=</span> factor<span class="ansi-blue-fg">.</span>eval<span class="ansi-blue-fg">(</span>factor_states<span class="ansi-blue-fg">[</span>factor<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    444</span>             <span class="ansi-green-fg">if</span> factor <span class="ansi-green-fg">in</span> cat_sniffers <span class="ansi-green-fg">or</span> guess_categorical<span class="ansi-blue-fg">(</span>value<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    445</span>                 <span class="ansi-green-fg">if</span> factor <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">in</span> cat_sniffers<span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">eval</span><span class="ansi-blue-fg">(self, memorize_state, data)</span>
-<span class="ansi-green-intense-fg ansi-bold">    564</span>         return self._eval(memorize_state["eval_code"],
-<span class="ansi-green-intense-fg ansi-bold">    565</span>                           memorize_state<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-fg">--&gt; 566</span><span class="ansi-red-fg">                           data)
-</span><span class="ansi-green-intense-fg ansi-bold">    567</span> 
-<span class="ansi-green-intense-fg ansi-bold">    568</span>     __getstate__ <span class="ansi-blue-fg">=</span> no_pickling
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/eval.py</span> in <span class="ansi-cyan-fg">_eval</span><span class="ansi-blue-fg">(self, code, memorize_state, data)</span>
-<span class="ansi-green-intense-fg ansi-bold">    549</span>                                  memorize_state<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">"eval_env"</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">.</span>eval<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    550</span>                                  code<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-fg">--&gt; 551</span><span class="ansi-red-fg">                                  inner_namespace=inner_namespace)
-</span><span class="ansi-green-intense-fg ansi-bold">    552</span> 
-<span class="ansi-green-intense-fg ansi-bold">    553</span>     <span class="ansi-green-fg">def</span> memorize_chunk<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> state<span class="ansi-blue-fg">,</span> which_pass<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">call_and_wrap_exc</span><span class="ansi-blue-fg">(msg, origin, f, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">     41</span>                                  origin)
-<span class="ansi-green-intense-fg ansi-bold">     42</span>             <span class="ansi-red-fg"># Use 'exec' to hide this syntax from the Python 2 parser:</span>
-<span class="ansi-green-fg">---&gt; 43</span><span class="ansi-red-fg">             </span>exec<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">"raise new_exc from e"</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     44</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     45</span>             <span class="ansi-red-fg"># In python 2, we just let the original exception escape -- better</span>
-
-<span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/compat.py</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
-
-<span class="ansi-red-fg">PatsyError</span>: Error evaluating factor: AttributeError: 'function' object has no attribute 'outer'
-    y ~ X + self.R_(X)
-            ^^^^^^^^^^</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [35]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">preds</span> <span class="o">=</span> <span class="n">gam</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">plot_x</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_text output_error">
@@ -400,15 +269,12 @@ The above exception was the direct cause of the following exception:
 The above exception was the direct cause of the following exception:
 
 <span class="ansi-red-fg">PatsyError</span>                                Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-35-a5e50dec4ee7&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> plot_x <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>linspace<span class="ansi-blue-fg">(</span>min_time<span class="ansi-blue-fg">,</span> max_time<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">100</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">----&gt; 2</span><span class="ansi-red-fg"> </span>preds <span class="ansi-blue-fg">=</span> gam<span class="ansi-blue-fg">.</span>predict<span class="ansi-blue-fg">(</span>plot_x<span class="ansi-blue-fg">)</span>
-
-<span class="ansi-green-fg">&lt;ipython-input-32-2e1401fc88d4&gt;</span> in <span class="ansi-cyan-fg">predict</span><span class="ansi-blue-fg">(self, X)</span>
-<span class="ansi-green-intense-fg ansi-bold">     41</span> 
-<span class="ansi-green-intense-fg ansi-bold">     42</span>     <span class="ansi-green-fg">def</span> predict<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> X<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 43</span><span class="ansi-red-fg">         </span>plot_X <span class="ansi-blue-fg">=</span> patsy<span class="ansi-blue-fg">.</span>dmatrix<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">'times + R_(times)'</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">'times'</span><span class="ansi-blue-fg">:</span> X<span class="ansi-blue-fg">}</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     44</span>         <span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>results<span class="ansi-blue-fg">.</span>predict<span class="ansi-blue-fg">(</span>plot_X<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">&lt;ipython-input-3-9eb1425fd693&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> 
+<span class="ansi-green-intense-fg ansi-bold">      4</span> plot_x <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>linspace<span class="ansi-blue-fg">(</span>min_time<span class="ansi-blue-fg">,</span> max_time<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">100</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">----&gt; 5</span><span class="ansi-red-fg"> </span>plot_X <span class="ansi-blue-fg">=</span> patsy<span class="ansi-blue-fg">.</span>dmatrix<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">'times + R_(times)'</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">'times'</span><span class="ansi-blue-fg">:</span> plot_x<span class="ansi-blue-fg">}</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      6</span> 
+<span class="ansi-green-intense-fg ansi-bold">      7</span> results <span class="ansi-blue-fg">=</span> GAM<span class="ansi-blue-fg">(</span>df<span class="ansi-blue-fg">)</span>
 
 <span class="ansi-green-fg">~/anaconda3/lib/python3.6/site-packages/patsy/highlevel.py</span> in <span class="ansi-cyan-fg">dmatrix</span><span class="ansi-blue-fg">(formula_like, data, eval_env, NA_action, return_type)</span>
 <span class="ansi-green-intense-fg ansi-bold">    289</span>     eval_env <span class="ansi-blue-fg">=</span> EvalEnvironment<span class="ansi-blue-fg">.</span>capture<span class="ansi-blue-fg">(</span>eval_env<span class="ansi-blue-fg">,</span> reference<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
@@ -478,21 +344,31 @@ The above exception was the direct cause of the following exception:
 </div>
 
 </div>
-    </div>
-  </div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
 
+    </div>
+</div>
+</div>
+
+</div>
+</div>
     </div>
     <aside class="postpromonav"><nav><ul class="pager hidden-print">
 <li class="previous">
                 <a href="../the-guts-of-gams/" rel="prev" title="The Guts of GAMs">Previous post</a>
             </li>
+            <li class="next">
+                <a href="../time-series-forecasting-with-sarimax/" rel="next" title="Time Series Forecasting with Sarimax">Next post</a>
+            </li>
         </ul></nav></aside><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-SDRP1VVYu+tgAGKhddBSl5+ezofHKZeI+OzxakbIe/Y=" crossorigin="anonymous"></script><script type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax: {inlineMath: [['$latex ','$'], ['\\(','\\)']]}});
-        </script></article>
-</div>
-        <!--End of body content-->
-
-        <footer id="footer">
+        </script></article><!--End of body content--><footer id="footer">
             Contents © 2018         <a href="mailto:tom.kealy.tk@gamil.com">Tom Kealy</a> - Powered by         <a href="https://getnikola.com" rel="nofollow">Nikola</a>         
             
         </footer>
@@ -500,9 +376,15 @@ The above exception was the direct cause of the following exception:
 </div>
 
 
-            <script src="../../assets/js/all-nocdn.js"></script><script>$('a.image-reference:not(.islink) img:not(.islink)').parent().colorbox({rel:"gal",maxWidth:"100%",maxHeight:"100%",scalePhotos:true});</script><!-- fancy dates --><script>
+        <script src="../../assets/js/all-nocdn.js"></script><!-- fancy dates --><script>
     moment.locale("en");
     fancydates(0, "YYYY-MM-DD HH:mm");
-    </script><!-- end fancy dates -->
+    </script><!-- end fancy dates --><script>
+    baguetteBox.run('div#content', {
+        ignoreClass: 'islink',
+        captions: function(element) {
+            return element.getElementsByTagName('img')[0].alt;
+    }});
+    </script>
 </body>
 </html>

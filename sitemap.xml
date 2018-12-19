@@ -15,7 +15,7 @@
  </url>
  <url>
   <loc>https://TomKealy.github.io/archive.html</loc>
-  <lastmod>2018-05-27T10:34:00Z</lastmod>
+  <lastmod>2018-12-19T13:51:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/ames-iowa/</loc>
@@ -24,6 +24,10 @@
  <url>
   <loc>https://TomKealy.github.io/blog/breaking-it-all-down/</loc>
   <lastmod>2018-03-23T12:17:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://TomKealy.github.io/blog/constrained-least-squares/</loc>
+  <lastmod>2018-12-19T13:51:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/distributed-averaging/</loc>
@@ -36,6 +40,10 @@
  <url>
   <loc>https://TomKealy.github.io/blog/gradient-free-gradient-descent/</loc>
   <lastmod>2018-03-23T12:17:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://TomKealy.github.io/blog/local-linear-trend-models-for-time-series/</loc>
+  <lastmod>2018-12-19T13:51:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/model-selection-with-gams/</loc>
@@ -58,6 +66,10 @@
   <lastmod>2018-05-27T10:34:00Z</lastmod>
  </url>
  <url>
+  <loc>https://TomKealy.github.io/blog/time-series-forecasting-with-sarimax/</loc>
+  <lastmod>2018-12-19T13:51:00Z</lastmod>
+ </url>
+ <url>
   <loc>https://TomKealy.github.io/blog/time-series-with-gams/</loc>
   <lastmod>2018-05-21T13:21:00Z</lastmod>
  </url>
@@ -71,6 +83,6 @@
  </url>
  <url>
   <loc>https://TomKealy.github.io/index-1.html</loc>
-  <lastmod>2018-05-27T10:34:00Z</lastmod>
+  <lastmod>2018-12-19T13:51:00Z</lastmod>
  </url>
 </urlset>
