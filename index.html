@@ -189,10 +189,931 @@ $$ y_t = u_{t} + \tau_t + \beta^T\textbf{x} + \varepsilon_t$$$$ u_T = u_{t_1} + 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[2]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead><tr style="text-align: right;">
+<th></th>
+      <th>iclaimsNSA</th>
+      <th>michigan.unemployment</th>
+      <th>idaho.unemployment</th>
+      <th>pennsylvania.unemployment</th>
+      <th>unemployment.filing</th>
+      <th>new.jersey.unemployment</th>
+      <th>department.of.unemployment</th>
+      <th>illinois.unemployment</th>
+      <th>rhode.island.unemployment</th>
+      <th>unemployment.office</th>
+      <th>filing.unemployment</th>
+    </tr></thead>
+<tbody>
+<tr>
+<th>0</th>
+      <td>2.536</td>
+      <td>1.488</td>
+      <td>-0.561</td>
+      <td>1.773</td>
+      <td>0.909</td>
+      <td>2.021</td>
+      <td>1.640</td>
+      <td>0.300</td>
+      <td>1.750</td>
+      <td>0.498</td>
+      <td>0.073</td>
+    </tr>
+<tr>
+<th>1</th>
+      <td>0.882</td>
+      <td>1.100</td>
+      <td>-0.992</td>
+      <td>0.900</td>
+      <td>0.148</td>
+      <td>1.280</td>
+      <td>1.014</td>
+      <td>0.180</td>
+      <td>-0.011</td>
+      <td>0.264</td>
+      <td>0.584</td>
+    </tr>
+<tr>
+<th>2</th>
+      <td>-0.077</td>
+      <td>1.155</td>
+      <td>-1.212</td>
+      <td>1.477</td>
+      <td>0.210</td>
+      <td>1.080</td>
+      <td>1.009</td>
+      <td>0.119</td>
+      <td>-0.028</td>
+      <td>0.031</td>
+      <td>0.448</td>
+    </tr>
+<tr>
+<th>3</th>
+      <td>0.135</td>
+      <td>0.530</td>
+      <td>-1.034</td>
+      <td>1.244</td>
+      <td>-0.308</td>
+      <td>1.067</td>
+      <td>0.734</td>
+      <td>0.727</td>
+      <td>-0.230</td>
+      <td>-0.143</td>
+      <td>-0.269</td>
+    </tr>
+<tr>
+<th>4</th>
+      <td>0.373</td>
+      <td>0.698</td>
+      <td>-1.195</td>
+      <td>0.643</td>
+      <td>0.570</td>
+      <td>1.125</td>
+      <td>0.502</td>
+      <td>0.598</td>
+      <td>0.625</td>
+      <td>-0.219</td>
+      <td>-1.006</td>
+    </tr>
+<tr>
+<th>5</th>
+      <td>-0.437</td>
+      <td>0.441</td>
+      <td>-1.386</td>
+      <td>0.049</td>
+      <td>-0.182</td>
+      <td>0.615</td>
+      <td>-0.226</td>
+      <td>-0.199</td>
+      <td>-0.401</td>
+      <td>-0.526</td>
+      <td>-1.124</td>
+    </tr>
+<tr>
+<th>6</th>
+      <td>-0.556</td>
+      <td>0.405</td>
+      <td>-0.844</td>
+      <td>0.198</td>
+      <td>-0.553</td>
+      <td>0.784</td>
+      <td>-0.518</td>
+      <td>-0.245</td>
+      <td>-0.976</td>
+      <td>-0.699</td>
+      <td>-0.504</td>
+    </tr>
+<tr>
+<th>7</th>
+      <td>-0.432</td>
+      <td>-0.016</td>
+      <td>-1.001</td>
+      <td>-0.401</td>
+      <td>-0.339</td>
+      <td>-0.163</td>
+      <td>-0.550</td>
+      <td>-0.871</td>
+      <td>-1.236</td>
+      <td>-0.884</td>
+      <td>-1.254</td>
+    </tr>
+<tr>
+<th>8</th>
+      <td>-0.460</td>
+      <td>0.271</td>
+      <td>-1.234</td>
+      <td>0.252</td>
+      <td>-0.666</td>
+      <td>0.321</td>
+      <td>-0.558</td>
+      <td>-0.359</td>
+      <td>-0.555</td>
+      <td>-0.778</td>
+      <td>-2.114</td>
+    </tr>
+<tr>
+<th>9</th>
+      <td>-0.698</td>
+      <td>-0.357</td>
+      <td>-1.269</td>
+      <td>-1.189</td>
+      <td>-1.911</td>
+      <td>-0.645</td>
+      <td>-1.468</td>
+      <td>-1.116</td>
+      <td>0.156</td>
+      <td>-1.182</td>
+      <td>-2.958</td>
+    </tr>
+<tr>
+<th>10</th>
+      <td>-0.765</td>
+      <td>-0.006</td>
+      <td>-1.326</td>
+      <td>0.242</td>
+      <td>0.175</td>
+      <td>-0.185</td>
+      <td>-0.912</td>
+      <td>-0.276</td>
+      <td>0.158</td>
+      <td>-0.917</td>
+      <td>-0.939</td>
+    </tr>
+<tr>
+<th>11</th>
+      <td>-0.833</td>
+      <td>-0.647</td>
+      <td>-2.124</td>
+      <td>-0.710</td>
+      <td>-0.140</td>
+      <td>-1.235</td>
+      <td>-1.924</td>
+      <td>-0.978</td>
+      <td>-0.572</td>
+      <td>-1.158</td>
+      <td>-1.758</td>
+    </tr>
+<tr>
+<th>12</th>
+      <td>-0.767</td>
+      <td>-0.282</td>
+      <td>-1.615</td>
+      <td>-0.489</td>
+      <td>-0.556</td>
+      <td>0.879</td>
+      <td>-0.593</td>
+      <td>-0.444</td>
+      <td>-1.992</td>
+      <td>-0.898</td>
+      <td>-0.831</td>
+    </tr>
+<tr>
+<th>13</th>
+      <td>-0.356</td>
+      <td>-0.503</td>
+      <td>-1.035</td>
+      <td>-0.201</td>
+      <td>-0.367</td>
+      <td>-0.340</td>
+      <td>-0.331</td>
+      <td>-0.397</td>
+      <td>-0.897</td>
+      <td>-0.844</td>
+      <td>-0.425</td>
+    </tr>
+<tr>
+<th>14</th>
+      <td>-0.496</td>
+      <td>-0.998</td>
+      <td>-1.356</td>
+      <td>-0.717</td>
+      <td>-0.514</td>
+      <td>-0.806</td>
+      <td>-1.270</td>
+      <td>-0.669</td>
+      <td>-0.338</td>
+      <td>-1.145</td>
+      <td>-1.210</td>
+    </tr>
+<tr>
+<th>15</th>
+      <td>-0.684</td>
+      <td>-0.618</td>
+      <td>-1.060</td>
+      <td>-0.012</td>
+      <td>-0.930</td>
+      <td>-0.093</td>
+      <td>-1.162</td>
+      <td>-0.805</td>
+      <td>-0.373</td>
+      <td>-1.040</td>
+      <td>-0.868</td>
+    </tr>
+<tr>
+<th>16</th>
+      <td>-0.953</td>
+      <td>-0.547</td>
+      <td>-1.437</td>
+      <td>0.007</td>
+      <td>-0.302</td>
+      <td>0.221</td>
+      <td>-1.277</td>
+      <td>-0.504</td>
+      <td>-0.512</td>
+      <td>-0.898</td>
+      <td>-1.441</td>
+    </tr>
+<tr>
+<th>17</th>
+      <td>-0.869</td>
+      <td>-0.403</td>
+      <td>-1.360</td>
+      <td>-0.386</td>
+      <td>-0.129</td>
+      <td>0.001</td>
+      <td>-1.214</td>
+      <td>-0.636</td>
+      <td>0.065</td>
+      <td>-1.069</td>
+      <td>-0.929</td>
+    </tr>
+<tr>
+<th>18</th>
+      <td>-0.831</td>
+      <td>-0.691</td>
+      <td>-1.553</td>
+      <td>-0.002</td>
+      <td>-0.348</td>
+      <td>-0.775</td>
+      <td>-0.428</td>
+      <td>-0.626</td>
+      <td>-0.489</td>
+      <td>-0.858</td>
+      <td>-1.033</td>
+    </tr>
+<tr>
+<th>19</th>
+      <td>-0.858</td>
+      <td>-0.793</td>
+      <td>-1.302</td>
+      <td>-0.401</td>
+      <td>-0.565</td>
+      <td>0.159</td>
+      <td>-0.657</td>
+      <td>-0.855</td>
+      <td>-0.629</td>
+      <td>-0.983</td>
+      <td>-0.942</td>
+    </tr>
+<tr>
+<th>20</th>
+      <td>-0.769</td>
+      <td>-0.654</td>
+      <td>-1.332</td>
+      <td>-0.052</td>
+      <td>-0.432</td>
+      <td>-0.134</td>
+      <td>-0.674</td>
+      <td>-0.562</td>
+      <td>0.569</td>
+      <td>-0.953</td>
+      <td>-1.054</td>
+    </tr>
+<tr>
+<th>21</th>
+      <td>-0.732</td>
+      <td>-0.780</td>
+      <td>-1.362</td>
+      <td>-0.518</td>
+      <td>-0.748</td>
+      <td>0.309</td>
+      <td>-0.366</td>
+      <td>-0.668</td>
+      <td>-0.649</td>
+      <td>-0.550</td>
+      <td>-1.276</td>
+    </tr>
+<tr>
+<th>22</th>
+      <td>-0.682</td>
+      <td>-0.575</td>
+      <td>-1.459</td>
+      <td>-0.390</td>
+      <td>0.024</td>
+      <td>-0.416</td>
+      <td>0.034</td>
+      <td>-0.693</td>
+      <td>-0.846</td>
+      <td>-0.701</td>
+      <td>-0.941</td>
+    </tr>
+<tr>
+<th>23</th>
+      <td>-0.606</td>
+      <td>-0.575</td>
+      <td>-1.522</td>
+      <td>0.589</td>
+      <td>-0.189</td>
+      <td>-0.206</td>
+      <td>-0.129</td>
+      <td>-0.681</td>
+      <td>0.457</td>
+      <td>-0.443</td>
+      <td>-0.218</td>
+    </tr>
+<tr>
+<th>24</th>
+      <td>-0.639</td>
+      <td>-0.792</td>
+      <td>-1.255</td>
+      <td>0.036</td>
+      <td>-0.190</td>
+      <td>1.170</td>
+      <td>-0.284</td>
+      <td>-0.483</td>
+      <td>0.024</td>
+      <td>-0.672</td>
+      <td>-1.335</td>
+    </tr>
+<tr>
+<th>25</th>
+      <td>-0.363</td>
+      <td>-0.189</td>
+      <td>-1.096</td>
+      <td>-0.005</td>
+      <td>-0.299</td>
+      <td>0.858</td>
+      <td>-0.292</td>
+      <td>0.131</td>
+      <td>-0.958</td>
+      <td>-0.453</td>
+      <td>0.058</td>
+    </tr>
+<tr>
+<th>26</th>
+      <td>0.473</td>
+      <td>0.560</td>
+      <td>-1.211</td>
+      <td>-0.024</td>
+      <td>-0.496</td>
+      <td>0.281</td>
+      <td>-0.508</td>
+      <td>-0.297</td>
+      <td>-0.025</td>
+      <td>-0.449</td>
+      <td>-0.401</td>
+    </tr>
+<tr>
+<th>27</th>
+      <td>0.030</td>
+      <td>0.045</td>
+      <td>-1.113</td>
+      <td>-0.113</td>
+      <td>0.441</td>
+      <td>0.599</td>
+      <td>0.283</td>
+      <td>-0.385</td>
+      <td>-0.316</td>
+      <td>-0.472</td>
+      <td>-0.597</td>
+    </tr>
+<tr>
+<th>28</th>
+      <td>-0.688</td>
+      <td>-0.233</td>
+      <td>-1.157</td>
+      <td>-0.408</td>
+      <td>-0.539</td>
+      <td>-0.102</td>
+      <td>-0.729</td>
+      <td>-0.575</td>
+      <td>-0.742</td>
+      <td>-0.585</td>
+      <td>-0.609</td>
+    </tr>
+<tr>
+<th>29</th>
+      <td>-0.963</td>
+      <td>-0.209</td>
+      <td>-1.211</td>
+      <td>-0.113</td>
+      <td>0.134</td>
+      <td>-0.288</td>
+      <td>-0.388</td>
+      <td>-0.535</td>
+      <td>-0.166</td>
+      <td>-0.524</td>
+      <td>-0.880</td>
+    </tr>
+<tr>
+<th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+<tr>
+<th>426</th>
+      <td>-0.450</td>
+      <td>-0.490</td>
+      <td>0.194</td>
+      <td>-0.602</td>
+      <td>-0.408</td>
+      <td>-0.255</td>
+      <td>-0.754</td>
+      <td>0.093</td>
+      <td>-0.540</td>
+      <td>-0.345</td>
+      <td>-0.566</td>
+    </tr>
+<tr>
+<th>427</th>
+      <td>-0.632</td>
+      <td>-0.653</td>
+      <td>0.214</td>
+      <td>-0.623</td>
+      <td>-0.339</td>
+      <td>1.468</td>
+      <td>-0.797</td>
+      <td>0.000</td>
+      <td>-0.558</td>
+      <td>-0.299</td>
+      <td>-0.455</td>
+    </tr>
+<tr>
+<th>428</th>
+      <td>-0.598</td>
+      <td>-0.720</td>
+      <td>0.429</td>
+      <td>-0.542</td>
+      <td>-0.268</td>
+      <td>2.738</td>
+      <td>-0.733</td>
+      <td>0.015</td>
+      <td>-0.596</td>
+      <td>-0.264</td>
+      <td>-0.143</td>
+    </tr>
+<tr>
+<th>429</th>
+      <td>-0.667</td>
+      <td>-0.726</td>
+      <td>0.180</td>
+      <td>-0.435</td>
+      <td>-0.753</td>
+      <td>0.194</td>
+      <td>-1.070</td>
+      <td>-0.047</td>
+      <td>-0.547</td>
+      <td>-0.308</td>
+      <td>-0.563</td>
+    </tr>
+<tr>
+<th>430</th>
+      <td>-0.008</td>
+      <td>-0.662</td>
+      <td>0.293</td>
+      <td>-0.663</td>
+      <td>-0.463</td>
+      <td>-0.317</td>
+      <td>-0.989</td>
+      <td>0.127</td>
+      <td>-0.508</td>
+      <td>-0.215</td>
+      <td>-0.259</td>
+    </tr>
+<tr>
+<th>431</th>
+      <td>-0.182</td>
+      <td>-0.794</td>
+      <td>-0.109</td>
+      <td>-0.660</td>
+      <td>-0.719</td>
+      <td>-0.470</td>
+      <td>-0.752</td>
+      <td>-0.060</td>
+      <td>-0.529</td>
+      <td>-0.011</td>
+      <td>-0.215</td>
+    </tr>
+<tr>
+<th>432</th>
+      <td>-0.180</td>
+      <td>-0.591</td>
+      <td>0.135</td>
+      <td>-0.693</td>
+      <td>-0.349</td>
+      <td>-0.778</td>
+      <td>-0.911</td>
+      <td>0.027</td>
+      <td>-0.378</td>
+      <td>-0.085</td>
+      <td>-0.078</td>
+    </tr>
+<tr>
+<th>433</th>
+      <td>-0.509</td>
+      <td>-0.757</td>
+      <td>0.001</td>
+      <td>-0.799</td>
+      <td>-0.466</td>
+      <td>-0.650</td>
+      <td>-1.129</td>
+      <td>0.094</td>
+      <td>-0.567</td>
+      <td>-0.172</td>
+      <td>-0.622</td>
+    </tr>
+<tr>
+<th>434</th>
+      <td>-0.442</td>
+      <td>-0.827</td>
+      <td>0.194</td>
+      <td>-0.751</td>
+      <td>-0.765</td>
+      <td>-0.612</td>
+      <td>-1.169</td>
+      <td>-0.041</td>
+      <td>-0.475</td>
+      <td>-0.121</td>
+      <td>-0.517</td>
+    </tr>
+<tr>
+<th>435</th>
+      <td>-0.583</td>
+      <td>-0.968</td>
+      <td>-0.306</td>
+      <td>-0.844</td>
+      <td>-0.906</td>
+      <td>-0.652</td>
+      <td>-1.197</td>
+      <td>0.261</td>
+      <td>-0.824</td>
+      <td>-0.043</td>
+      <td>-0.332</td>
+    </tr>
+<tr>
+<th>436</th>
+      <td>-0.536</td>
+      <td>-0.890</td>
+      <td>-0.164</td>
+      <td>-0.760</td>
+      <td>-0.867</td>
+      <td>-0.615</td>
+      <td>-1.007</td>
+      <td>-0.107</td>
+      <td>-0.452</td>
+      <td>0.023</td>
+      <td>-0.399</td>
+    </tr>
+<tr>
+<th>437</th>
+      <td>-0.396</td>
+      <td>-0.948</td>
+      <td>-0.298</td>
+      <td>-1.059</td>
+      <td>-0.776</td>
+      <td>-0.725</td>
+      <td>-0.615</td>
+      <td>-0.092</td>
+      <td>-0.472</td>
+      <td>0.077</td>
+      <td>-0.502</td>
+    </tr>
+<tr>
+<th>438</th>
+      <td>-0.589</td>
+      <td>-0.821</td>
+      <td>-0.070</td>
+      <td>-0.753</td>
+      <td>-0.578</td>
+      <td>-0.397</td>
+      <td>-0.961</td>
+      <td>0.154</td>
+      <td>-0.414</td>
+      <td>0.036</td>
+      <td>-0.223</td>
+    </tr>
+<tr>
+<th>439</th>
+      <td>-0.127</td>
+      <td>-0.839</td>
+      <td>-0.242</td>
+      <td>-0.811</td>
+      <td>-0.604</td>
+      <td>-0.433</td>
+      <td>-0.885</td>
+      <td>0.060</td>
+      <td>-0.416</td>
+      <td>0.340</td>
+      <td>-0.247</td>
+    </tr>
+<tr>
+<th>440</th>
+      <td>-0.234</td>
+      <td>-0.886</td>
+      <td>-0.256</td>
+      <td>-0.665</td>
+      <td>-0.736</td>
+      <td>-0.449</td>
+      <td>-0.637</td>
+      <td>-0.157</td>
+      <td>-0.448</td>
+      <td>0.311</td>
+      <td>-0.030</td>
+    </tr>
+<tr>
+<th>441</th>
+      <td>-0.182</td>
+      <td>-0.796</td>
+      <td>-0.377</td>
+      <td>-0.644</td>
+      <td>-0.689</td>
+      <td>-0.120</td>
+      <td>-0.472</td>
+      <td>-0.055</td>
+      <td>-0.372</td>
+      <td>0.436</td>
+      <td>0.173</td>
+    </tr>
+<tr>
+<th>442</th>
+      <td>-0.187</td>
+      <td>-0.573</td>
+      <td>-0.339</td>
+      <td>-0.497</td>
+      <td>-0.559</td>
+      <td>0.024</td>
+      <td>-0.689</td>
+      <td>-0.049</td>
+      <td>-0.287</td>
+      <td>0.574</td>
+      <td>0.203</td>
+    </tr>
+<tr>
+<th>443</th>
+      <td>0.452</td>
+      <td>-0.370</td>
+      <td>-0.192</td>
+      <td>-0.152</td>
+      <td>-0.148</td>
+      <td>0.318</td>
+      <td>-0.117</td>
+      <td>0.264</td>
+      <td>-0.252</td>
+      <td>0.466</td>
+      <td>0.532</td>
+    </tr>
+<tr>
+<th>444</th>
+      <td>0.568</td>
+      <td>-0.211</td>
+      <td>-0.209</td>
+      <td>-0.433</td>
+      <td>-0.554</td>
+      <td>0.022</td>
+      <td>-0.254</td>
+      <td>0.339</td>
+      <td>-0.537</td>
+      <td>0.926</td>
+      <td>0.343</td>
+    </tr>
+<tr>
+<th>445</th>
+      <td>-0.444</td>
+      <td>-0.147</td>
+      <td>-0.067</td>
+      <td>-0.402</td>
+      <td>-0.689</td>
+      <td>-0.267</td>
+      <td>-0.296</td>
+      <td>0.195</td>
+      <td>-0.626</td>
+      <td>0.760</td>
+      <td>0.171</td>
+    </tr>
+<tr>
+<th>446</th>
+      <td>-0.690</td>
+      <td>-0.452</td>
+      <td>-0.345</td>
+      <td>-0.504</td>
+      <td>-0.522</td>
+      <td>-0.484</td>
+      <td>-0.382</td>
+      <td>0.218</td>
+      <td>-0.525</td>
+      <td>0.730</td>
+      <td>-0.125</td>
+    </tr>
+<tr>
+<th>447</th>
+      <td>-0.626</td>
+      <td>-0.487</td>
+      <td>-0.140</td>
+      <td>-0.412</td>
+      <td>-0.641</td>
+      <td>-0.349</td>
+      <td>-0.592</td>
+      <td>0.234</td>
+      <td>-0.635</td>
+      <td>0.840</td>
+      <td>-0.081</td>
+    </tr>
+<tr>
+<th>448</th>
+      <td>-0.648</td>
+      <td>-0.801</td>
+      <td>-0.224</td>
+      <td>-0.591</td>
+      <td>-0.731</td>
+      <td>-0.780</td>
+      <td>-0.668</td>
+      <td>0.107</td>
+      <td>-0.734</td>
+      <td>0.667</td>
+      <td>-0.307</td>
+    </tr>
+<tr>
+<th>449</th>
+      <td>-0.700</td>
+      <td>-0.679</td>
+      <td>-0.191</td>
+      <td>-0.848</td>
+      <td>-0.829</td>
+      <td>-0.522</td>
+      <td>-0.825</td>
+      <td>0.088</td>
+      <td>-0.431</td>
+      <td>0.742</td>
+      <td>-0.192</td>
+    </tr>
+<tr>
+<th>450</th>
+      <td>-0.694</td>
+      <td>-0.769</td>
+      <td>-0.174</td>
+      <td>-0.825</td>
+      <td>-0.804</td>
+      <td>-0.742</td>
+      <td>-0.865</td>
+      <td>0.051</td>
+      <td>-0.419</td>
+      <td>0.668</td>
+      <td>-0.266</td>
+    </tr>
+<tr>
+<th>451</th>
+      <td>-0.720</td>
+      <td>-0.716</td>
+      <td>-0.312</td>
+      <td>-0.812</td>
+      <td>-0.879</td>
+      <td>0.922</td>
+      <td>-1.279</td>
+      <td>0.132</td>
+      <td>-0.540</td>
+      <td>0.369</td>
+      <td>-0.397</td>
+    </tr>
+<tr>
+<th>452</th>
+      <td>-0.807</td>
+      <td>-0.730</td>
+      <td>-0.319</td>
+      <td>-0.808</td>
+      <td>-0.659</td>
+      <td>-0.678</td>
+      <td>-1.140</td>
+      <td>0.019</td>
+      <td>-0.386</td>
+      <td>0.256</td>
+      <td>-0.359</td>
+    </tr>
+<tr>
+<th>453</th>
+      <td>-0.536</td>
+      <td>-0.728</td>
+      <td>-0.038</td>
+      <td>-0.758</td>
+      <td>-0.829</td>
+      <td>-0.864</td>
+      <td>-1.451</td>
+      <td>-0.110</td>
+      <td>-0.430</td>
+      <td>0.388</td>
+      <td>-0.200</td>
+    </tr>
+<tr>
+<th>454</th>
+      <td>-0.772</td>
+      <td>-0.808</td>
+      <td>-0.264</td>
+      <td>-0.818</td>
+      <td>-0.855</td>
+      <td>-0.878</td>
+      <td>-1.460</td>
+      <td>-0.136</td>
+      <td>-0.423</td>
+      <td>0.226</td>
+      <td>-0.343</td>
+    </tr>
+<tr>
+<th>455</th>
+      <td>-0.816</td>
+      <td>-1.043</td>
+      <td>-0.364</td>
+      <td>-0.824</td>
+      <td>-1.014</td>
+      <td>-0.908</td>
+      <td>-1.639</td>
+      <td>-0.018</td>
+      <td>-0.548</td>
+      <td>0.249</td>
+      <td>-0.399</td>
+    </tr>
+</tbody>
+</table>
+<p>456 rows × 11 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 <div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_feed</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'y'</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">'unemployment.office'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],)),</span> <span class="s1">'T'</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+<span class="n">sm</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">StanModel</span><span class="p">(</span><span class="n">model_code</span><span class="o">=</span><span class="n">stan_code</span><span class="p">)</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">sampling</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_feed</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -219,7 +1140,7 @@ $$ y_t = u_{t} + \tau_t + \beta^T\textbf{x} + \varepsilon_t$$$$ u_T = u_{t_1} + 
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let $y_t$ denote observation $t$ in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$</p>
+<p>Let (y_t) denote observation $t$ in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$</p>
 $$ y_t = Z^T_tu_{t} + \varepsilon_t$$$$ u_T = Tu_{t_1} + R\eta_t $$<p>Where $ \varepsilon_t \sim N\left(0, H_t\right) $ and $ \eta_t \sim N\left(0, Q_t\right) $.</p>
 <p>One usefuel extension of thsi model is the 'basic' structural time series, which can be described in the following equations:</p>
 $$ y_t = u_{t} + \tau_t + \beta^T\textbf{x} + \varepsilon_t$$$$ u_T = u_{t_1} + \delta_{t-1} + \eta_t $$$$ \delta_t = \delta_{t-1} + \nu_t $$$$ \tau_t = -\sum_{s=1}^{S-1} \tau_{t-s} + w_t $$<p>We'll model this in sections, firsly by excluding the seasonal component.</p>

@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="DataTom">
 <meta property="og:title" content="Bayesian Structural Time Series in pystan">
 <meta property="og:url" content="https://TomKealy.github.io/blog/bayesian-structural-time-series-in-pystan/">
-<meta property="og:description" content="Let $y_t$ denote observation $t$ in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$
+<meta property="og:description" content="Let (y_t) denote observation $t$ in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$
 $$ y_t = Z">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2018-12-21T22:55:47+01:00">
@@ -101,7 +101,7 @@ $$ y_t = Z">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let $y_t$ denote observation $t$ in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$</p>
+<p>Let (y_t) denote observation $t$ in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$</p>
 $$ y_t = Z^T_tu_{t} + \varepsilon_t$$$$ u_T = Tu_{t_1} + R\eta_t $$<p>Where $ \varepsilon_t \sim N\left(0, H_t\right) $ and $ \eta_t \sim N\left(0, Q_t\right) $.</p>
 <p>One usefuel extension of thsi model is the 'basic' structural time series, which can be described in the following equations:</p>
 $$ y_t = u_{t} + \tau_t + \beta^T\textbf{x} + \varepsilon_t$$$$ u_T = u_{t_1} + \delta_{t-1} + \eta_t $$$$ \delta_t = \delta_{t-1} + \nu_t $$$$ \tau_t = -\sum_{s=1}^{S-1} \tau_{t-s} + w_t $$<p>We'll model this in sections, firsly by excluding the seasonal component.</p>
