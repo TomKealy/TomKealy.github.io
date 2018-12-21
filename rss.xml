@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataTom</title><link>https://TomKealy.github.io/</link><description>Data Blog</description><atom:link href="https://TomKealy.github.io/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>en</language><copyright>Contents © 2018 &lt;a href="mailto:tom.kealy.tk@gamil.com"&gt;Tom Kealy&lt;/a&gt; </copyright><lastBuildDate>Fri, 21 Dec 2018 23:36:48 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Bayesian Time Series with Seasonality</title><link>https://TomKealy.github.io/blog/bayesian-time-series-with-seasonality/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div&gt;&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataTom</title><link>https://TomKealy.github.io/</link><description>Data Blog</description><atom:link href="https://TomKealy.github.io/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>en</language><copyright>Contents © 2018 &lt;a href="mailto:tom.kealy.tk@gamil.com"&gt;Tom Kealy&lt;/a&gt; </copyright><lastBuildDate>Fri, 21 Dec 2018 23:38:27 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>Bayesian Time Series with Seasonality</title><link>https://TomKealy.github.io/blog/bayesian-time-series-with-seasonality/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div&gt;&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Let $y_t$ denote observation $t$ in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$&lt;/p&gt;
@@ -1298,54 +1298,6 @@ $$ y_t = u_{t} + \tau_t + \beta^T\textbf{x} + \varepsilon_t$$$$ u_T = u_{t_1} + 
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="cell border-box-sizing code_cell rendered"&gt;
-&lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;In [ ]:&lt;/div&gt;
-&lt;div class="inner_cell"&gt;
-    &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;stan_code&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"""data {&lt;/span&gt;
-&lt;span class="s2"&gt;  int &amp;lt;lower=0&amp;gt; T;&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] x;&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] y;&lt;/span&gt;
-&lt;span class="s2"&gt;  int S; &lt;/span&gt;
-&lt;span class="s2"&gt;}&lt;/span&gt;
-
-&lt;span class="s2"&gt;parameters {&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] u_err; //Slope innovation&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] v_err; //Level innovation&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] t_err; //Seasonal innovation&lt;/span&gt;
-&lt;span class="s2"&gt;  real beta;&lt;/span&gt;
-&lt;span class="s2"&gt;  real &amp;lt;lower=0&amp;gt; s_obs;&lt;/span&gt;
-&lt;span class="s2"&gt;  real &amp;lt;lower=0&amp;gt; s_slope;&lt;/span&gt;
-&lt;span class="s2"&gt;  real &amp;lt;lower=0&amp;gt; s_level;&lt;/span&gt;
-&lt;span class="s2"&gt;  real &amp;lt;lower=0&amp;gt; s_seasonal;&lt;/span&gt;
-&lt;span class="s2"&gt;}&lt;/span&gt;
-
-&lt;span class="s2"&gt;transformed parameters {&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] u; //Level&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] v; //Slope&lt;/span&gt;
-&lt;span class="s2"&gt;  vector[T] tau; //Seasonal&lt;/span&gt;
-&lt;span class="s2"&gt;  u[1] = u_err[1];&lt;/span&gt;
-&lt;span class="s2"&gt;  v[1] = v_err[1];&lt;/span&gt;
-&lt;span class="s2"&gt;  for (t in 2:T) {&lt;/span&gt;
-&lt;span class="s2"&gt;    u[t] = u[t-1] + v[t-1] + s_level * u_err[t];&lt;/span&gt;
-&lt;span class="s2"&gt;    v[t] = v[t-1] + s_slope * v_err[t];&lt;/span&gt;
-&lt;span class="s2"&gt;    tau[1] =  &lt;/span&gt;
-&lt;span class="s2"&gt;  }&lt;/span&gt;
-&lt;span class="s2"&gt;}&lt;/span&gt;
-
-&lt;span class="s2"&gt;model {&lt;/span&gt;
-&lt;span class="s2"&gt;  u_err ~ normal(0,1);&lt;/span&gt;
-&lt;span class="s2"&gt;  v_err ~ normal(0,1);&lt;/span&gt;
-&lt;span class="s2"&gt;  y ~ normal (u + beta*x, s_obs);&lt;/span&gt;
-&lt;span class="s2"&gt;}"""&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
 &lt;/div&gt;&lt;/div&gt;</description><guid>https://TomKealy.github.io/blog/bayesian-structural-time-series-in-pystan/</guid><pubDate>Fri, 21 Dec 2018 21:55:47 GMT</pubDate></item><item><title>Local Linear Trend Models for Time Series</title><link>https://TomKealy.github.io/blog/local-linear-trend-models-for-time-series/</link><dc:creator>Tom Kealy</dc:creator><description>&lt;div&gt;&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;

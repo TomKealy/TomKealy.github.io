@@ -361,54 +361,6 @@ $$ y_t = u_{t} + \tau_t + \beta^T\textbf{x} + \varepsilon_t$$$$ u_T = u_{t_1} + 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">stan_code</span> <span class="o">=</span> <span class="s2">"""data {</span>
-<span class="s2">  int &lt;lower=0&gt; T;</span>
-<span class="s2">  vector[T] x;</span>
-<span class="s2">  vector[T] y;</span>
-<span class="s2">  int S; </span>
-<span class="s2">}</span>
-
-<span class="s2">parameters {</span>
-<span class="s2">  vector[T] u_err; //Slope innovation</span>
-<span class="s2">  vector[T] v_err; //Level innovation</span>
-<span class="s2">  vector[T] t_err; //Seasonal innovation</span>
-<span class="s2">  real beta;</span>
-<span class="s2">  real &lt;lower=0&gt; s_obs;</span>
-<span class="s2">  real &lt;lower=0&gt; s_slope;</span>
-<span class="s2">  real &lt;lower=0&gt; s_level;</span>
-<span class="s2">  real &lt;lower=0&gt; s_seasonal;</span>
-<span class="s2">}</span>
-
-<span class="s2">transformed parameters {</span>
-<span class="s2">  vector[T] u; //Level</span>
-<span class="s2">  vector[T] v; //Slope</span>
-<span class="s2">  vector[T] tau; //Seasonal</span>
-<span class="s2">  u[1] = u_err[1];</span>
-<span class="s2">  v[1] = v_err[1];</span>
-<span class="s2">  for (t in 2:T) {</span>
-<span class="s2">    u[t] = u[t-1] + v[t-1] + s_level * u_err[t];</span>
-<span class="s2">    v[t] = v[t-1] + s_slope * v_err[t];</span>
-<span class="s2">    tau[1] =  </span>
-<span class="s2">  }</span>
-<span class="s2">}</span>
-
-<span class="s2">model {</span>
-<span class="s2">  u_err ~ normal(0,1);</span>
-<span class="s2">  v_err ~ normal(0,1);</span>
-<span class="s2">  y ~ normal (u + beta*x, s_obs);</span>
-<span class="s2">}"""</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
 </div>
     </div>
     <aside class="postpromonav"><nav><ul class="pager hidden-print">
