@@ -15,11 +15,15 @@
  </url>
  <url>
   <loc>https://TomKealy.github.io/archive.html</loc>
-  <lastmod>2018-12-23T13:51:00Z</lastmod>
+  <lastmod>2018-12-26T13:43:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/ames-iowa/</loc>
   <lastmod>2018-05-21T13:21:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://TomKealy.github.io/blog/bayesian-feature-selection/</loc>
+  <lastmod>2018-12-26T13:43:00Z</lastmod>
  </url>
  <url>
   <loc>https://TomKealy.github.io/blog/bayesian-structural-time-series-in-pystan/</loc>
@@ -95,6 +99,6 @@
  </url>
  <url>
   <loc>https://TomKealy.github.io/index-1.html</loc>
-  <lastmod>2018-12-23T13:51:00Z</lastmod>
+  <lastmod>2018-12-26T13:43:00Z</lastmod>
  </url>
 </urlset>
