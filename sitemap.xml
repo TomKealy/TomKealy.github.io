@@ -1,104 +1,41 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset
-    xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-                        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
- <url>
-  <loc>https://TomKealy.github.io/</loc>
-  <lastmod>2018-05-27T10:34:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/2018/</loc>
-  <lastmod>2018-03-23T12:17:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/archive.html</loc>
-  <lastmod>2018-12-26T13:43:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/ames-iowa/</loc>
-  <lastmod>2018-05-21T13:21:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/bayesian-feature-selection/</loc>
-  <lastmod>2018-12-26T13:43:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/bayesian-structural-time-series-in-pystan/</loc>
-  <lastmod>2018-12-21T23:28:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/bayesian-time-series-with-seasonality/</loc>
-  <lastmod>2018-12-21T23:28:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/breaking-it-all-down/</loc>
-  <lastmod>2018-03-23T12:17:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/constrained-least-squares/</loc>
-  <lastmod>2018-12-19T13:51:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/distributed-averaging/</loc>
-  <lastmod>2018-03-23T12:17:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/gradient-descent/</loc>
-  <lastmod>2018-03-23T12:17:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/gradient-free-gradient-descent/</loc>
-  <lastmod>2018-03-23T12:17:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/local-linear-trend-models-for-time-series/</loc>
-  <lastmod>2018-12-19T13:51:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/mixed-models/</loc>
-  <lastmod>2018-12-23T13:51:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/model-selection-with-gams/</loc>
-  <lastmod>2018-05-27T10:34:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/more-complex-regularised-linear-regressions/</loc>
-  <lastmod>2018-05-21T10:47:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/neural-networks-from-scratch/</loc>
-  <lastmod>2018-03-25T10:07:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/r/</loc>
-  <lastmod>2018-05-21T10:47:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/the-guts-of-gams/</loc>
-  <lastmod>2018-05-27T10:34:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/time-series-forecasting-with-sarimax/</loc>
-  <lastmod>2018-12-19T13:51:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/time-series-with-gams/</loc>
-  <lastmod>2018-05-21T13:21:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/blog/variants-of-gradient-descent-which-are-useful-to-know/</loc>
-  <lastmod>2018-03-23T12:17:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/categories/</loc>
-  <lastmod>2018-03-23T12:17:00Z</lastmod>
- </url>
- <url>
-  <loc>https://TomKealy.github.io/index-1.html</loc>
-  <lastmod>2018-12-26T13:43:00Z</lastmod>
- </url>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/authors/admin/</loc>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+  </url>
+  
+  <url>
+    <loc>/authors/</loc>
+  </url>
+  
+  <url>
+    <loc>/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+  </url>
+  
+  <url>
+    <loc>/publication_types/</loc>
+  </url>
+  
+  <url>
+    <loc>/publication/</loc>
+  </url>
+  
+  <url>
+    <loc>/talk/</loc>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+  </url>
+  
 </urlset>
