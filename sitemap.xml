@@ -3,11 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/authors/admin/</loc>
+    <loc>/</loc>
+    <lastmod>2019-10-20T17:51:21+02:00</lastmod>
   </url>
   
   <url>
-    <loc>/</loc>
+    <loc>/post/local-linear-models-for-time-series/</loc>
+    <lastmod>2019-10-20T17:51:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2019-10-20T17:51:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/authors/admin/</loc>
   </url>
   
   <url>
@@ -16,10 +27,6 @@
   
   <url>
     <loc>/categories/</loc>
-  </url>
-  
-  <url>
-    <loc>/post/</loc>
   </url>
   
   <url>
