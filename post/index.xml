@@ -19,11 +19,11 @@
       <guid>/post/local-linear-models-for-time-series/</guid>
       <description>&lt;p&gt;Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:&lt;/p&gt;
 
-&lt;p&gt;$$ v_{t+1} \sim N\left(v_t, \sigma_v^2\right) $$&lt;/p&gt;
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ v_{t+1} \sim N\left(v_t, \sigma_v^2\right) \]&lt;/span&gt;&lt;/p&gt;
 
-&lt;p&gt;$$ x&lt;em&gt;t \sim N\left(x&lt;/em&gt;{t-1} + v_{t-1}, \sigma_x^2\right) $$&lt;/p&gt;
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ x_t \sim N\left(x_{t-1} + v_{t-1}, \sigma_x^2\right) \]&lt;/span&gt;&lt;/p&gt;
 
-&lt;p&gt;$$ y_t \sim N\left(x_t, \sigma_y^2\right) $$&lt;/p&gt;
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ y_t \sim N\left(x_t, \sigma_y^2\right) \]&lt;/span&gt;&lt;/p&gt;
 
 &lt;p&gt;Where $\sigma_x^2$ is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance&lt;/p&gt;
 
@@ -46,7 +46,7 @@ passengers.plot(figsize=(15, 10))
 &lt;pre&gt;&lt;code&gt;&amp;lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1eb1f828&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_1_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_1_1.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;In stan we can write out model as follows:&lt;/p&gt;
 
@@ -85,7 +85,7 @@ fit = sm.sampling(data=data_feed, iter=1000)
     fit.plot()
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_6_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_6_0.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;And we can also check the in sample fit visually:&lt;/p&gt;
 
@@ -100,7 +100,7 @@ passengers.plot(figsize=(30, 10))
 &lt;pre&gt;&lt;code&gt;&amp;lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ff665c0&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_9_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_9_1.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;To predict future points, we have to include the extra points in the original stan code&lt;/p&gt;
 
@@ -158,7 +158,7 @@ passengers.plot(figsize=(30, 10))
 &lt;pre&gt;&lt;code&gt;&amp;lt;matplotlib.axes._subplots.AxesSubplot at 0x1a204ff0b8&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_14_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_14_1.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;index = pd.date_range(&#39;1961-01&#39;, periods=10, freq=&#39;MS&#39;)
 &lt;/code&gt;&lt;/pre&gt;
@@ -179,15 +179,15 @@ df_ = pd.concat([df_, pred_df], axis=1)
 &lt;pre&gt;&lt;code&gt;&amp;lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1f9f33c8&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_19_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_19_1.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;So, even though our model has a good in-sample fit, the out of sample predictions are very poor. To solve this, we can add a seasonal component:&lt;/p&gt;
 
-&lt;p&gt;$$ u&lt;em&gt;t \sim N\left(u&lt;/em&gt;{t-1}, \sigma_v^2\right) $$&lt;/p&gt;
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ u_t \sim N\left(u_{t-1}, \sigma_v^2\right) \]&lt;/span&gt;&lt;/p&gt;
 
-&lt;p&gt;$$ s&lt;em&gt;t \sim N\left(-\sum^n&lt;/em&gt;{l=1}s_{t-l}, \sigma_s\right) $$&lt;/p&gt;
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ s_t \sim N\left(-\sum^n_{l=1}s_{t-l}, \sigma_s\right) \]&lt;/span&gt;&lt;/p&gt;
 
-&lt;p&gt;$$ y_t \sim N\left(u_t + s_t, \sigma_y^2\right) $$&lt;/p&gt;
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ y_t \sim N\left(u_t + s_t, \sigma_y^2\right) \]&lt;/span&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;stan_code = &amp;quot;&amp;quot;&amp;quot;data {
     int N;
@@ -251,7 +251,7 @@ df_[[&#39;Passengers&#39;, &#39;pred&#39;,  0, 1, 2, 3, 4, 5, 6, 7, 8, 9]].plot(
 &lt;pre&gt;&lt;code&gt;&amp;lt;matplotlib.axes._subplots.AxesSubplot at 0x1a2118a278&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_23_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_23_1.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;s_pred = samples[&#39;s_pred&#39;].mean(axis=0)
 plt.plot(list(range(0, s_pred.shape[0])), s_pred)
@@ -260,7 +260,7 @@ plt.plot(list(range(0, s_pred.shape[0])), s_pred)
 &lt;pre&gt;&lt;code&gt;[&amp;lt;matplotlib.lines.Line2D at 0x1a25972710&amp;gt;]
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_24_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./local-linear-trend-models-for-time-series_24_1.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;These out of sample predicitons look much better!&lt;/p&gt;
 

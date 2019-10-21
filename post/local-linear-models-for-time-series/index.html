@@ -29,9 +29,9 @@
     
   
   <meta name="description" content="Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:
-$$ v_{t&#43;1} \sim N\left(v_t, \sigma_v^2\right) $$
-$$ xt \sim N\left(x{t-1} &#43; v_{t-1}, \sigma_x^2\right) $$
-$$ y_t \sim N\left(x_t, \sigma_y^2\right) $$
+\[ v_{t&#43;1} \sim N\left(v_t, \sigma_v^2\right) \]
+\[ x_t \sim N\left(x_{t-1} &#43; v_{t-1}, \sigma_x^2\right) \]
+\[ y_t \sim N\left(x_t, \sigma_y^2\right) \]
 Where $\sigma_x^2$ is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance
 We will model this in pystan, using the air passengers dataset.
 import pystan import matplotlib as mpl import matplotlib.">
@@ -123,9 +123,9 @@ import pystan import matplotlib as mpl import matplotlib.">
   <meta property="og:url" content="/post/local-linear-models-for-time-series/">
   <meta property="og:title" content="Local Linear Models for Time Series | Academic">
   <meta property="og:description" content="Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:
-$$ v_{t&#43;1} \sim N\left(v_t, \sigma_v^2\right) $$
-$$ xt \sim N\left(x{t-1} &#43; v_{t-1}, \sigma_x^2\right) $$
-$$ y_t \sim N\left(x_t, \sigma_y^2\right) $$
+\[ v_{t&#43;1} \sim N\left(v_t, \sigma_v^2\right) \]
+\[ x_t \sim N\left(x_{t-1} &#43; v_{t-1}, \sigma_x^2\right) \]
+\[ y_t \sim N\left(x_t, \sigma_y^2\right) \]
 Where $\sigma_x^2$ is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance
 We will model this in pystan, using the air passengers dataset.
 import pystan import matplotlib as mpl import matplotlib."><meta property="og:image" content="/img/icon-192.png">
@@ -180,7 +180,7 @@ import pystan import matplotlib as mpl import matplotlib."><meta property="og:im
       "url": "/img/icon-512.png"
     }
   },
-  "description": "Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:\n$$ v_{t+1} \\sim N\\left(v_t, \\sigma_v^2\\right) $$\n$$ xt \\sim N\\left(x{t-1} + v_{t-1}, \\sigma_x^2\\right) $$\n$$ y_t \\sim N\\left(x_t, \\sigma_y^2\\right) $$\nWhere $\\sigma_x^2$ is the observation error, $\\sigma_y^2$ is the level disturbance, and $\\sigma_v^2$ is the slope distrubance\nWe will model this in pystan, using the air passengers dataset.\nimport pystan import matplotlib as mpl import matplotlib."
+  "description": "Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:\n\\[ v_{t+1} \\sim N\\left(v_t, \\sigma_v^2\\right) \\]\n\\[ x_t \\sim N\\left(x_{t-1} + v_{t-1}, \\sigma_x^2\\right) \\]\n\\[ y_t \\sim N\\left(x_t, \\sigma_y^2\\right) \\]\nWhere $\\sigma_x^2$ is the observation error, $\\sigma_y^2$ is the level disturbance, and $\\sigma_v^2$ is the slope distrubance\nWe will model this in pystan, using the air passengers dataset.\nimport pystan import matplotlib as mpl import matplotlib."
 }
 </script>
 
@@ -607,11 +607,11 @@ import pystan import matplotlib as mpl import matplotlib."><meta property="og:im
     <div class="article-style">
       <p>Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:</p>
 
-<p>$$ v_{t+1} \sim N\left(v_t, \sigma_v^2\right) $$</p>
+<p><span  class="math">\[ v_{t+1} \sim N\left(v_t, \sigma_v^2\right) \]</span></p>
 
-<p>$$ x<em>t \sim N\left(x</em>{t-1} + v_{t-1}, \sigma_x^2\right) $$</p>
+<p><span  class="math">\[ x_t \sim N\left(x_{t-1} + v_{t-1}, \sigma_x^2\right) \]</span></p>
 
-<p>$$ y_t \sim N\left(x_t, \sigma_y^2\right) $$</p>
+<p><span  class="math">\[ y_t \sim N\left(x_t, \sigma_y^2\right) \]</span></p>
 
 <p>Where $\sigma_x^2$ is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance</p>
 
@@ -634,7 +634,7 @@ passengers.plot(figsize=(15, 10))
 <pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1eb1f828&gt;
 </code></pre>
 
-<p><img src="./local-linear-trend-models-for-time-series_1_1.png" alt="png" /></p>
+<p><figure><img src="./local-linear-trend-models-for-time-series_1_1.png" alt="png"></figure></p>
 
 <p>In stan we can write out model as follows:</p>
 
@@ -673,7 +673,7 @@ fit = sm.sampling(data=data_feed, iter=1000)
     fit.plot()
 </code></pre>
 
-<p><img src="./local-linear-trend-models-for-time-series_6_0.png" alt="png" /></p>
+<p><figure><img src="./local-linear-trend-models-for-time-series_6_0.png" alt="png"></figure></p>
 
 <p>And we can also check the in sample fit visually:</p>
 
@@ -688,7 +688,7 @@ passengers.plot(figsize=(30, 10))
 <pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ff665c0&gt;
 </code></pre>
 
-<p><img src="./local-linear-trend-models-for-time-series_9_1.png" alt="png" /></p>
+<p><figure><img src="./local-linear-trend-models-for-time-series_9_1.png" alt="png"></figure></p>
 
 <p>To predict future points, we have to include the extra points in the original stan code</p>
 
@@ -746,7 +746,7 @@ passengers.plot(figsize=(30, 10))
 <pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a204ff0b8&gt;
 </code></pre>
 
-<p><img src="./local-linear-trend-models-for-time-series_14_1.png" alt="png" /></p>
+<p><figure><img src="./local-linear-trend-models-for-time-series_14_1.png" alt="png"></figure></p>
 
 <pre><code class="language-python">index = pd.date_range('1961-01', periods=10, freq='MS')
 </code></pre>
@@ -767,15 +767,15 @@ df_ = pd.concat([df_, pred_df], axis=1)
 <pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1f9f33c8&gt;
 </code></pre>
 
-<p><img src="./local-linear-trend-models-for-time-series_19_1.png" alt="png" /></p>
+<p><figure><img src="./local-linear-trend-models-for-time-series_19_1.png" alt="png"></figure></p>
 
 <p>So, even though our model has a good in-sample fit, the out of sample predictions are very poor. To solve this, we can add a seasonal component:</p>
 
-<p>$$ u<em>t \sim N\left(u</em>{t-1}, \sigma_v^2\right) $$</p>
+<p><span  class="math">\[ u_t \sim N\left(u_{t-1}, \sigma_v^2\right) \]</span></p>
 
-<p>$$ s<em>t \sim N\left(-\sum^n</em>{l=1}s_{t-l}, \sigma_s\right) $$</p>
+<p><span  class="math">\[ s_t \sim N\left(-\sum^n_{l=1}s_{t-l}, \sigma_s\right) \]</span></p>
 
-<p>$$ y_t \sim N\left(u_t + s_t, \sigma_y^2\right) $$</p>
+<p><span  class="math">\[ y_t \sim N\left(u_t + s_t, \sigma_y^2\right) \]</span></p>
 
 <pre><code class="language-python">stan_code = &quot;&quot;&quot;data {
     int N;
@@ -839,7 +839,7 @@ df_[['Passengers', 'pred',  0, 1, 2, 3, 4, 5, 6, 7, 8, 9]].plot(figsize=(30, 10)
 <pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a2118a278&gt;
 </code></pre>
 
-<p><img src="./local-linear-trend-models-for-time-series_23_1.png" alt="png" /></p>
+<p><figure><img src="./local-linear-trend-models-for-time-series_23_1.png" alt="png"></figure></p>
 
 <pre><code class="language-python">s_pred = samples['s_pred'].mean(axis=0)
 plt.plot(list(range(0, s_pred.shape[0])), s_pred)
@@ -848,7 +848,7 @@ plt.plot(list(range(0, s_pred.shape[0])), s_pred)
 <pre><code>[&lt;matplotlib.lines.Line2D at 0x1a25972710&gt;]
 </code></pre>
 
-<p><img src="./local-linear-trend-models-for-time-series_24_1.png" alt="png" /></p>
+<p><figure><img src="./local-linear-trend-models-for-time-series_24_1.png" alt="png"></figure></p>
 
 <p>These out of sample predicitons look much better!</p>
 
@@ -975,6 +975,9 @@ plt.plot(list(range(0, s_pred.shape[0])), s_pred)
 
     
     
+    
+    <script src="/js/mathjax-config.js"></script>
+    
 
     
     
@@ -995,6 +998,8 @@ plt.plot(list(range(0, s_pred.shape[0])), s_pred)
       
 
       
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
       
     
 
