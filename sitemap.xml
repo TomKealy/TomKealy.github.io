@@ -4,16 +4,21 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2019-10-20T17:51:21+02:00</lastmod>
+    <lastmod>2019-10-21T10:04:15+02:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/local-linear-models-for-time-series/</loc>
-    <lastmod>2019-10-20T17:51:21+02:00</lastmod>
+    <loc>/post/gradient-free-gradient-descent/</loc>
+    <lastmod>2019-10-21T10:04:15+02:00</lastmod>
   </url>
   
   <url>
     <loc>/post/</loc>
+    <lastmod>2019-10-21T10:04:15+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/local-linear-models-for-time-series/</loc>
     <lastmod>2019-10-20T17:51:21+02:00</lastmod>
   </url>
   

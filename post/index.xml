@@ -5,12 +5,189 @@
     <link>/post/</link>
       <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 20 Oct 2019 17:51:21 +0200</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 21 Oct 2019 10:04:15 +0200</lastBuildDate>
     <image>
       <url>/img/icon-192.png</url>
       <title>Posts</title>
       <link>/post/</link>
     </image>
+    
+    <item>
+      <title>Gradient Free Gradient Descent</title>
+      <link>/post/gradient-free-gradient-descent/</link>
+      <pubDate>Mon, 21 Oct 2019 10:04:15 +0200</pubDate>
+      <guid>/post/gradient-free-gradient-descent/</guid>
+      <description>&lt;h1 id=&#34;gradient-descent-without-gradients&#34;&gt;Gradient Descent Without Gradients&lt;/h1&gt;
+
+&lt;p&gt;In the last post I introduced Gradient Descent, and used it to a simple linear regression in 1 dimension. The function that did most of the work was:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def gradient_descent(X, y, cost, learning_rate=0.01, num_iters=250):
+    m, n = X.shape
+    theta = np.zeros((n, 1))
+    yhat = theta.T @ X.T
+    yield theta, cost(y.reshape(-1, 1), yhat.T)
+
+    for i in range(num_iters):
+        yhat = theta.T @ X.T
+        yhatt = yhat.T
+        nabla = np.sum(X.T @ (y.reshape(-1, 1) - yhatt), axis=1).reshape(-1, 1)
+        assert(nabla.shape == theta.shape)
+        theta +=  (2 * learning_rate / m) * nabla
+        yield theta, cost(y.reshape(-1, 1), yhat.T)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;However, this function has a drawback - it only works for linear regression. In this post we&#39;ll modify the function to take other losses and perform gradient descent automatically. Let&#39;s first generate some toy data:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import autograd.numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+%config InlineBackend.figure_format = &#39;retina&#39;
+plt.style.use([&#39;seaborn-colorblind&#39;, &#39;seaborn-darkgrid&#39;])
+
+def make_blobs(num_samples=1000, num_features=2, num_classes=2):
+    mu = np.random.rand(num_classes, num_features)
+    sigma = np.ones((num_classes, num_features)) * 0.1
+    samples_per_class = num_samples // num_classes
+    x = np.zeros((num_samples, num_features))
+    y = np.zeros((num_samples, num_classes))
+    for i in range(num_classes):
+        class_samples = np.random.normal(mu[i, :], sigma[i, :], (samples_per_class, num_features))
+        x[i * samples_per_class:(i+1) * samples_per_class] = class_samples
+        y[i * samples_per_class:(i+1) * samples_per_class, i] = 1
+    return x, y
+
+
+def plot_clusters(x, y, num_classes=2):
+    temp = np.argmax(y, axis=1)
+    colours = [&#39;r&#39;, &#39;g&#39;, &#39;b&#39;]
+    for i in range(num_classes):
+        x_class = x[temp == i]
+        plt.scatter(x_class[:, 0], x_class[:, 1], color=colours[i], s=1)
+    plt.show()
+
+NUM_FEATURES=50
+NUM_CLASSES=2
+NUM_SAMPLES=1000
+
+X, y, = make_blobs(num_samples=NUM_SAMPLES, num_features=NUM_FEATURES, num_classes=NUM_CLASSES)
+plot_clusters(X, y, num_classes=NUM_CLASSES)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./gradient-free-gradient-descent_4_0.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;X
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;array([[-0.05461888,  0.93787102, -0.09551936, ...,  0.02657511,
+         0.72509201,  0.68530672],
+       [-0.09366208,  0.7994963 ,  0.008594  , ...,  0.12660328,
+         0.60329672,  0.66772192],
+       [ 0.13367689,  0.81014452, -0.10304008, ...,  0.15666234,
+         0.71245837,  0.57504779],
+       ...,
+       [ 0.9828324 ,  0.82414756,  0.55084061, ...,  0.23759356,
+         1.06799085,  0.56271078],
+       [ 0.77171086,  0.93970304,  0.37411522, ...,  0.04376771,
+         0.95470468,  0.43622007],
+       [ 0.8846701 ,  0.89806374,  0.35203692, ...,  0.09546763,
+         1.09566046,  0.5202908 ]])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&#39;ll predict the class of each point using softmax (multinomial logistic) regression. The model has a matrix $ W $ of weights, which measures for each feature how likely that feature is to be in a particular. It is of size $ \mathrm{n_{features}} \times \mathrm{n_{classes}} $. The goal of softmax regression is to learn such a matrix. Given a matrix of weights, $ W $, and matrix of points, $ X $, it predicts the probability od each class given the samples&lt;/p&gt;
+
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ p\left( y_i | x_i ; w \right) = \frac{e^{w_j^T x_i}}{\sum_j e^{w_j^T x_i}}\]&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;This prediction is encapsulated in the following function:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def sigmoid(x):
+    prob = 1.0 / (1.0 + np.exp(-x))
+    return prob
+
+def predict(w, x):
+    return sigmoid(np.dot(x, w))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To get a feel we&#39;ll make a random guess:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;weights = np.random.randn(NUM_FEATURES, NUM_CLASSES)
+y_pred = predict(weights, X)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;plot_clusters(X, y_pred, NUM_CLASSES)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./gradient-free-gradient-descent_10_0.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, that looks nothing like the real clusters!&lt;/p&gt;
+
+&lt;p&gt;Logistic regression minimises the following loss function:&lt;/p&gt;
+
+&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ J\left(w\right) = y * p\left( y_i | x_i ; w \right) + (1-y) * (1 - p\left( y_i | x_i ; w \right)) \]&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;There is a mathematical justification for why this is the right loss to use, but heuristically, this loss minimises the probability error between the predicition classes and the true classes.&lt;/p&gt;
+
+&lt;p&gt;In python, the loss can be written:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def loss(weights, inputs, targets):
+    num_samples = inputs.shape[0]
+    y_pred = predict(weights, inputs)
+    label_probabilities = y_pred * targets + (1 - y_pred) * (1 - targets)
+    return -np.sum(np.log(label_probabilities))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;loss(weights, X, y)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;4750.573533547572
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&#39;re now in a position to do gradient descent!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from autograd import grad
+gradient = grad(loss)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def gradient_descent_auto(X, y, cost, num_classes=2, learning_rate=0.001, num_iters=20):
+    from autograd import grad
+    num_samples, num_features = X.shape
+    weights = np.zeros((num_features, num_classes))
+    gradient = grad(cost)
+    yield weights, cost(weights, X, y)
+
+    for i in range(num_iters):
+        nabla = gradient(weights, X, y)
+        weights = weights - learning_rate * nabla
+        yield weights, cost(weights, X, y)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;weights = gradient_descent_auto(X, y, loss, learning_rate=0.001, num_classes=NUM_CLASSES)
+w = list(weights)
+costs = [x[1] for x in w]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;predictions = predict(w[-1][0], X)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;plot_clusters(X, predictions, NUM_CLASSES)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./gradient-free-gradient-descent_19_0.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;plt.plot(costs)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;[&amp;lt;matplotlib.lines.Line2D at 0x11e28a9b0&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;./gradient-free-gradient-descent_20_1.png&#34; alt=&#34;png&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Local Linear Models for Time Series</title>
@@ -25,7 +202,7 @@
 
 &lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ y_t \sim N\left(x_t, \sigma_y^2\right) \]&lt;/span&gt;&lt;/p&gt;
 
-&lt;p&gt;Where $\sigma_x^2$ is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance&lt;/p&gt;
+&lt;p&gt;Where \(\sigma_x^2\) is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance&lt;/p&gt;
 
 &lt;p&gt;We will model this in pystan, using the air passengers dataset.&lt;/p&gt;
 
@@ -107,7 +284,7 @@ passengers.plot(figsize=(30, 10))
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;stan_code = &amp;quot;&amp;quot;&amp;quot;data {
     int N;
     vector[N] X;
-    int pred_num; 
+    int pred_num;
 }
 
 parameters {
@@ -123,7 +300,7 @@ model {
     u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
     X ~ normal(u, s_x);
 }
-    
+
 generated quantities {
     vector[N + pred_num] u_pred;
     vector[pred_num] x_pred;
