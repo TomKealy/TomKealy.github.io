@@ -4,16 +4,21 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2019-10-22T18:31:54+02:00</lastmod>
+    <lastmod>2019-10-22T18:47:47+02:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/gradient-descent/</loc>
-    <lastmod>2019-10-22T18:31:54+02:00</lastmod>
+    <loc>/post/neural-networks-from-scratch/</loc>
+    <lastmod>2019-10-22T18:47:47+02:00</lastmod>
   </url>
   
   <url>
     <loc>/post/</loc>
+    <lastmod>2019-10-22T18:47:47+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/gradient-descent/</loc>
     <lastmod>2019-10-22T18:31:54+02:00</lastmod>
   </url>
   
