@@ -5,12 +5,186 @@
     <link>/</link>
       <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <description>Academic</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 22 Oct 2019 18:47:47 +0200</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 22 Oct 2019 19:00:19 +0200</lastBuildDate>
     <image>
       <url>/img/icon-192.png</url>
       <title>Academic</title>
       <link>/</link>
     </image>
+    
+    <item>
+      <title>Regularised Linear Regressions</title>
+      <link>/post/regularised-linear-regressions/</link>
+      <pubDate>Tue, 22 Oct 2019 19:00:19 +0200</pubDate>
+      <guid>/post/regularised-linear-regressions/</guid>
+      <description>&lt;p&gt;We have previously considered models of the form:&lt;/p&gt;
+
+&lt;p&gt;$$ \hat{y} = \beta X + w $$&lt;/p&gt;
+
+&lt;p&gt;where we have measured how well the model is doing by minimising the function:&lt;/p&gt;
+
+&lt;p&gt;$$ J\left( \beta \right) = \frac{1}{n} \lVert y - \hat{y} \rVert $$&lt;/p&gt;
+
+&lt;p&gt;However, this method doesn&amp;rsquo;t allow us to encode some of the ideas we may have about \(\beta\).&lt;/p&gt;
+
+&lt;p&gt;In least squares regression we are (essentially) solving a series of equations:&lt;/p&gt;
+
+&lt;p&gt;$$ y = X \beta $$&lt;/p&gt;
+
+&lt;p&gt;but the problem may be ill posed: there may be no \(\beta\), or many, which satisfy the above equation. Also, many systems we are interested in moddeling act like low-pass filters going in the direction \(X \beta\), so inverting the system naively will act like a high-pass filter and will amplify noise. We can give preference to particular solutions by instead minimising:&lt;/p&gt;
+
+&lt;p&gt;$$ J\left( \theta \right) = \frac{1}{n} \lVert y - \hat{y} \rVert_2^2 + \lVert \Gamma \beta \rVert_2^2 $$&lt;/p&gt;
+
+&lt;p&gt;Luckily, this equation has a closed form solution:&lt;/p&gt;
+
+&lt;p&gt;$$ \hat{\beta} = \left(X^T X + \Gamma^T \Gamma \right)^{-1} X^T y $$&lt;/p&gt;
+
+&lt;p&gt;which can be found the same way as the closed form solution for Linear Regression. A particularly important case is \(\Gamma = \lambda 1\) (a constant times the identity matrix), which is known by the name of Ridge Regression.&lt;/p&gt;
+
+&lt;p&gt;Sometimes we have more complex priors about which solutions we require from any particular optimisation problem, and many cannot be solved by simply taking the gradient. For example&lt;/p&gt;
+
+&lt;p&gt;$$ J\left( \theta \right) = \frac{1}{n} \lVert y - \hat{y} \rVert_2^2 + \lVert \beta \rVert_1 $$&lt;/p&gt;
+
+&lt;p&gt;this optimisation problem is non differentiable! Or consider&lt;/p&gt;
+
+&lt;p&gt;$$ J\left( \theta \right) = \frac{1}{n} \lVert y - \hat{y} \rVert_2^2 + \lVert \nabla \beta \rVert_1 $$&lt;/p&gt;
+
+&lt;p&gt;or&lt;/p&gt;
+
+&lt;p&gt;$$ J\left( \theta \right) = \frac{1}{n} \lVert y - \hat{y} \rVert_2^2 + \lVert \beta \rVert_0 $$&lt;/p&gt;
+
+&lt;p&gt;where&lt;/p&gt;
+
+&lt;p&gt;$$ \lVert \beta \rVert_0 = {\beta \neq 0 } $$&lt;/p&gt;
+
+&lt;p&gt;None of these optimisation problems can be solved in the straightforward way that we solved Ridge regression.&lt;/p&gt;
+
+&lt;p&gt;These optimisation problem can be solved by using the following trick, set&lt;/p&gt;
+
+&lt;p&gt;$$ z = \beta $$&lt;/p&gt;
+
+&lt;p&gt;in the second term, and then optimise the following function (the last term is to enforce the constraint we introduced):&lt;/p&gt;
+
+&lt;p&gt;$$ J\left( \beta \right) = \frac{1}{n} \lVert y - \beta^T X\rVert_2^2 + \lambda \lVert z \rVert_2^2 + \nu^T \left(\beta - z\right) + \frac{\rho}{2} \lVert\beta -z\rVert_2^2 $$&lt;/p&gt;
+
+&lt;p&gt;This is cleverer than it looks, because&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{\partial J}{\partial \beta} = -X^T \left(y - X\beta\right) + \rho\left(\beta - z\right) + \nu^T $$&lt;/p&gt;
+
+&lt;p&gt;and&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{\partial J}{\partial z} = \lambda - \nu^T - \rho\left( \beta - z\right) $$&lt;/p&gt;
+
+&lt;p&gt;for \( z &amp;gt; 0 \), and&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{\partial J}{\partial z} = - \lambda - \nu^T + \rho\left( \beta - z\right) $$&lt;/p&gt;
+
+&lt;p&gt;for \( z &amp;lt; 0 \), and&lt;/p&gt;
+
+&lt;p&gt;$$ -\frac{\lambda}{\rho} \leq x + \frac{\nu}{\rho} \leq \frac{\lambda}{\rho} $$&lt;/p&gt;
+
+&lt;p&gt;combining these we find:&lt;/p&gt;
+
+&lt;p&gt;$$ z = \mathrm{sign}\left(X + \frac{\nu}{\rho}\right) \mathrm{max} \left(\mid X + \frac{\nu}{\rho} \mid - \frac{\lambda}{\rho}, 0 \right) $$&lt;/p&gt;
+
+&lt;p&gt;we can then update our weights by the following set of iterates:&lt;/p&gt;
+
+&lt;p&gt;$$ X^{k+1} = \left(X^T X + \rho I\right)^{-1} \left(X^t y + \rho \left(z^{k} - \nu^{k}\right)\right)$$&lt;/p&gt;
+
+&lt;p&gt;$$ z^{k+1} = S_{\frac{\lambda}{\rho}}\left(X^{k+1} + \nu^{k}/\rho\right) $$&lt;/p&gt;
+
+&lt;p&gt;$$ \nu^{k+1} = n^{k} + \rho \left(x^{k+1} - z^{k+1} \right) $$&lt;/p&gt;
+
+&lt;p&gt;This is implemented in the code below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+def l2prox(y, mu):
+    return (1.0/(1.0 + mu)) * y
+
+def l1prox(y, mu):
+    return np.sign(y)*np.maximum(0, np.absolute(y)-mu/2.0)
+
+def ADMM(A, y, rho, mu, prox):
+    &amp;quot;&amp;quot;&amp;quot;Alternating Direction Method of Multipliers
+
+    This is a python implementation of the Alternating Direction
+    Method of Multipliers - a method of constrained optimisation
+    that is used widely in statistics (http://stanford.edu/~boyd/admm.html).
+    &amp;quot;&amp;quot;&amp;quot;
+
+    m, n = A.shape
+    A_t_A = A.T.dot(A)
+    w, v = np.linalg.eig(A_t_A)
+    MAX_ITER = 10000
+
+    #Function to caluculate min 1/2(y - Ax) + l||x||
+    #via alternating direction methods
+    x_hat = np.zeros([n, 1])
+    z_hat = np.zeros([n, 1])
+    u = np.zeros([n, 1])
+
+    #Calculate regression co-efficient and stepsize
+    # r = np.amax(np.absolute(w))
+    # l_over_rho = np.sqrt(2*np.log(n)) * r / 2.0 # I might be wrong here
+    # rho = mu/r
+
+    #Pre-compute to save some multiplications
+    A_t_y = A.T.dot(y)
+    Q = A_t_A + rho * np.identity(n)
+    Q = np.linalg.inv(Q)
+    Q_dot = Q.dot
+
+    for _ in range(MAX_ITER):
+        #x minimisation step via posterier OLS
+        x_hat = Q_dot(A_t_y + rho*(z_hat - u))
+        z_hat = prox(x_hat + u, mu)
+        #mulitplier update
+        u = u  + rho*(x_hat - z_hat)
+    return z_hat
+
+def plot(original, computed):
+    &amp;quot;&amp;quot;&amp;quot;Plot two vectors to compare their values&amp;quot;&amp;quot;&amp;quot;
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(original, label=&#39;Original&#39;)
+    plt.plot(computed, label=&#39;Estimate&#39;)
+    plt.subplot(212)
+    plt.plot(original - computed)
+    
+
+    plt.legend(loc=&#39;upper right&#39;)
+
+    plt.show()
+
+def test(m=50, n=200):
+    &amp;quot;&amp;quot;&amp;quot;Test the ADMM method with randomly generated matrices and vectors&amp;quot;&amp;quot;&amp;quot;
+    A = np.random.randn(m, n)
+
+    num_non_zeros = 10
+    positions = np.random.randint(0, n, num_non_zeros)
+    amplitudes = 100*np.random.randn(num_non_zeros, 1)
+    x = np.zeros((n, 1))
+    x[positions] = amplitudes
+
+    y = A.dot(x) #+ np.random.randn(m, 1)
+
+    plot(x, ADMM(A, y, 1.0, 1.0, l1prox))
+
+test()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;No handles with labels found to put in legend.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;./more-complex-regularised-linear-regressions_1_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Neural Networks From Scratch</title>
