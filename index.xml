@@ -205,7 +205,7 @@ test()
 
 &lt;p&gt;$$ y = W h $$&lt;/p&gt;
 
-&lt;p&gt;Thus we are esentially fitting a linear classifier on the basis expansion $\mathrm{sigmoid}(M x)$, the difference being that we fit the basis expansion, as well as the linear classifier. That is, the Network learns a data dependent basis on which to clssify.&lt;/p&gt;
+&lt;p&gt;Thus we are esentially fitting a linear classifier on the basis expansion \( \mathrm{sigmoid}(M x) \), the difference being that we fit the basis expansion, as well as the linear classifier. That is, the Network learns a data dependent basis on which to clssify.&lt;/p&gt;
 
 &lt;p&gt;Enough with the maths, lets do some coding!&lt;/p&gt;
 
