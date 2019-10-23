@@ -813,9 +813,9 @@ assert np.allclose(grads, numeric_grads, rtol=1e-3, atol=0),\
 $$f(X)= W \cdot X + \vec b $$</p>
 
 <p>Where
-* X is an object-feature matrix of shape [batch_size, num_features],
-* W is a weight matrix [num_features, num_outputs]
-* and b is a vector of num_outputs biases.</p>
+*X is an object-feature matrix of shape [batch_size, num_features],
+*W is a weight matrix [num_features, num_outputs]
+*and b is a vector of num_outputs biases.</p>
 
 <p>Both W and b are initialized during layer creation and updated each time backward is called.</p>
 

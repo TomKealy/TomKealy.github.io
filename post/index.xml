@@ -5,12 +5,127 @@
     <link>/post/</link>
       <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 22 Oct 2019 19:00:19 +0200</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Wed, 23 Oct 2019 10:13:20 +0200</lastBuildDate>
     <image>
       <url>/img/icon-192.png</url>
       <title>Posts</title>
       <link>/post/</link>
     </image>
+    
+    <item>
+      <title>Fourier Transform</title>
+      <link>/post/fourier-transform/</link>
+      <pubDate>Wed, 23 Oct 2019 10:13:20 +0200</pubDate>
+      <guid>/post/fourier-transform/</guid>
+      <description>
+
+&lt;h1 id=&#34;breaking-it-all-down&#34;&gt;Breaking it all down&lt;/h1&gt;
+
+&lt;p&gt;Since it&amp;rsquo;s Joseph Fourier&amp;rsquo;s birthday, I&amp;rsquo;ll write a little about his central idea and why it&amp;rsquo;s so important.&lt;/p&gt;
+
+&lt;p&gt;One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&amp;rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&amp;rsquo;re interested in.&lt;/p&gt;
+
+&lt;p&gt;As an example, consider the plane \( \mathrm{R}^2 \) and the two vectors \( e_1 = (1, 0)^T \) and \( e_2 = (0, 1)^T \). We can write &lt;em&gt;any&lt;/em&gt; vector in that plane as a sum  of those two vectors:&lt;/p&gt;
+
+&lt;p&gt;$$ (40.2, 3.0)^T = 40.2 * e_1 + 3.0 e_2 $$&lt;/p&gt;
+
+&lt;p&gt;This idea extends to any dimension \( n &amp;gt; 2 \). What&amp;rsquo;s more amazing, is that this idea can also work for spaces with infinite dimensions! In these infinite spaces, a vector is now a function, and we seek to express the function in terms of simpler ones.&lt;/p&gt;
+
+&lt;p&gt;In school (and university) we were taught about the functions \( \mathrm{sin}(x) \) and \( \mathrm{cos}(x) \), these functions have the usefull properties that:&lt;/p&gt;
+
+&lt;p&gt;$$ \int_0^{2\pi} cos(x) dx  = 0 $$&lt;/p&gt;
+
+&lt;p&gt;$$ \int_0^{2\pi} sin(x) dx  = 0 $$&lt;/p&gt;
+
+&lt;p&gt;and that&lt;/p&gt;
+
+&lt;p&gt;$$ \int_0^{2\pi} cos(x) sin(x) dx  = 0 $$&lt;/p&gt;
+
+&lt;p&gt;Because of these (admittedly quite arbitrary properties) \( sin \) and \( cos \) can play the role for functions that \( e_1 \) and \( e_2 \) played for vectors. This was Joseph Fourier&amp;rsquo;s insight, and there&amp;rsquo;s not a part of Science/Engineering that has been left untouched (mainly because if you&amp;rsquo;re out of ideas about what to do in a data analysis, taking a Fourier Transform will seldom be  a bad one).&lt;/p&gt;
+
+&lt;p&gt;In the rest of this post, we&amp;rsquo;ll consider an effcient way of computing a discrete version of the Fourier Tansform&lt;/p&gt;
+
+&lt;p&gt;If we have a vector \( x  \in \mathrm{R}^N \) which we can write it&amp;rsquo;s Fourier Transform as:&lt;/p&gt;
+
+&lt;p&gt;$$ X&lt;em&gt;k = \sum&lt;/em&gt;{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$&lt;/p&gt;
+
+&lt;p&gt;Or, more compactly in matrix notation:&lt;/p&gt;
+
+&lt;p&gt;$$ X_k = W x_n $$&lt;/p&gt;
+
+&lt;p&gt;with $$ W_{kn} = e^{-i2\pi kn/N} $$&lt;/p&gt;
+
+&lt;p&gt;Naively, we could simply compute the FT by doing some matrix multiplication:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import numpy as np
+
+x = np.random.randn(1024)
+
+def DFT(x):
+
+    X = np.zeros_like(x)
+    N = x.shape[0]
+    n = np.arange(N)
+    k = n.reshape((N, 1))
+    W = np.exp(-1.0*(2j * np.pi * k * n /N))
+    X = W @ x
+    return X
+
+X = DFT(x)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can check to see if we&amp;rsquo;re right:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;np.allclose(X, np.fft.fft(x))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;True
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;However, there&amp;rsquo;s a much better way of computing the FT by exploiting some symmetries of W. First of all we&amp;rsquo;ll show that $ X_{k + N} = X_k $ and then how this insight can be turned into a recursive algorithm for computing $X_k$.&lt;/p&gt;
+
+&lt;p&gt;Firstly&lt;/p&gt;
+
+&lt;p&gt;$$ X&lt;em&gt;{k + N} = \sum&lt;/em&gt;{n=0}^{N-1} x_n e^{-i2\pi (k+N)n/N}  $$&lt;/p&gt;
+
+&lt;p&gt;$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi n} e^{-i2\pi kn/N} $$&lt;/p&gt;
+
+&lt;p&gt;$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$&lt;/p&gt;
+
+&lt;p&gt;because \( e^{i2\pi n} = 1 \) for any \( n \).&lt;/p&gt;
+
+&lt;p&gt;The trick for computing the FT, which makes use of this symmetry, is to perform an FT on the odd and even parts of $ x $ respectively:&lt;/p&gt;
+
+&lt;p&gt;$$ X&lt;em&gt;{k} = \sum&lt;/em&gt;{m=0}^{N/2-1} x&lt;em&gt;{2m} e^{-i2\pi (2m)n/N} + \sum&lt;/em&gt;{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m+1)n/N} $$&lt;/p&gt;
+
+&lt;p&gt;$$ X&lt;em&gt;{k} = \sum&lt;/em&gt;{m=0}^{N/2-1} x&lt;em&gt;{2m} e^{-i2\pi (2m)n/N} + e^{-i 2\pi k/N} \sum&lt;/em&gt;{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m)n/N} $$&lt;/p&gt;
+
+&lt;p&gt;What that these two lines show, is that we can split an \( N \) length FT into two \( N/2 )) length Fts, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to \( m = 1 \), which is what this graphic shows&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;radix2fft.png&#34;&gt;&lt;/p&gt;
+
+&lt;p&gt;In python, we can write the FFT as like so:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def FFT(x):
+    N = x.shape[0]
+    
+    if N % 2 &amp;gt; 0:
+        return x
+    else:
+        X_even = FFT(x[::2])
+        X_odd = FFT(x[1::2])
+        factor = np.exp(-2j * np.pi * np.arange(N) / N)
+        return np.concatenate([X_even + factor[:(N // 2)] * X_odd, X_even + factor[(N // 2):] * X_odd])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;X = FFT(x)
+np.allclose(X, np.fft.fft(x))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;True
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Regularised Linear Regressions</title>
@@ -403,9 +518,9 @@ assert np.allclose(grads, numeric_grads, rtol=1e-3, atol=0),\
 $$f(X)= W \cdot X + \vec b $$&lt;/p&gt;
 
 &lt;p&gt;Where
-* X is an object-feature matrix of shape [batch_size, num_features],
-* W is a weight matrix [num_features, num_outputs]
-* and b is a vector of num_outputs biases.&lt;/p&gt;
+*X is an object-feature matrix of shape [batch_size, num_features],
+*W is a weight matrix [num_features, num_outputs]
+*and b is a vector of num_outputs biases.&lt;/p&gt;
 
 &lt;p&gt;Both W and b are initialized during layer creation and updated each time backward is called.&lt;/p&gt;
 

@@ -28,10 +28,11 @@
   
     
   
-  <meta name="description" content="Data Scientist">
+  <meta name="description" content="Breaking it all down Since it&rsquo;s Joseph Fourier&rsquo;s birthday, I&rsquo;ll write a little about his central idea and why it&rsquo;s so important.
+One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&rsquo;re interested in.">
 
   
-  <link rel="alternate" hreflang="en-us" href="/post/">
+  <link rel="alternate" hreflang="en-us" href="/post/fourier-transform/">
 
   
 
@@ -96,14 +97,12 @@
 
 
   
-  <link rel="alternate" href="/post/index.xml" type="application/rss+xml" title="Academic">
-  
 
   <link rel="manifest" href="/index.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon-32.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="/post/">
+  <link rel="canonical" href="/post/fourier-transform/">
 
   
   
@@ -116,18 +115,66 @@
   <meta property="twitter:card" content="summary">
   
   <meta property="og:site_name" content="Academic">
-  <meta property="og:url" content="/post/">
-  <meta property="og:title" content="Posts | Academic">
-  <meta property="og:description" content="Data Scientist"><meta property="og:image" content="/img/icon-192.png">
+  <meta property="og:url" content="/post/fourier-transform/">
+  <meta property="og:title" content="Fourier Transform | Academic">
+  <meta property="og:description" content="Breaking it all down Since it&rsquo;s Joseph Fourier&rsquo;s birthday, I&rsquo;ll write a little about his central idea and why it&rsquo;s so important.
+One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&rsquo;re interested in."><meta property="og:image" content="/img/icon-192.png">
   <meta property="twitter:image" content="/img/icon-192.png"><meta property="og:locale" content="en-us">
   
-    <meta property="og:updated_time" content="2019-10-23T10:13:20&#43;02:00">
+    
+      <meta property="article:published_time" content="2019-10-23T10:13:20&#43;02:00">
+    
+    <meta property="article:modified_time" content="2019-10-23T10:13:20&#43;02:00">
   
 
   
 
 
+    
 
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/fourier-transform/"
+  },
+  "headline": "Fourier Transform",
+  
+  "datePublished": "2019-10-23T10:13:20+02:00",
+  "dateModified": "2019-10-23T10:13:20+02:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Thomas Kealy"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Academic",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "/img/icon-512.png"
+    }
+  },
+  "description": "Breaking it all down Since it\u0026rsquo;s Joseph Fourier\u0026rsquo;s birthday, I\u0026rsquo;ll write a little about his central idea and why it\u0026rsquo;s so important.\nOne of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I\u0026rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we\u0026rsquo;re interested in."
+}
+</script>
+
+  
 
   
 
@@ -135,10 +182,13 @@
   
 
 
+  
 
 
 
-  <title>Posts | Academic</title>
+
+
+  <title>Fourier Transform | Academic</title>
 
 </head>
 
@@ -370,78 +420,33 @@
 </nav>
 
 
-  
-
-
-
-
-
-
-
-
-
-
-
+  <article class="article">
 
   
 
+
+
+
+
+
+
+
+
+
+
+
+  
+
   
   
+  
+<div class="article-container pt-3">
+  <h1>Fourier Transform</h1>
+
+  
+
   
     
-  
-<div class="universal-wrapper pt-3">
-  <h1>Posts</h1>
-
-  
-
-  
-</div>
-
-
-
-<div class="universal-wrapper">
-
-  
-
-  
-  
-    
-      
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<div class="media stream-item">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0">
-      <a href="/post/fourier-transform/" >Fourier Transform</a>
-    </h3>
-
-    
-    <div class="article-style">
-      Breaking it all down Since it&rsquo;s Joseph Fourier&rsquo;s birthday, I&rsquo;ll write a little about his central idea and why …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
-      
-
-      
-        
 
 
 
@@ -477,471 +482,342 @@
   
 
   
-
-</div>
-
-      
-    </div>
-
     
-
-  </div>
-  <div class="ml-3">
-    
-    
-  </div>
-</div>
-
-    
-  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
     
       
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<div class="media stream-item">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0">
-      <a href="/post/regularised-linear-regressions/" >Regularised Linear Regressions</a>
-    </h3>
-
-    
-    <div class="article-style">
-      We have previously considered models of the form:
-$$ \hat{y} = \beta X + w $$
-where we have measured how well the model is doing by …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
       
-
       
         
-
-
-
-<div class="article-metadata">
-
-  
-  
-
-  
-  <span class="article-date">
-    
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/fourier-transform/&amp;text=Fourier%20Transform" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
     
       
-    
-    Oct 22, 2019
-  </span>
-  
-
-  
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    4 min read
-  </span>
-  
-
-  
-  
-  
-
-  
-  
-
-  
-
-</div>
-
       
-    </div>
-
-    
-
-  </div>
-  <div class="ml-3">
-    
-    
-  </div>
-</div>
-
-    
-  
-    
-      
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<div class="media stream-item">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0">
-      <a href="/post/neural-networks-from-scratch/" >Neural Networks From Scratch</a>
-    </h3>
-
-    
-    <div class="article-style">
-      It&rsquo;s useful sometimes to write simple versions of complex things, so that you understand them. In this post we write a simple …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
-      
-
       
         
-
-
-
-<div class="article-metadata">
-
-  
-  
-
-  
-  <span class="article-date">
-    
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/fourier-transform/&amp;t=Fourier%20Transform" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+      </li>
     
       
-    
-    Oct 22, 2019
-  </span>
-  
-
-  
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    8 min read
-  </span>
-  
-
-  
-  
-  
-
-  
-  
-
-  
-
-</div>
-
       
-    </div>
-
-    
-
-  </div>
-  <div class="ml-3">
-    
-    
-  </div>
-</div>
-
-    
-  
-    
-      
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<div class="media stream-item">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0">
-      <a href="/post/gradient-descent/" >Gradient Descent</a>
-    </h3>
-
-    
-    <div class="article-style">
-      Gradient Descent Gradient Descent is the simplest learning algorithm. Suppose you have a set of observations of some process you wanted …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
-      
-
       
         
-
-
-
-<div class="article-metadata">
-
-  
-  
-
-  
-  <span class="article-date">
-    
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Fourier%20Transform&amp;body=/post/fourier-transform/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
     
       
-    
-    Oct 22, 2019
-  </span>
-  
-
-  
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    3 min read
-  </span>
-  
-
-  
-  
-  
-
-  
-  
-
-  
-
-</div>
-
       
-    </div>
-
-    
-
-  </div>
-  <div class="ml-3">
-    
-    
-  </div>
-</div>
-
-    
-  
-    
-      
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<div class="media stream-item">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0">
-      <a href="/post/gradient-free-gradient-descent/" >Gradient Free Gradient Descent</a>
-    </h3>
-
-    
-    <div class="article-style">
-      Gradient Descent Without Gradients In the last post I introduced Gradient Descent, and used it to a simple linear regression in 1 …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
-      
-
       
         
-
-
-
-<div class="article-metadata">
-
-  
-  
-
-  
-  <span class="article-date">
-    
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/fourier-transform/&amp;title=Fourier%20Transform" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
     
       
-    
-    Oct 21, 2019
-  </span>
-  
-
-  
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    3 min read
-  </span>
-  
-
-  
-  
-  
-
-  
-  
-
-  
-
-</div>
-
       
-    </div>
-
-    
-
-  </div>
-  <div class="ml-3">
-    
-    
-  </div>
-</div>
-
-    
-  
-    
-      
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<div class="media stream-item">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0">
-      <a href="/post/local-linear-models-for-time-series/" >Local Linear Models for Time Series</a>
-    </h3>
-
-    
-    <div class="article-style">
-      Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:
-\[ v_{t+1} \sim …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
-      
-
       
         
-
-
-
-<div class="article-metadata">
-
-  
-  
-
-  
-  <span class="article-date">
-    
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Fourier%20Transform%20/post/fourier-transform/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
     
       
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/fourier-transform/&amp;title=Fourier%20Transform" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
     
-    Oct 20, 2019
-  </span>
-  
+  </ul>
+</div>
 
-  
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    3 min read
-  </span>
-  
-
-  
-  
-  
-
-  
-  
 
   
 
 </div>
 
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
       
+
+<h1 id="breaking-it-all-down">Breaking it all down</h1>
+
+<p>Since it&rsquo;s Joseph Fourier&rsquo;s birthday, I&rsquo;ll write a little about his central idea and why it&rsquo;s so important.</p>
+
+<p>One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&rsquo;re interested in.</p>
+
+<p>As an example, consider the plane \( \mathrm{R}^2 \) and the two vectors \( e_1 = (1, 0)^T \) and \( e_2 = (0, 1)^T \). We can write <em>any</em> vector in that plane as a sum  of those two vectors:</p>
+
+<p>$$ (40.2, 3.0)^T = 40.2 * e_1 + 3.0 e_2 $$</p>
+
+<p>This idea extends to any dimension \( n &gt; 2 \). What&rsquo;s more amazing, is that this idea can also work for spaces with infinite dimensions! In these infinite spaces, a vector is now a function, and we seek to express the function in terms of simpler ones.</p>
+
+<p>In school (and university) we were taught about the functions \( \mathrm{sin}(x) \) and \( \mathrm{cos}(x) \), these functions have the usefull properties that:</p>
+
+<p>$$ \int_0^{2\pi} cos(x) dx  = 0 $$</p>
+
+<p>$$ \int_0^{2\pi} sin(x) dx  = 0 $$</p>
+
+<p>and that</p>
+
+<p>$$ \int_0^{2\pi} cos(x) sin(x) dx  = 0 $$</p>
+
+<p>Because of these (admittedly quite arbitrary properties) \( sin \) and \( cos \) can play the role for functions that \( e_1 \) and \( e_2 \) played for vectors. This was Joseph Fourier&rsquo;s insight, and there&rsquo;s not a part of Science/Engineering that has been left untouched (mainly because if you&rsquo;re out of ideas about what to do in a data analysis, taking a Fourier Transform will seldom be  a bad one).</p>
+
+<p>In the rest of this post, we&rsquo;ll consider an effcient way of computing a discrete version of the Fourier Tansform</p>
+
+<p>If we have a vector \( x  \in \mathrm{R}^N \) which we can write it&rsquo;s Fourier Transform as:</p>
+
+<p>$$ X<em>k = \sum</em>{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$</p>
+
+<p>Or, more compactly in matrix notation:</p>
+
+<p>$$ X_k = W x_n $$</p>
+
+<p>with $$ W_{kn} = e^{-i2\pi kn/N} $$</p>
+
+<p>Naively, we could simply compute the FT by doing some matrix multiplication:</p>
+
+<pre><code class="language-python">import numpy as np
+
+x = np.random.randn(1024)
+
+def DFT(x):
+
+    X = np.zeros_like(x)
+    N = x.shape[0]
+    n = np.arange(N)
+    k = n.reshape((N, 1))
+    W = np.exp(-1.0*(2j * np.pi * k * n /N))
+    X = W @ x
+    return X
+
+X = DFT(x)
+</code></pre>
+
+<p>We can check to see if we&rsquo;re right:</p>
+
+<pre><code class="language-python">np.allclose(X, np.fft.fft(x))
+</code></pre>
+
+<pre><code>True
+</code></pre>
+
+<p>However, there&rsquo;s a much better way of computing the FT by exploiting some symmetries of W. First of all we&rsquo;ll show that $ X_{k + N} = X_k $ and then how this insight can be turned into a recursive algorithm for computing $X_k$.</p>
+
+<p>Firstly</p>
+
+<p>$$ X<em>{k + N} = \sum</em>{n=0}^{N-1} x_n e^{-i2\pi (k+N)n/N}  $$</p>
+
+<p>$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi n} e^{-i2\pi kn/N} $$</p>
+
+<p>$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$</p>
+
+<p>because \( e^{i2\pi n} = 1 \) for any \( n \).</p>
+
+<p>The trick for computing the FT, which makes use of this symmetry, is to perform an FT on the odd and even parts of $ x $ respectively:</p>
+
+<p>$$ X<em>{k} = \sum</em>{m=0}^{N/2-1} x<em>{2m} e^{-i2\pi (2m)n/N} + \sum</em>{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m+1)n/N} $$</p>
+
+<p>$$ X<em>{k} = \sum</em>{m=0}^{N/2-1} x<em>{2m} e^{-i2\pi (2m)n/N} + e^{-i 2\pi k/N} \sum</em>{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m)n/N} $$</p>
+
+<p>What that these two lines show, is that we can split an \( N \) length FT into two \( N/2 )) length Fts, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to \( m = 1 \), which is what this graphic shows</p>
+
+<p><img src="radix2fft.png"></p>
+
+<p>In python, we can write the FFT as like so:</p>
+
+<pre><code class="language-python">def FFT(x):
+    N = x.shape[0]
+    
+    if N % 2 &gt; 0:
+        return x
+    else:
+        X_even = FFT(x[::2])
+        X_odd = FFT(x[1::2])
+        factor = np.exp(-2j * np.pi * np.arange(N) / N)
+        return np.concatenate([X_even + factor[:(N // 2)] * X_odd, X_even + factor[(N // 2):] * X_odd])
+</code></pre>
+
+<pre><code class="language-python">X = FFT(x)
+np.allclose(X, np.fft.fft(x))
+</code></pre>
+
+<pre><code>True
+</code></pre>
+
     </div>
 
     
 
-  </div>
-  <div class="ml-3">
-    
-    
-  </div>
-</div>
+
+
 
     
+
+
+
+    
+      
+
+
+
+
+
+
+
+
   
 
+
+
+
+
+
   
+  
+  
+    
+  
+  
+  <div class="media author-card">
+    
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hu52a603635ecebd45650b162dadabb4e5_12861_250x250_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Thomas Kealy</a></h5>
+      <h6 class="card-subtitle">Data Scientist</h6>
+      <p class="card-text">I am a Data Scientist in Berlin.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="/#contact" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/ThomasKealy" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/TomKealy" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
 
 
-</div>
+
+      
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
 
       
 
