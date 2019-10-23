@@ -41,7 +41,7 @@
 
 &lt;p&gt;Because of these (admittedly quite arbitrary properties) \( sin \) and \( cos \) can play the role for functions that \( e_1 \) and \( e_2 \) played for vectors. This was Joseph Fourier&#39;s insight, and there&#39;s not a part of Science/Engineering that has been left untouched (mainly because if you&#39;re out of ideas about what to do in a data analysis, taking a Fourier Transform will seldom be  a bad one).&lt;/p&gt;
 
-&lt;p&gt;In the rest of this post, we&#39;ll consider an effcient way of computing a discrete version of the Fourier Tansform&lt;/p&gt;
+&lt;p&gt;In the rest of this post, we&#39;ll consider an effcient way of computing a discrete version of the Fourier Transform&lt;/p&gt;
 
 &lt;p&gt;If we have a vector \( x  \in \mathrm{R}^N \) which we can write it&#39;s Fourier Transform as:&lt;/p&gt;
 
@@ -98,7 +98,7 @@ X = DFT(x)
 
 &lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[ X_{k} = \sum_{m=0}^{N/2-1} x_{2m} e^{-i2\pi (2m)n/N} + e^{-i 2\pi k/N} \sum_{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m)n/N} \]&lt;/span&gt;&lt;/p&gt;
 
-&lt;p&gt;What that these two lines show, is that we can split an \( N \) length FT into two \( N/2 )) length Fts, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to \( m = 1 \), which is what this graphic shows&lt;/p&gt;
+&lt;p&gt;What that these two lines show, is that we can split an \( N \) length FT into two \( N/2\) length FTs, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to \( m = 1 \), which is what this graphic shows&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;radix2fft.png&#34;&gt;&lt;/p&gt;
 
