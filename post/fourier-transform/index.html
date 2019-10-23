@@ -28,8 +28,8 @@
   
     
   
-  <meta name="description" content="Breaking it all down Since it&rsquo;s Joseph Fourier&rsquo;s birthday, I&rsquo;ll write a little about his central idea and why it&rsquo;s so important.
-One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&rsquo;re interested in.">
+  <meta name="description" content="Breaking it all down Since it&#39;s Joseph Fourier&#39;s birthday, I&#39;ll write a little about his central idea and why it&#39;s so important.
+One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&#39;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&#39;re interested in.">
 
   
   <link rel="alternate" hreflang="en-us" href="/post/fourier-transform/">
@@ -117,8 +117,8 @@ One of the most important ideas in mathematics, is that you can build complex th
   <meta property="og:site_name" content="Academic">
   <meta property="og:url" content="/post/fourier-transform/">
   <meta property="og:title" content="Fourier Transform | Academic">
-  <meta property="og:description" content="Breaking it all down Since it&rsquo;s Joseph Fourier&rsquo;s birthday, I&rsquo;ll write a little about his central idea and why it&rsquo;s so important.
-One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&rsquo;re interested in."><meta property="og:image" content="/img/icon-192.png">
+  <meta property="og:description" content="Breaking it all down Since it&#39;s Joseph Fourier&#39;s birthday, I&#39;ll write a little about his central idea and why it&#39;s so important.
+One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&#39;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&#39;re interested in."><meta property="og:image" content="/img/icon-192.png">
   <meta property="twitter:image" content="/img/icon-192.png"><meta property="og:locale" content="en-us">
   
     
@@ -170,7 +170,7 @@ One of the most important ideas in mathematics, is that you can build complex th
       "url": "/img/icon-512.png"
     }
   },
-  "description": "Breaking it all down Since it\u0026rsquo;s Joseph Fourier\u0026rsquo;s birthday, I\u0026rsquo;ll write a little about his central idea and why it\u0026rsquo;s so important.\nOne of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I\u0026rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we\u0026rsquo;re interested in."
+  "description": "Breaking it all down Since it's Joseph Fourier's birthday, I'll write a little about his central idea and why it's so important.\nOne of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I'm talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we're interested in."
 }
 </script>
 
@@ -595,43 +595,41 @@ One of the most important ideas in mathematics, is that you can build complex th
   <div class="article-container">
 
     <div class="article-style">
-      
+      <h1 id="breaking-it-all-down">Breaking it all down</h1>
 
-<h1 id="breaking-it-all-down">Breaking it all down</h1>
+<p>Since it's Joseph Fourier's birthday, I'll write a little about his central idea and why it's so important.</p>
 
-<p>Since it&rsquo;s Joseph Fourier&rsquo;s birthday, I&rsquo;ll write a little about his central idea and why it&rsquo;s so important.</p>
-
-<p>One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&rsquo;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&rsquo;re interested in.</p>
+<p>One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I'm talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we're interested in.</p>
 
 <p>As an example, consider the plane \( \mathrm{R}^2 \) and the two vectors \( e_1 = (1, 0)^T \) and \( e_2 = (0, 1)^T \). We can write <em>any</em> vector in that plane as a sum  of those two vectors:</p>
 
-<p>$$ (40.2, 3.0)^T = 40.2 * e_1 + 3.0 e_2 $$</p>
+<p><span  class="math">\[ (40.2, 3.0)^T = 40.2 * e_1 + 3.0 e_2 \]</span></p>
 
-<p>This idea extends to any dimension \( n &gt; 2 \). What&rsquo;s more amazing, is that this idea can also work for spaces with infinite dimensions! In these infinite spaces, a vector is now a function, and we seek to express the function in terms of simpler ones.</p>
+<p>This idea extends to any dimension \( n &gt; 2 \). What's more amazing, is that this idea can also work for spaces with infinite dimensions! In these infinite spaces, a vector is now a function, and we seek to express the function in terms of simpler ones.</p>
 
 <p>In school (and university) we were taught about the functions \( \mathrm{sin}(x) \) and \( \mathrm{cos}(x) \), these functions have the usefull properties that:</p>
 
-<p>$$ \int_0^{2\pi} cos(x) dx  = 0 $$</p>
+<p><span  class="math">\[ \int_0^{2\pi} cos(x) dx  = 0 \]</span></p>
 
-<p>$$ \int_0^{2\pi} sin(x) dx  = 0 $$</p>
+<p><span  class="math">\[ \int_0^{2\pi} sin(x) dx  = 0 \]</span></p>
 
 <p>and that</p>
 
-<p>$$ \int_0^{2\pi} cos(x) sin(x) dx  = 0 $$</p>
+<p><span  class="math">\[ \int_0^{2\pi} cos(x) sin(x) dx  = 0 \]</span></p>
 
-<p>Because of these (admittedly quite arbitrary properties) \( sin \) and \( cos \) can play the role for functions that \( e_1 \) and \( e_2 \) played for vectors. This was Joseph Fourier&rsquo;s insight, and there&rsquo;s not a part of Science/Engineering that has been left untouched (mainly because if you&rsquo;re out of ideas about what to do in a data analysis, taking a Fourier Transform will seldom be  a bad one).</p>
+<p>Because of these (admittedly quite arbitrary properties) \( sin \) and \( cos \) can play the role for functions that \( e_1 \) and \( e_2 \) played for vectors. This was Joseph Fourier's insight, and there's not a part of Science/Engineering that has been left untouched (mainly because if you're out of ideas about what to do in a data analysis, taking a Fourier Transform will seldom be  a bad one).</p>
 
-<p>In the rest of this post, we&rsquo;ll consider an effcient way of computing a discrete version of the Fourier Tansform</p>
+<p>In the rest of this post, we'll consider an effcient way of computing a discrete version of the Fourier Tansform</p>
 
-<p>If we have a vector \( x  \in \mathrm{R}^N \) which we can write it&rsquo;s Fourier Transform as:</p>
+<p>If we have a vector \( x  \in \mathrm{R}^N \) which we can write it's Fourier Transform as:</p>
 
-<p>$$ X<em>k = \sum</em>{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$</p>
+<p><span  class="math">\[ X_k = \sum_{n=0}^{N-1} x_n e^{-i2 \pi kn/N} \]</span></p>
 
 <p>Or, more compactly in matrix notation:</p>
 
-<p>$$ X_k = W x_n $$</p>
+<p><span  class="math">\[ X_k = W x_n \]</span></p>
 
-<p>with $$ W_{kn} = e^{-i2\pi kn/N} $$</p>
+<p>with <span  class="math">\( W_{kn} = e^{-i2\pi kn/N} \)</span></p>
 
 <p>Naively, we could simply compute the FT by doing some matrix multiplication:</p>
 
@@ -652,7 +650,7 @@ def DFT(x):
 X = DFT(x)
 </code></pre>
 
-<p>We can check to see if we&rsquo;re right:</p>
+<p>We can check to see if we're right:</p>
 
 <pre><code class="language-python">np.allclose(X, np.fft.fft(x))
 </code></pre>
@@ -660,23 +658,23 @@ X = DFT(x)
 <pre><code>True
 </code></pre>
 
-<p>However, there&rsquo;s a much better way of computing the FT by exploiting some symmetries of W. First of all we&rsquo;ll show that $ X_{k + N} = X_k $ and then how this insight can be turned into a recursive algorithm for computing $X_k$.</p>
+<p>However, there's a much better way of computing the FT by exploiting some symmetries of W. First of all we'll show that $ X_{k + N} = X_k $ and then how this insight can be turned into a recursive algorithm for computing $X_k$.</p>
 
 <p>Firstly</p>
 
-<p>$$ X<em>{k + N} = \sum</em>{n=0}^{N-1} x_n e^{-i2\pi (k+N)n/N}  $$</p>
+<p><span  class="math">\[ X_{k + N} = \sum_{n=0}^{N-1} x_n e^{-i2\pi (k+N)n/N}  \]</span></p>
 
-<p>$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi n} e^{-i2\pi kn/N} $$</p>
+<p><span  class="math">\[ = \sum_{n=0}^{N-1} x_n e^{-i2\pi n} e^{-i2\pi kn/N} \]</span></p>
 
-<p>$$ = \sum_{n=0}^{N-1} x_n e^{-i2\pi kn/N} $$</p>
+<p><span  class="math">\[ = \sum_{n=0}^{N-1} x_n e^{-i2\pi kn/N} \]</span></p>
 
 <p>because \( e^{i2\pi n} = 1 \) for any \( n \).</p>
 
 <p>The trick for computing the FT, which makes use of this symmetry, is to perform an FT on the odd and even parts of $ x $ respectively:</p>
 
-<p>$$ X<em>{k} = \sum</em>{m=0}^{N/2-1} x<em>{2m} e^{-i2\pi (2m)n/N} + \sum</em>{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m+1)n/N} $$</p>
+<p><span  class="math">\[ X_{k} = \sum_{m=0}^{N/2-1} x_{2m} e^{-i2\pi (2m)n/N} + \sum_{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m+1)n/N} \]</span></p>
 
-<p>$$ X<em>{k} = \sum</em>{m=0}^{N/2-1} x<em>{2m} e^{-i2\pi (2m)n/N} + e^{-i 2\pi k/N} \sum</em>{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m)n/N} $$</p>
+<p><span  class="math">\[ X_{k} = \sum_{m=0}^{N/2-1} x_{2m} e^{-i2\pi (2m)n/N} + e^{-i 2\pi k/N} \sum_{m=0}^{N/2-1} x_{2m+1} e^{-i2\pi (2m)n/N} \]</span></p>
 
 <p>What that these two lines show, is that we can split an \( N \) length FT into two \( N/2 )) length Fts, with the second multiplied by some factor. We need not stop there though, as we can continue this splitting trick all the way down to \( m = 1 \), which is what this graphic shows</p>
 
@@ -686,7 +684,7 @@ X = DFT(x)
 
 <pre><code class="language-python">def FFT(x):
     N = x.shape[0]
-    
+
     if N % 2 &gt; 0:
         return x
     else:
