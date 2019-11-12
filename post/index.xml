@@ -5,12 +5,2934 @@
     <link>/post/</link>
       <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sat, 26 Oct 2019 13:20:11 +0200</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 12 Nov 2019 19:13:32 +0100</lastBuildDate>
     <image>
       <url>/img/icon-192.png</url>
       <title>Posts</title>
       <link>/post/</link>
     </image>
+    
+    <item>
+      <title>Ames Iowa</title>
+      <link>/post/ames-iowa/</link>
+      <pubDate>Tue, 12 Nov 2019 19:13:32 +0100</pubDate>
+      <guid>/post/ames-iowa/</guid>
+      <description>
+
+&lt;h1 id=&#34;pipelines-and-pandas&#34;&gt;Pipelines and Pandas&lt;/h1&gt;
+
+&lt;p&gt;This is a short post about how to use Scikit-Learn Pipelines so that you have &amp;lsquo;Pandas in, pandas out&amp;rsquo;. I&amp;rsquo;ll build a small data pipeline on the Ames Iowa housing dataset. The first thing is to import the dataset, and inspect it! The data has 82 columns which include 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables (and 2 additional observation identifiers).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import pandas as pd
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;ames = pd.read_csv(&#39;ames.csv&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;ames.head(10)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;Order&lt;/th&gt;
+      &lt;th&gt;PID&lt;/th&gt;
+      &lt;th&gt;MS.SubClass&lt;/th&gt;
+      &lt;th&gt;MS.Zoning&lt;/th&gt;
+      &lt;th&gt;Lot.Frontage&lt;/th&gt;
+      &lt;th&gt;Lot.Area&lt;/th&gt;
+      &lt;th&gt;Street&lt;/th&gt;
+      &lt;th&gt;Alley&lt;/th&gt;
+      &lt;th&gt;Lot.Shape&lt;/th&gt;
+      &lt;th&gt;Land.Contour&lt;/th&gt;
+      &lt;th&gt;...&lt;/th&gt;
+      &lt;th&gt;Pool.Area&lt;/th&gt;
+      &lt;th&gt;Pool.QC&lt;/th&gt;
+      &lt;th&gt;Fence&lt;/th&gt;
+      &lt;th&gt;Misc.Feature&lt;/th&gt;
+      &lt;th&gt;Misc.Val&lt;/th&gt;
+      &lt;th&gt;Mo.Sold&lt;/th&gt;
+      &lt;th&gt;Yr.Sold&lt;/th&gt;
+      &lt;th&gt;Sale.Type&lt;/th&gt;
+      &lt;th&gt;Sale.Condition&lt;/th&gt;
+      &lt;th&gt;SalePrice&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;526301100&lt;/td&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;141.0&lt;/td&gt;
+      &lt;td&gt;31770&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;IR1&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;215000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;526350040&lt;/td&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;RH&lt;/td&gt;
+      &lt;td&gt;80.0&lt;/td&gt;
+      &lt;td&gt;11622&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Reg&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;MnPrv&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;105000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;526351010&lt;/td&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;81.0&lt;/td&gt;
+      &lt;td&gt;14267&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;IR1&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Gar2&lt;/td&gt;
+      &lt;td&gt;12500&lt;/td&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;172000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;526353030&lt;/td&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;93.0&lt;/td&gt;
+      &lt;td&gt;11160&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Reg&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;244000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;527105010&lt;/td&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;74.0&lt;/td&gt;
+      &lt;td&gt;13830&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;IR1&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;MnPrv&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;189900&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;5&lt;/th&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;527105030&lt;/td&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;78.0&lt;/td&gt;
+      &lt;td&gt;9978&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;IR1&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;195500&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;6&lt;/th&gt;
+      &lt;td&gt;7&lt;/td&gt;
+      &lt;td&gt;527127150&lt;/td&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;41.0&lt;/td&gt;
+      &lt;td&gt;4920&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Reg&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;213500&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;7&lt;/th&gt;
+      &lt;td&gt;8&lt;/td&gt;
+      &lt;td&gt;527145080&lt;/td&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;43.0&lt;/td&gt;
+      &lt;td&gt;5005&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;IR1&lt;/td&gt;
+      &lt;td&gt;HLS&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;191500&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;8&lt;/th&gt;
+      &lt;td&gt;9&lt;/td&gt;
+      &lt;td&gt;527146030&lt;/td&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;39.0&lt;/td&gt;
+      &lt;td&gt;5389&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;IR1&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;236500&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;9&lt;/th&gt;
+      &lt;td&gt;10&lt;/td&gt;
+      &lt;td&gt;527162130&lt;/td&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;RL&lt;/td&gt;
+      &lt;td&gt;60.0&lt;/td&gt;
+      &lt;td&gt;7500&lt;/td&gt;
+      &lt;td&gt;Pave&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Reg&lt;/td&gt;
+      &lt;td&gt;Lvl&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;2010&lt;/td&gt;
+      &lt;td&gt;WD&lt;/td&gt;
+      &lt;td&gt;Normal&lt;/td&gt;
+      &lt;td&gt;189000&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;10 rows × 82 columns&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;rsquo;s always a good idea to set an index on a DataFrame if you have one. In this case, the &lt;code&gt;PID&lt;/code&gt; column is a unique identifier.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;ames = ames.set_index(&#39;PID&#39;).copy()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;ames.describe().T
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;count&lt;/th&gt;
+      &lt;th&gt;mean&lt;/th&gt;
+      &lt;th&gt;std&lt;/th&gt;
+      &lt;th&gt;min&lt;/th&gt;
+      &lt;th&gt;25%&lt;/th&gt;
+      &lt;th&gt;50%&lt;/th&gt;
+      &lt;th&gt;75%&lt;/th&gt;
+      &lt;th&gt;max&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Order&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;1465.500000&lt;/td&gt;
+      &lt;td&gt;845.962470&lt;/td&gt;
+      &lt;td&gt;1.0&lt;/td&gt;
+      &lt;td&gt;733.25&lt;/td&gt;
+      &lt;td&gt;1465.5&lt;/td&gt;
+      &lt;td&gt;2197.75&lt;/td&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;MS.SubClass&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;57.387372&lt;/td&gt;
+      &lt;td&gt;42.638025&lt;/td&gt;
+      &lt;td&gt;20.0&lt;/td&gt;
+      &lt;td&gt;20.00&lt;/td&gt;
+      &lt;td&gt;50.0&lt;/td&gt;
+      &lt;td&gt;70.00&lt;/td&gt;
+      &lt;td&gt;190.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Lot.Frontage&lt;/th&gt;
+      &lt;td&gt;2440.0&lt;/td&gt;
+      &lt;td&gt;69.224590&lt;/td&gt;
+      &lt;td&gt;23.365335&lt;/td&gt;
+      &lt;td&gt;21.0&lt;/td&gt;
+      &lt;td&gt;58.00&lt;/td&gt;
+      &lt;td&gt;68.0&lt;/td&gt;
+      &lt;td&gt;80.00&lt;/td&gt;
+      &lt;td&gt;313.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Lot.Area&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;10147.921843&lt;/td&gt;
+      &lt;td&gt;7880.017759&lt;/td&gt;
+      &lt;td&gt;1300.0&lt;/td&gt;
+      &lt;td&gt;7440.25&lt;/td&gt;
+      &lt;td&gt;9436.5&lt;/td&gt;
+      &lt;td&gt;11555.25&lt;/td&gt;
+      &lt;td&gt;215245.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Overall.Qual&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;6.094881&lt;/td&gt;
+      &lt;td&gt;1.411026&lt;/td&gt;
+      &lt;td&gt;1.0&lt;/td&gt;
+      &lt;td&gt;5.00&lt;/td&gt;
+      &lt;td&gt;6.0&lt;/td&gt;
+      &lt;td&gt;7.00&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Overall.Cond&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;5.563140&lt;/td&gt;
+      &lt;td&gt;1.111537&lt;/td&gt;
+      &lt;td&gt;1.0&lt;/td&gt;
+      &lt;td&gt;5.00&lt;/td&gt;
+      &lt;td&gt;5.0&lt;/td&gt;
+      &lt;td&gt;6.00&lt;/td&gt;
+      &lt;td&gt;9.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Year.Built&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;1971.356314&lt;/td&gt;
+      &lt;td&gt;30.245361&lt;/td&gt;
+      &lt;td&gt;1872.0&lt;/td&gt;
+      &lt;td&gt;1954.00&lt;/td&gt;
+      &lt;td&gt;1973.0&lt;/td&gt;
+      &lt;td&gt;2001.00&lt;/td&gt;
+      &lt;td&gt;2010.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Year.Remod.Add&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;1984.266553&lt;/td&gt;
+      &lt;td&gt;20.860286&lt;/td&gt;
+      &lt;td&gt;1950.0&lt;/td&gt;
+      &lt;td&gt;1965.00&lt;/td&gt;
+      &lt;td&gt;1993.0&lt;/td&gt;
+      &lt;td&gt;2004.00&lt;/td&gt;
+      &lt;td&gt;2010.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Mas.Vnr.Area&lt;/th&gt;
+      &lt;td&gt;2907.0&lt;/td&gt;
+      &lt;td&gt;101.896801&lt;/td&gt;
+      &lt;td&gt;179.112611&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;164.00&lt;/td&gt;
+      &lt;td&gt;1600.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;BsmtFin.SF.1&lt;/th&gt;
+      &lt;td&gt;2929.0&lt;/td&gt;
+      &lt;td&gt;442.629566&lt;/td&gt;
+      &lt;td&gt;455.590839&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;370.0&lt;/td&gt;
+      &lt;td&gt;734.00&lt;/td&gt;
+      &lt;td&gt;5644.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;BsmtFin.SF.2&lt;/th&gt;
+      &lt;td&gt;2929.0&lt;/td&gt;
+      &lt;td&gt;49.722431&lt;/td&gt;
+      &lt;td&gt;169.168476&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;1526.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Bsmt.Unf.SF&lt;/th&gt;
+      &lt;td&gt;2929.0&lt;/td&gt;
+      &lt;td&gt;559.262547&lt;/td&gt;
+      &lt;td&gt;439.494153&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;219.00&lt;/td&gt;
+      &lt;td&gt;466.0&lt;/td&gt;
+      &lt;td&gt;802.00&lt;/td&gt;
+      &lt;td&gt;2336.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Total.Bsmt.SF&lt;/th&gt;
+      &lt;td&gt;2929.0&lt;/td&gt;
+      &lt;td&gt;1051.614544&lt;/td&gt;
+      &lt;td&gt;440.615067&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;793.00&lt;/td&gt;
+      &lt;td&gt;990.0&lt;/td&gt;
+      &lt;td&gt;1302.00&lt;/td&gt;
+      &lt;td&gt;6110.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;X1st.Flr.SF&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;1159.557679&lt;/td&gt;
+      &lt;td&gt;391.890885&lt;/td&gt;
+      &lt;td&gt;334.0&lt;/td&gt;
+      &lt;td&gt;876.25&lt;/td&gt;
+      &lt;td&gt;1084.0&lt;/td&gt;
+      &lt;td&gt;1384.00&lt;/td&gt;
+      &lt;td&gt;5095.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;X2nd.Flr.SF&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;335.455973&lt;/td&gt;
+      &lt;td&gt;428.395715&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;703.75&lt;/td&gt;
+      &lt;td&gt;2065.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Low.Qual.Fin.SF&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;4.676792&lt;/td&gt;
+      &lt;td&gt;46.310510&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;1064.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Gr.Liv.Area&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;1499.690444&lt;/td&gt;
+      &lt;td&gt;505.508887&lt;/td&gt;
+      &lt;td&gt;334.0&lt;/td&gt;
+      &lt;td&gt;1126.00&lt;/td&gt;
+      &lt;td&gt;1442.0&lt;/td&gt;
+      &lt;td&gt;1742.75&lt;/td&gt;
+      &lt;td&gt;5642.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Bsmt.Full.Bath&lt;/th&gt;
+      &lt;td&gt;2928.0&lt;/td&gt;
+      &lt;td&gt;0.431352&lt;/td&gt;
+      &lt;td&gt;0.524820&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+      &lt;td&gt;3.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Bsmt.Half.Bath&lt;/th&gt;
+      &lt;td&gt;2928.0&lt;/td&gt;
+      &lt;td&gt;0.061134&lt;/td&gt;
+      &lt;td&gt;0.245254&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;2.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Full.Bath&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;1.566553&lt;/td&gt;
+      &lt;td&gt;0.552941&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+      &lt;td&gt;2.0&lt;/td&gt;
+      &lt;td&gt;2.00&lt;/td&gt;
+      &lt;td&gt;4.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Half.Bath&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;0.379522&lt;/td&gt;
+      &lt;td&gt;0.502629&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+      &lt;td&gt;2.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Bedroom.AbvGr&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;2.854266&lt;/td&gt;
+      &lt;td&gt;0.827731&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;2.00&lt;/td&gt;
+      &lt;td&gt;3.0&lt;/td&gt;
+      &lt;td&gt;3.00&lt;/td&gt;
+      &lt;td&gt;8.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Kitchen.AbvGr&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;1.044369&lt;/td&gt;
+      &lt;td&gt;0.214076&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+      &lt;td&gt;1.0&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+      &lt;td&gt;3.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;TotRms.AbvGrd&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;6.443003&lt;/td&gt;
+      &lt;td&gt;1.572964&lt;/td&gt;
+      &lt;td&gt;2.0&lt;/td&gt;
+      &lt;td&gt;5.00&lt;/td&gt;
+      &lt;td&gt;6.0&lt;/td&gt;
+      &lt;td&gt;7.00&lt;/td&gt;
+      &lt;td&gt;15.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Fireplaces&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;0.599317&lt;/td&gt;
+      &lt;td&gt;0.647921&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;1.0&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+      &lt;td&gt;4.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Garage.Yr.Blt&lt;/th&gt;
+      &lt;td&gt;2771.0&lt;/td&gt;
+      &lt;td&gt;1978.132443&lt;/td&gt;
+      &lt;td&gt;25.528411&lt;/td&gt;
+      &lt;td&gt;1895.0&lt;/td&gt;
+      &lt;td&gt;1960.00&lt;/td&gt;
+      &lt;td&gt;1979.0&lt;/td&gt;
+      &lt;td&gt;2002.00&lt;/td&gt;
+      &lt;td&gt;2207.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Garage.Cars&lt;/th&gt;
+      &lt;td&gt;2929.0&lt;/td&gt;
+      &lt;td&gt;1.766815&lt;/td&gt;
+      &lt;td&gt;0.760566&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+      &lt;td&gt;2.0&lt;/td&gt;
+      &lt;td&gt;2.00&lt;/td&gt;
+      &lt;td&gt;5.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Garage.Area&lt;/th&gt;
+      &lt;td&gt;2929.0&lt;/td&gt;
+      &lt;td&gt;472.819734&lt;/td&gt;
+      &lt;td&gt;215.046549&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;320.00&lt;/td&gt;
+      &lt;td&gt;480.0&lt;/td&gt;
+      &lt;td&gt;576.00&lt;/td&gt;
+      &lt;td&gt;1488.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Wood.Deck.SF&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;93.751877&lt;/td&gt;
+      &lt;td&gt;126.361562&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;168.00&lt;/td&gt;
+      &lt;td&gt;1424.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Open.Porch.SF&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;47.533447&lt;/td&gt;
+      &lt;td&gt;67.483400&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;27.0&lt;/td&gt;
+      &lt;td&gt;70.00&lt;/td&gt;
+      &lt;td&gt;742.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Enclosed.Porch&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;23.011604&lt;/td&gt;
+      &lt;td&gt;64.139059&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;1012.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;X3Ssn.Porch&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;2.592491&lt;/td&gt;
+      &lt;td&gt;25.141331&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;508.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Screen.Porch&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;16.002048&lt;/td&gt;
+      &lt;td&gt;56.087370&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;576.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Pool.Area&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;2.243345&lt;/td&gt;
+      &lt;td&gt;35.597181&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;800.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Misc.Val&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;50.635154&lt;/td&gt;
+      &lt;td&gt;566.344288&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;0.0&lt;/td&gt;
+      &lt;td&gt;0.00&lt;/td&gt;
+      &lt;td&gt;17000.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Mo.Sold&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;6.216041&lt;/td&gt;
+      &lt;td&gt;2.714492&lt;/td&gt;
+      &lt;td&gt;1.0&lt;/td&gt;
+      &lt;td&gt;4.00&lt;/td&gt;
+      &lt;td&gt;6.0&lt;/td&gt;
+      &lt;td&gt;8.00&lt;/td&gt;
+      &lt;td&gt;12.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Yr.Sold&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;2007.790444&lt;/td&gt;
+      &lt;td&gt;1.316613&lt;/td&gt;
+      &lt;td&gt;2006.0&lt;/td&gt;
+      &lt;td&gt;2007.00&lt;/td&gt;
+      &lt;td&gt;2008.0&lt;/td&gt;
+      &lt;td&gt;2009.00&lt;/td&gt;
+      &lt;td&gt;2010.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;SalePrice&lt;/th&gt;
+      &lt;td&gt;2930.0&lt;/td&gt;
+      &lt;td&gt;180796.060068&lt;/td&gt;
+      &lt;td&gt;79886.692357&lt;/td&gt;
+      &lt;td&gt;12789.0&lt;/td&gt;
+      &lt;td&gt;129500.00&lt;/td&gt;
+      &lt;td&gt;160000.0&lt;/td&gt;
+      &lt;td&gt;213500.00&lt;/td&gt;
+      &lt;td&gt;755000.0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The main comment is that there&amp;rsquo;s a lof of missing data, and that some columns should be dropped entirely (in particular Alley, Pool QC, Fence, Misc Feature, Fireplace QC) - or the dataset documentation needs to be checked to see that N/A isn&amp;rsquo;t a default category in these cases. There&amp;rsquo;s also a mixture of categorical and numerical features, which is a little tricky to handle. Luckily sklearn has the &lt;code&gt;FeatureUnion&lt;/code&gt; and &lt;code&gt;Pipeline&lt;/code&gt; objects to help us.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;ames.isnull().sum()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Order                0
+MS.SubClass          0
+MS.Zoning            0
+Lot.Frontage       490
+Lot.Area             0
+Street               0
+Alley             2732
+Lot.Shape            0
+Land.Contour         0
+Utilities            0
+Lot.Config           0
+Land.Slope           0
+Neighborhood         0
+Condition.1          0
+Condition.2          0
+Bldg.Type            0
+House.Style          0
+Overall.Qual         0
+Overall.Cond         0
+Year.Built           0
+Year.Remod.Add       0
+Roof.Style           0
+Roof.Matl            0
+Exterior.1st         0
+Exterior.2nd         0
+Mas.Vnr.Type        23
+Mas.Vnr.Area        23
+Exter.Qual           0
+Exter.Cond           0
+Foundation           0
+                  ... 
+Bedroom.AbvGr        0
+Kitchen.AbvGr        0
+Kitchen.Qual         0
+TotRms.AbvGrd        0
+Functional           0
+Fireplaces           0
+Fireplace.Qu      1422
+Garage.Type        157
+Garage.Yr.Blt      159
+Garage.Finish      159
+Garage.Cars          1
+Garage.Area          1
+Garage.Qual        159
+Garage.Cond        159
+Paved.Drive          0
+Wood.Deck.SF         0
+Open.Porch.SF        0
+Enclosed.Porch       0
+X3Ssn.Porch          0
+Screen.Porch         0
+Pool.Area            0
+Pool.QC           2917
+Fence             2358
+Misc.Feature      2824
+Misc.Val             0
+Mo.Sold              0
+Yr.Sold              0
+Sale.Type            0
+Sale.Condition       0
+SalePrice            0
+Length: 81, dtype: int64
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;First of all, let&amp;rsquo;s build a transformer which drops the columns we suggest. A sklearn compatible transformer is a class which has to have two methods &lt;code&gt;fit&lt;/code&gt; (which returns &lt;code&gt;self&lt;/code&gt;), and &lt;code&gt;transform&lt;/code&gt; (which can return whatever you want). It&amp;rsquo;s a good idea to inherit from &lt;code&gt;sklearn.base.TransformerMixin&lt;/code&gt; and &lt;code&gt;sklearn.base.BaseEstimator&lt;/code&gt;. The general pattern of a Transformer is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.base import BaseEstimator, TransformerMixin
+
+class ExampleTransformer(BaseEstimator, TransformerMixin):
+    
+    def __init__(self):
+        pass
+    
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        return do_something_to(self, X)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;These are actually quite simple, and can be quite flexible. Later on, we might see a transformer that uses the &lt;code&gt;fit&lt;/code&gt; method. Anyway, here&amp;rsquo;s a column dropper.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.linear_model import LarsCV
+from sklearn.model_selection import  train_test_split
+from sklearn.metrics import mean_squared_error, mean_squared_log_error
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class ColumnDropper(BaseEstimator, TransformerMixin):
+    &#39;&#39;&#39;
+    Transformer to drop a list of cols
+    &#39;&#39;&#39;
+    
+    def __init__(self, drop_cols):
+        self._drop_cols = drop_cols
+    
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        df = X.copy()
+        df = df.drop(self._drop_cols, axis=1)
+        return df
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;y = ames[&#39;SalePrice&#39;].copy()
+X = ames.drop(&#39;SalePrice&#39;, axis=1).copy()
+X.columns
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Index([&#39;Order&#39;, &#39;MS.SubClass&#39;, &#39;MS.Zoning&#39;, &#39;Lot.Frontage&#39;, &#39;Lot.Area&#39;,
+       &#39;Street&#39;, &#39;Alley&#39;, &#39;Lot.Shape&#39;, &#39;Land.Contour&#39;, &#39;Utilities&#39;,
+       &#39;Lot.Config&#39;, &#39;Land.Slope&#39;, &#39;Neighborhood&#39;, &#39;Condition.1&#39;,
+       &#39;Condition.2&#39;, &#39;Bldg.Type&#39;, &#39;House.Style&#39;, &#39;Overall.Qual&#39;,
+       &#39;Overall.Cond&#39;, &#39;Year.Built&#39;, &#39;Year.Remod.Add&#39;, &#39;Roof.Style&#39;,
+       &#39;Roof.Matl&#39;, &#39;Exterior.1st&#39;, &#39;Exterior.2nd&#39;, &#39;Mas.Vnr.Type&#39;,
+       &#39;Mas.Vnr.Area&#39;, &#39;Exter.Qual&#39;, &#39;Exter.Cond&#39;, &#39;Foundation&#39;, &#39;Bsmt.Qual&#39;,
+       &#39;Bsmt.Cond&#39;, &#39;Bsmt.Exposure&#39;, &#39;BsmtFin.Type.1&#39;, &#39;BsmtFin.SF.1&#39;,
+       &#39;BsmtFin.Type.2&#39;, &#39;BsmtFin.SF.2&#39;, &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;,
+       &#39;Heating&#39;, &#39;Heating.QC&#39;, &#39;Central.Air&#39;, &#39;Electrical&#39;, &#39;X1st.Flr.SF&#39;,
+       &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;, &#39;Gr.Liv.Area&#39;, &#39;Bsmt.Full.Bath&#39;,
+       &#39;Bsmt.Half.Bath&#39;, &#39;Full.Bath&#39;, &#39;Half.Bath&#39;, &#39;Bedroom.AbvGr&#39;,
+       &#39;Kitchen.AbvGr&#39;, &#39;Kitchen.Qual&#39;, &#39;TotRms.AbvGrd&#39;, &#39;Functional&#39;,
+       &#39;Fireplaces&#39;, &#39;Fireplace.Qu&#39;, &#39;Garage.Type&#39;, &#39;Garage.Yr.Blt&#39;,
+       &#39;Garage.Finish&#39;, &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;, &#39;Garage.Qual&#39;,
+       &#39;Garage.Cond&#39;, &#39;Paved.Drive&#39;, &#39;Wood.Deck.SF&#39;, &#39;Open.Porch.SF&#39;,
+       &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;, &#39;Screen.Porch&#39;, &#39;Pool.Area&#39;, &#39;Pool.QC&#39;,
+       &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Misc.Val&#39;, &#39;Mo.Sold&#39;, &#39;Yr.Sold&#39;, &#39;Sale.Type&#39;,
+       &#39;Sale.Condition&#39;],
+      dtype=&#39;object&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;pipe = Pipeline([(&#39;dropper&#39;, ColumnDropper([&#39;Alley&#39;, &#39;Pool.QC&#39;, &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Fireplace.Qu&#39;, &#39;Order&#39;]))])
+X_trans = pipe.fit_transform(X)
+X_trans.columns
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Index([&#39;MS.SubClass&#39;, &#39;MS.Zoning&#39;, &#39;Lot.Frontage&#39;, &#39;Lot.Area&#39;, &#39;Street&#39;,
+       &#39;Lot.Shape&#39;, &#39;Land.Contour&#39;, &#39;Utilities&#39;, &#39;Lot.Config&#39;, &#39;Land.Slope&#39;,
+       &#39;Neighborhood&#39;, &#39;Condition.1&#39;, &#39;Condition.2&#39;, &#39;Bldg.Type&#39;,
+       &#39;House.Style&#39;, &#39;Overall.Qual&#39;, &#39;Overall.Cond&#39;, &#39;Year.Built&#39;,
+       &#39;Year.Remod.Add&#39;, &#39;Roof.Style&#39;, &#39;Roof.Matl&#39;, &#39;Exterior.1st&#39;,
+       &#39;Exterior.2nd&#39;, &#39;Mas.Vnr.Type&#39;, &#39;Mas.Vnr.Area&#39;, &#39;Exter.Qual&#39;,
+       &#39;Exter.Cond&#39;, &#39;Foundation&#39;, &#39;Bsmt.Qual&#39;, &#39;Bsmt.Cond&#39;, &#39;Bsmt.Exposure&#39;,
+       &#39;BsmtFin.Type.1&#39;, &#39;BsmtFin.SF.1&#39;, &#39;BsmtFin.Type.2&#39;, &#39;BsmtFin.SF.2&#39;,
+       &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;, &#39;Heating&#39;, &#39;Heating.QC&#39;, &#39;Central.Air&#39;,
+       &#39;Electrical&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;,
+       &#39;Gr.Liv.Area&#39;, &#39;Bsmt.Full.Bath&#39;, &#39;Bsmt.Half.Bath&#39;, &#39;Full.Bath&#39;,
+       &#39;Half.Bath&#39;, &#39;Bedroom.AbvGr&#39;, &#39;Kitchen.AbvGr&#39;, &#39;Kitchen.Qual&#39;,
+       &#39;TotRms.AbvGrd&#39;, &#39;Functional&#39;, &#39;Fireplaces&#39;, &#39;Garage.Type&#39;,
+       &#39;Garage.Yr.Blt&#39;, &#39;Garage.Finish&#39;, &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;,
+       &#39;Garage.Qual&#39;, &#39;Garage.Cond&#39;, &#39;Paved.Drive&#39;, &#39;Wood.Deck.SF&#39;,
+       &#39;Open.Porch.SF&#39;, &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;, &#39;Screen.Porch&#39;,
+       &#39;Pool.Area&#39;, &#39;Misc.Val&#39;, &#39;Mo.Sold&#39;, &#39;Yr.Sold&#39;, &#39;Sale.Type&#39;,
+       &#39;Sale.Condition&#39;],
+      dtype=&#39;object&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Another option, especially with columns with missing values, is to impute the value but to include a column telling the model where the imputed values are.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class ImputeWithDummy(BaseEstimator, TransformerMixin):
+    
+    def __init__(self, cols_to_impute, strategy, fill=&#39;NA&#39;):
+        self.cols_to_impute = cols_to_impute
+        self.strategy = strategy
+        self.fill = fill
+        
+    def fit(self, X, y=None, **kwargs):
+        if self.strategy == &#39;mean&#39;:
+            self.fill = X.mean()
+        elif self.strategy == &#39;median&#39;:
+            self.fill = X.median()
+        elif self.strategy == &#39;mode&#39;:
+            self.fill = X.mode().iloc[0]
+        elif self.strategy == &#39;fill&#39;:
+            if type(self.fill) is list and type(X) is pd.DataFrame:
+                self.fill = dict([(cname, v) for cname,v in zip(X.columns, self.fill)])
+        return self
+    
+    def transform(self, X):
+        df = X.copy()
+        for col in self.cols_to_impute:
+            df[&#39;{}_missing&#39;.format(col)] = df[col].isnull().astype(int)
+            df[col] = df[col].fillna(self.fill[col])
+        return df
+    
+X = pd.read_csv(&#39;ames.csv&#39;)
+imputer = ImputeWithDummy([&#39;Alley&#39;], strategy=&#39;mode&#39;)
+X_transformed = imputer.fit_transform(X)
+X_transformed[[&#39;Alley&#39;, &#39;Alley_missing&#39;]].head()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;Alley&lt;/th&gt;
+      &lt;th&gt;Alley_missing&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;Grvl&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;Grvl&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;Grvl&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;Grvl&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;Grvl&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Of course, you should always read the data documentation (&lt;a href=&#34;https://ww2.amstat.org/publications/jse/v19n3/decock/datadocumentation.txt&#34; target=&#34;_blank&#34;&gt;https://ww2.amstat.org/publications/jse/v19n3/decock/datadocumentation.txt&lt;/a&gt;), and there you&amp;rsquo;ll see for Alley that NaN means No Alley Access, and that we don&amp;rsquo;t need to any imputation at all!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class NaNImpute(BaseEstimator, TransformerMixin):
+    
+    def __init__(self, cols, fill_vals):
+        self.cols = cols
+        self.fill_vals = fill_vals
+        
+    def fit(self, X, y=None, **kwargs):
+        return self
+    
+    def transform(self, X):
+        df = X.copy()
+        for i, col in enumerate(self.cols):
+            df[col].fillna(self.fill_vals[i])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The other thing we&amp;rsquo;ll need to consider is that some columns will need to be converted to numeric features first, before an estimator can be fitted. First we&amp;rsquo;ll fit an imputer, and then encode.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class DummyEncoding(BaseEstimator, TransformerMixin):
+
+    def __init__(self, columns=None):
+
+        self.columns = columns
+
+    def fit(self, X, y=None, **kwargs):
+        return self
+    
+    def transform(self, X, y=None, **kwargs):
+        return pd.get_dummies(X, columns=self.columns, drop_first=True)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;impute_cols = [&#39;Alley&#39;, &#39;Pool.QC&#39;, &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Fireplace.Qu&#39;]
+pipe = Pipeline([(&#39;impute&#39;, ImputeWithDummy(impute_cols, strategy=&#39;mode&#39;)), (&#39;encode&#39;, DummyEncoding(impute_cols))])
+X = pd.read_csv(&#39;ames.csv&#39;)
+X_trans = pipe.fit_transform(X)
+X_trans.columns
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Index([&#39;Order&#39;, &#39;PID&#39;, &#39;MS.SubClass&#39;, &#39;MS.Zoning&#39;, &#39;Lot.Frontage&#39;, &#39;Lot.Area&#39;,
+       &#39;Street&#39;, &#39;Lot.Shape&#39;, &#39;Land.Contour&#39;, &#39;Utilities&#39;, &#39;Lot.Config&#39;,
+       &#39;Land.Slope&#39;, &#39;Neighborhood&#39;, &#39;Condition.1&#39;, &#39;Condition.2&#39;, &#39;Bldg.Type&#39;,
+       &#39;House.Style&#39;, &#39;Overall.Qual&#39;, &#39;Overall.Cond&#39;, &#39;Year.Built&#39;,
+       &#39;Year.Remod.Add&#39;, &#39;Roof.Style&#39;, &#39;Roof.Matl&#39;, &#39;Exterior.1st&#39;,
+       &#39;Exterior.2nd&#39;, &#39;Mas.Vnr.Type&#39;, &#39;Mas.Vnr.Area&#39;, &#39;Exter.Qual&#39;,
+       &#39;Exter.Cond&#39;, &#39;Foundation&#39;, &#39;Bsmt.Qual&#39;, &#39;Bsmt.Cond&#39;, &#39;Bsmt.Exposure&#39;,
+       &#39;BsmtFin.Type.1&#39;, &#39;BsmtFin.SF.1&#39;, &#39;BsmtFin.Type.2&#39;, &#39;BsmtFin.SF.2&#39;,
+       &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;, &#39;Heating&#39;, &#39;Heating.QC&#39;, &#39;Central.Air&#39;,
+       &#39;Electrical&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;,
+       &#39;Gr.Liv.Area&#39;, &#39;Bsmt.Full.Bath&#39;, &#39;Bsmt.Half.Bath&#39;, &#39;Full.Bath&#39;,
+       &#39;Half.Bath&#39;, &#39;Bedroom.AbvGr&#39;, &#39;Kitchen.AbvGr&#39;, &#39;Kitchen.Qual&#39;,
+       &#39;TotRms.AbvGrd&#39;, &#39;Functional&#39;, &#39;Fireplaces&#39;, &#39;Garage.Type&#39;,
+       &#39;Garage.Yr.Blt&#39;, &#39;Garage.Finish&#39;, &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;,
+       &#39;Garage.Qual&#39;, &#39;Garage.Cond&#39;, &#39;Paved.Drive&#39;, &#39;Wood.Deck.SF&#39;,
+       &#39;Open.Porch.SF&#39;, &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;, &#39;Screen.Porch&#39;,
+       &#39;Pool.Area&#39;, &#39;Misc.Val&#39;, &#39;Mo.Sold&#39;, &#39;Yr.Sold&#39;, &#39;Sale.Type&#39;,
+       &#39;Sale.Condition&#39;, &#39;SalePrice&#39;, &#39;Alley_missing&#39;, &#39;Pool.QC_missing&#39;,
+       &#39;Fence_missing&#39;, &#39;Misc.Feature_missing&#39;, &#39;Fireplace.Qu_missing&#39;,
+       &#39;Alley_Pave&#39;, &#39;Pool.QC_Fa&#39;, &#39;Pool.QC_Gd&#39;, &#39;Pool.QC_TA&#39;, &#39;Fence_GdWo&#39;,
+       &#39;Fence_MnPrv&#39;, &#39;Fence_MnWw&#39;, &#39;Misc.Feature_Gar2&#39;, &#39;Misc.Feature_Othr&#39;,
+       &#39;Misc.Feature_Shed&#39;, &#39;Misc.Feature_TenC&#39;, &#39;Fireplace.Qu_Fa&#39;,
+       &#39;Fireplace.Qu_Gd&#39;, &#39;Fireplace.Qu_Po&#39;, &#39;Fireplace.Qu_TA&#39;],
+      dtype=&#39;object&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This dataset has several types of columns - continuous features encoded as ints and floats, but also some ordinal variables have snick in as ints. We&amp;rsquo;ll properly define all the int and float colukmns first:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;float_cols = [&#39;Lot.Frontage&#39;, 
+              &#39;Mas.Vnr.Area&#39;, 
+              &#39;BsmtFin.SF.1&#39;, 
+              &#39;BsmtFin.SF.2&#39;, 
+              &#39;Bsmt.Unf.SF&#39;,
+              &#39;Total.Bsmt.SF&#39;,
+              &#39;Garage.Cars&#39;,
+              &#39;Garage.Area&#39;
+             ]
+
+int_cols = [&#39;MS.SubClass&#39;, 
+            &#39;Lot.Area&#39;,
+            &#39;X1st.Flr.SF&#39;,
+            &#39;X2nd.Flr.SF&#39;, 
+            &#39;Low.Qual.Fin.SF&#39;, 
+            &#39;Gr.Liv.Area&#39;, 
+            &#39;Full.Bath&#39;,
+            &#39;Half.Bath&#39;, 
+            &#39;Bedroom.AbvGr&#39;, 
+            &#39;Kitchen.AbvGr&#39;, 
+            &#39;TotRms.AbvGrd&#39;,
+            &#39;Fireplaces&#39;, 
+            &#39;Wood.Deck.SF&#39;, 
+            &#39;Open.Porch.SF&#39;, 
+            &#39;Enclosed.Porch&#39;,
+            &#39;X3Ssn.Porch&#39;, 
+            &#39;Screen.Porch&#39;, 
+            &#39;Pool.Area&#39;, 
+            &#39;Misc.Val&#39;
+           ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, we need some way to deal with ordinal features:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Lot Shape (Ordinal): General shape of property&lt;/li&gt;
+&lt;li&gt;Utilities (Ordinal): Type of utilities available&lt;/li&gt;
+&lt;li&gt;Land Slope (Ordinal): Slope of property&lt;/li&gt;
+&lt;li&gt;Overall Qual (Ordinal): Rates the overall material and finish of the house&lt;/li&gt;
+&lt;li&gt;Overall Cond (Ordinal): Rates the overall condition of the house&lt;/li&gt;
+&lt;li&gt;Exter Qual (Ordinal): Evaluates the quality of the material on the exterior&lt;/li&gt;
+&lt;li&gt;Exter Cond (Ordinal): Evaluates the present condition of the material on the exterior&lt;/li&gt;
+&lt;li&gt;Bsmt Qual (Ordinal): Evaluates the height of the basement&lt;/li&gt;
+&lt;li&gt;Bsmt Cond (Ordinal): Evaluates the general condition of the basement&lt;/li&gt;
+&lt;li&gt;Bsmt Exposure   (Ordinal): Refers to walkout or garden level walls&lt;/li&gt;
+&lt;li&gt;BsmtFin Type 1  (Ordinal): Rating of basement finished area&lt;/li&gt;
+&lt;li&gt;BsmtFin Type 2  (Ordinal): Rating of basement finished area (if multiple types)&lt;/li&gt;
+&lt;li&gt;HeatingQC (Ordinal): Heating quality and condition&lt;/li&gt;
+&lt;li&gt;Electrical (Ordinal): Electrical system&lt;/li&gt;
+&lt;li&gt;FireplaceQu (Ordinal): Fireplace quality&lt;/li&gt;
+&lt;li&gt;Garage Finish (Ordinal) : Interior finish of the garage&lt;/li&gt;
+&lt;li&gt;Garage Qual (Ordinal): Garage quality&lt;/li&gt;
+&lt;li&gt;Garage Cond (Ordinal): Garage condition&lt;/li&gt;
+&lt;li&gt;Paved Drive (Ordinal): Paved driveway&lt;/li&gt;
+&lt;li&gt;Pool QC (Ordinal): Pool quality&lt;/li&gt;
+&lt;li&gt;Fence (Ordinal): Fence quality&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To do this we could use the OrdinalEncoder from &lt;a href=&#34;http://contrib.scikit-learn.org/categorical-encoding/&#34; target=&#34;_blank&#34;&gt;http://contrib.scikit-learn.org/categorical-encoding/&lt;/a&gt;, which will be included in sklearn in a future release  - but I have trouble getting this to work with Pandas. Another choice is just to write our own. What we&amp;rsquo;ll do instead is to mix ordinal and categorical variables, and use the OneHotEncoder from the category_encoders package.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;ord_cols     = [&#39;Lot.Shape&#39;,
+                &#39;Utilities&#39;,
+                &#39;Land.Slope&#39;,
+                &#39;Overall.Qual&#39;,
+                &#39;Overall.Cond&#39;,
+                &#39;Exter.Qual&#39;, 
+                &#39;Exter.Cond&#39;,
+                &#39;Bsmt.Qual&#39;,
+                &#39;Bsmt.Cond&#39;, 
+                &#39;Bsmt.Exposure&#39;, 
+                &#39;BsmtFin.Type.1&#39;, 
+                &#39;BsmtFin.SF.1&#39;,
+                &#39;Heating.QC&#39;,
+                &#39;Electrical&#39;,
+                &#39;Fireplace.Qu&#39;,
+                &#39;Garage.Finish&#39;,
+                &#39;Garage.Qual&#39;,
+                &#39;Garage.Cond&#39;,
+                &#39;Paved.Drive&#39;,
+                &#39;Pool.QC&#39;,
+                &#39;Fence&#39;,
+               ]
+
+cat_cols = [&#39;MS.SubClass&#39;,
+            &#39;MS.Zoning&#39;,
+            &#39;Street&#39;,
+            &#39;Alley&#39;,
+            &#39;Land.Contour&#39;,
+            &#39;Lot.Config&#39;,
+            &#39;Neighborhood&#39;,
+            &#39;Condition.1&#39;,
+            &#39;Condition.2&#39;,
+            &#39;Bldg.Type&#39;,
+            &#39;House.Style&#39;,
+            &#39;Roof.Style&#39;,
+            &#39;Exterior.1st&#39;, 
+            &#39;Exterior.2nd&#39;,
+            &#39;Mas.Vnr.Type&#39;,
+            &#39;Foundation&#39;,
+            &#39;Heating&#39;,
+            &#39;Central.Air&#39;,
+            &#39;Garage.Type&#39;,
+            &#39;Misc.Feature&#39;,
+            &#39;Sale.Type&#39;,
+            &#39;Sale.Condition&#39;
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, we define a few useful transforms and put together our first pipeline.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class DataFrameSelector(BaseEstimator, TransformerMixin):
+    &#39;&#39;&#39;
+    Select columns from pandas dataframe by specifying a list of column names
+    &#39;&#39;&#39;
+    def __init__(self, col_names):
+        self.col_names = col_names
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X[self.col_names]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Scale(BaseEstimator, TransformerMixin):
+    
+    def __init__(self, cols):
+        self.scaler = StandardScaler()
+        self.cols = cols
+        self.index = []
+        
+    def fit(self, X, y=None, **kwargs):
+        self.scaler.fit(X)
+        self.cols = X.columns
+        self.index = X.index
+        return self
+        
+    def transform(self, X):
+        df = X.copy()
+        df = self.scaler.transform(df)
+        df = pd.DataFrame(df, columns=self.cols, index=self.index)
+        return df
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.externals.joblib import Parallel, delayed
+from sklearn.pipeline import FeatureUnion, _fit_transform_one, _transform_one
+from scipy import sparse
+
+
+class FeatureUnion(FeatureUnion):
+    def fit_transform(self, X, y=None, **fit_params):
+        self._validate_transformers()
+        result = Parallel(n_jobs=self.n_jobs)(
+            delayed(_fit_transform_one)(trans, weight, X, y,
+                                        **fit_params)
+            for name, trans, weight in self._iter())
+
+        if not result:
+            # All transformers are None
+            return np.zeros((X.shape[0], 0))
+        Xs, transformers = zip(*result)
+        self._update_transformer_list(transformers)
+        if any(sparse.issparse(f) for f in Xs):
+            Xs = sparse.hstack(Xs).tocsr()
+        else:
+            Xs = self.merge_dataframes_by_column(Xs)
+        return Xs
+
+    def merge_dataframes_by_column(self, Xs):
+        return pd.concat(Xs, axis=&amp;quot;columns&amp;quot;, copy=False)
+
+    def transform(self, X):
+        Xs = Parallel(n_jobs=self.n_jobs)(
+            delayed(_transform_one)(trans, weight, X)
+            for name, trans, weight in self._iter())
+        if not Xs:
+            # All transformers are None
+            return np.zeros((X.shape[0], 0))
+        if any(sparse.issparse(f) for f in Xs):
+            Xs = sparse.hstack(Xs).tocsr()
+        else:
+            Xs = self.merge_dataframes_by_column(Xs)
+        return Xs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.preprocessing import StandardScaler, LabelEncoder, LabelBinarizer
+from category_encoders import OneHotEncoder
+
+numerical_cols = int_cols + float_cols
+
+pipe = Pipeline([
+    (&#39;features&#39;, FeatureUnion(n_jobs=1, transformer_list=[
+        (&#39;numericals&#39;, Pipeline([
+             (&#39;selector&#39;, DataFrameSelector(numerical_cols)),
+             (&#39;imputer&#39;, ImputeWithDummy(numerical_cols, strategy=&#39;mean&#39;)),
+             #(&#39;scaling&#39;, Scale(numerical_cols))
+        ])),
+        
+        #(&#39;categoricals&#39;, Pipeline([
+        #     (&#39;selector&#39;, DataFrameSelector(cat_cols)), 
+        #     (&#39;encode&#39;, OneHotEncoder(cat_cols, return_df=True)),
+        #])),
+        
+        #(&#39;NanImpute&#39;, Pipeline([
+        ##     (&#39;selector&#39;, DataFrameSelector([&#39;Alley&#39;, &#39;Pool.QC&#39;, &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Fireplace.Qu&#39;])),
+        #     (&#39;nan_impute&#39;, NaNImpute([&#39;Alley&#39;, &#39;Pool.QC&#39;, &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Fireplace.Qu&#39;], &#39;Not Applicable&#39;))
+        #])),
+    ])), 
+])  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;X = pd.read_csv(&#39;ames.csv&#39;)
+X = X.set_index(&#39;PID&#39;).copy()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;X_trans = pipe.fit_transform(X)
+X_trans
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;MS.SubClass&lt;/th&gt;
+      &lt;th&gt;Lot.Area&lt;/th&gt;
+      &lt;th&gt;X1st.Flr.SF&lt;/th&gt;
+      &lt;th&gt;X2nd.Flr.SF&lt;/th&gt;
+      &lt;th&gt;Low.Qual.Fin.SF&lt;/th&gt;
+      &lt;th&gt;Gr.Liv.Area&lt;/th&gt;
+      &lt;th&gt;Full.Bath&lt;/th&gt;
+      &lt;th&gt;Half.Bath&lt;/th&gt;
+      &lt;th&gt;Bedroom.AbvGr&lt;/th&gt;
+      &lt;th&gt;Kitchen.AbvGr&lt;/th&gt;
+      &lt;th&gt;...&lt;/th&gt;
+      &lt;th&gt;Pool.Area_missing&lt;/th&gt;
+      &lt;th&gt;Misc.Val_missing&lt;/th&gt;
+      &lt;th&gt;Lot.Frontage_missing&lt;/th&gt;
+      &lt;th&gt;Mas.Vnr.Area_missing&lt;/th&gt;
+      &lt;th&gt;BsmtFin.SF.1_missing&lt;/th&gt;
+      &lt;th&gt;BsmtFin.SF.2_missing&lt;/th&gt;
+      &lt;th&gt;Bsmt.Unf.SF_missing&lt;/th&gt;
+      &lt;th&gt;Total.Bsmt.SF_missing&lt;/th&gt;
+      &lt;th&gt;Garage.Cars_missing&lt;/th&gt;
+      &lt;th&gt;Garage.Area_missing&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;PID&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;526301100&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;31770&lt;/td&gt;
+      &lt;td&gt;1656&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1656&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;526350040&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;11622&lt;/td&gt;
+      &lt;td&gt;896&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;896&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;526351010&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;14267&lt;/td&gt;
+      &lt;td&gt;1329&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1329&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;526353030&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;11160&lt;/td&gt;
+      &lt;td&gt;2110&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2110&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527105010&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;13830&lt;/td&gt;
+      &lt;td&gt;928&lt;/td&gt;
+      &lt;td&gt;701&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1629&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527105030&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;9978&lt;/td&gt;
+      &lt;td&gt;926&lt;/td&gt;
+      &lt;td&gt;678&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1604&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527127150&lt;/th&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;4920&lt;/td&gt;
+      &lt;td&gt;1338&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1338&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527145080&lt;/th&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;5005&lt;/td&gt;
+      &lt;td&gt;1280&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1280&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527146030&lt;/th&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;5389&lt;/td&gt;
+      &lt;td&gt;1616&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1616&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527162130&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;7500&lt;/td&gt;
+      &lt;td&gt;1028&lt;/td&gt;
+      &lt;td&gt;776&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1804&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527163010&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;10000&lt;/td&gt;
+      &lt;td&gt;763&lt;/td&gt;
+      &lt;td&gt;892&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1655&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527165230&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;7980&lt;/td&gt;
+      &lt;td&gt;1187&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1187&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527166040&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;8402&lt;/td&gt;
+      &lt;td&gt;789&lt;/td&gt;
+      &lt;td&gt;676&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1465&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527180040&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;10176&lt;/td&gt;
+      &lt;td&gt;1341&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1341&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527182190&lt;/th&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;6820&lt;/td&gt;
+      &lt;td&gt;1502&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1502&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527216070&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;53504&lt;/td&gt;
+      &lt;td&gt;1690&lt;/td&gt;
+      &lt;td&gt;1589&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3279&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527225035&lt;/th&gt;
+      &lt;td&gt;50&lt;/td&gt;
+      &lt;td&gt;12134&lt;/td&gt;
+      &lt;td&gt;1080&lt;/td&gt;
+      &lt;td&gt;672&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1752&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527258010&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;11394&lt;/td&gt;
+      &lt;td&gt;1856&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1856&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527276150&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;19138&lt;/td&gt;
+      &lt;td&gt;864&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;864&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527302110&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;13175&lt;/td&gt;
+      &lt;td&gt;2073&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2073&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527358140&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;11751&lt;/td&gt;
+      &lt;td&gt;1844&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1844&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527358200&lt;/th&gt;
+      &lt;td&gt;85&lt;/td&gt;
+      &lt;td&gt;10625&lt;/td&gt;
+      &lt;td&gt;1173&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1173&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527368020&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;7500&lt;/td&gt;
+      &lt;td&gt;814&lt;/td&gt;
+      &lt;td&gt;860&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1674&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527402200&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;11241&lt;/td&gt;
+      &lt;td&gt;1004&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1004&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527402250&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;12537&lt;/td&gt;
+      &lt;td&gt;1078&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1078&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527403020&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;8450&lt;/td&gt;
+      &lt;td&gt;1056&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1056&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527404120&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;8400&lt;/td&gt;
+      &lt;td&gt;882&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;882&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527425090&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;10500&lt;/td&gt;
+      &lt;td&gt;864&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;864&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527427230&lt;/th&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;5858&lt;/td&gt;
+      &lt;td&gt;1337&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1337&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;527451180&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;1680&lt;/td&gt;
+      &lt;td&gt;483&lt;/td&gt;
+      &lt;td&gt;504&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;987&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;...&lt;/th&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;916477010&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;13618&lt;/td&gt;
+      &lt;td&gt;1960&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1960&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;921205030&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;11443&lt;/td&gt;
+      &lt;td&gt;2028&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2028&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;921205050&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;11577&lt;/td&gt;
+      &lt;td&gt;1838&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1838&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923125030&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;31250&lt;/td&gt;
+      &lt;td&gt;1600&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1600&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923202025&lt;/th&gt;
+      &lt;td&gt;90&lt;/td&gt;
+      &lt;td&gt;7020&lt;/td&gt;
+      &lt;td&gt;1368&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1368&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923203090&lt;/th&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;4500&lt;/td&gt;
+      &lt;td&gt;1216&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1216&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923203100&lt;/th&gt;
+      &lt;td&gt;120&lt;/td&gt;
+      &lt;td&gt;4500&lt;/td&gt;
+      &lt;td&gt;1337&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1337&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923205120&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;17217&lt;/td&gt;
+      &lt;td&gt;1140&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1140&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923225190&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;2665&lt;/td&gt;
+      &lt;td&gt;616&lt;/td&gt;
+      &lt;td&gt;688&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1304&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923225240&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;2665&lt;/td&gt;
+      &lt;td&gt;925&lt;/td&gt;
+      &lt;td&gt;550&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1475&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923225260&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;3964&lt;/td&gt;
+      &lt;td&gt;1291&lt;/td&gt;
+      &lt;td&gt;1230&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2521&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923225510&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;10172&lt;/td&gt;
+      &lt;td&gt;874&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;874&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923226150&lt;/th&gt;
+      &lt;td&gt;90&lt;/td&gt;
+      &lt;td&gt;11836&lt;/td&gt;
+      &lt;td&gt;1652&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1652&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923226180&lt;/th&gt;
+      &lt;td&gt;180&lt;/td&gt;
+      &lt;td&gt;1470&lt;/td&gt;
+      &lt;td&gt;630&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;630&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923226290&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;1484&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1092&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923227100&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;13384&lt;/td&gt;
+      &lt;td&gt;1360&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1360&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923228130&lt;/th&gt;
+      &lt;td&gt;180&lt;/td&gt;
+      &lt;td&gt;1533&lt;/td&gt;
+      &lt;td&gt;630&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;630&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923228180&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;1533&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1092&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923228210&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;1526&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1092&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923228260&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;1936&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1092&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923228310&lt;/th&gt;
+      &lt;td&gt;160&lt;/td&gt;
+      &lt;td&gt;1894&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;546&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1092&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923229110&lt;/th&gt;
+      &lt;td&gt;90&lt;/td&gt;
+      &lt;td&gt;12640&lt;/td&gt;
+      &lt;td&gt;1728&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1728&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923230040&lt;/th&gt;
+      &lt;td&gt;90&lt;/td&gt;
+      &lt;td&gt;9297&lt;/td&gt;
+      &lt;td&gt;1728&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1728&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923250060&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;17400&lt;/td&gt;
+      &lt;td&gt;1126&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1126&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923251180&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;20000&lt;/td&gt;
+      &lt;td&gt;1224&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1224&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923275080&lt;/th&gt;
+      &lt;td&gt;80&lt;/td&gt;
+      &lt;td&gt;7937&lt;/td&gt;
+      &lt;td&gt;1003&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1003&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923276100&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;8885&lt;/td&gt;
+      &lt;td&gt;902&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;902&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;923400125&lt;/th&gt;
+      &lt;td&gt;85&lt;/td&gt;
+      &lt;td&gt;10441&lt;/td&gt;
+      &lt;td&gt;970&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;970&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;924100070&lt;/th&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;10010&lt;/td&gt;
+      &lt;td&gt;1389&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1389&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;924151050&lt;/th&gt;
+      &lt;td&gt;60&lt;/td&gt;
+      &lt;td&gt;9627&lt;/td&gt;
+      &lt;td&gt;996&lt;/td&gt;
+      &lt;td&gt;1004&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;2000&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;2930 rows × 54 columns&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;l = list(X_trans.isnull().sum())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import warnings
+warnings.filterwarnings(&amp;quot;ignore&amp;quot;)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=42)
+model = Pipeline([(&#39;pipeline&#39;, pipe), (&#39;clf&#39;, LarsCV())])
+model.fit(X_train, y_train)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Pipeline(memory=None,
+     steps=[(&#39;pipeline&#39;, Pipeline(memory=None,
+     steps=[(&#39;features&#39;, FeatureUnion(n_jobs=1,
+       transformer_list=[(&#39;numericals&#39;, Pipeline(memory=None,
+     steps=[(&#39;selector&#39;, DataFrameSelector(col_names=[&#39;MS.SubClass&#39;, &#39;Lot.Area&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;, &#39;Gr.Liv.Area&#39;, &#39;Fu...max_n_alphas=1000, n_jobs=1, normalize=True,
+    positive=False, precompute=&#39;auto&#39;, verbose=False))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;pipe.fit_transform(X_test).columns
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Index([&#39;MS.SubClass&#39;, &#39;Lot.Area&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;,
+       &#39;Low.Qual.Fin.SF&#39;, &#39;Gr.Liv.Area&#39;, &#39;Full.Bath&#39;, &#39;Half.Bath&#39;,
+       &#39;Bedroom.AbvGr&#39;, &#39;Kitchen.AbvGr&#39;, &#39;TotRms.AbvGrd&#39;, &#39;Fireplaces&#39;,
+       &#39;Wood.Deck.SF&#39;, &#39;Open.Porch.SF&#39;, &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;,
+       &#39;Screen.Porch&#39;, &#39;Pool.Area&#39;, &#39;Misc.Val&#39;, &#39;Lot.Frontage&#39;, &#39;Mas.Vnr.Area&#39;,
+       &#39;BsmtFin.SF.1&#39;, &#39;BsmtFin.SF.2&#39;, &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;,
+       &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;, &#39;MS.SubClass_missing&#39;, &#39;Lot.Area_missing&#39;,
+       &#39;X1st.Flr.SF_missing&#39;, &#39;X2nd.Flr.SF_missing&#39;, &#39;Low.Qual.Fin.SF_missing&#39;,
+       &#39;Gr.Liv.Area_missing&#39;, &#39;Full.Bath_missing&#39;, &#39;Half.Bath_missing&#39;,
+       &#39;Bedroom.AbvGr_missing&#39;, &#39;Kitchen.AbvGr_missing&#39;,
+       &#39;TotRms.AbvGrd_missing&#39;, &#39;Fireplaces_missing&#39;, &#39;Wood.Deck.SF_missing&#39;,
+       &#39;Open.Porch.SF_missing&#39;, &#39;Enclosed.Porch_missing&#39;,
+       &#39;X3Ssn.Porch_missing&#39;, &#39;Screen.Porch_missing&#39;, &#39;Pool.Area_missing&#39;,
+       &#39;Misc.Val_missing&#39;, &#39;Lot.Frontage_missing&#39;, &#39;Mas.Vnr.Area_missing&#39;,
+       &#39;BsmtFin.SF.1_missing&#39;, &#39;BsmtFin.SF.2_missing&#39;, &#39;Bsmt.Unf.SF_missing&#39;,
+       &#39;Total.Bsmt.SF_missing&#39;, &#39;Garage.Cars_missing&#39;, &#39;Garage.Area_missing&#39;],
+      dtype=&#39;object&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;preds = model.predict(X_test)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+
+def rmse_cv(model, X, y):
+    rmse= np.sqrt(-cross_val_score(model, X, y, scoring=&amp;quot;neg_mean_squared_error&amp;quot;, cv=2))
+    return(rmse)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;rmse_cv(model, X, y)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;array([37647.53964453, 71123.27879506])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.metrics import r2_score
+
+def get_score(prediction, labels):    
+    print(&#39;R2: {}&#39;.format(r2_score(prediction, labels)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;get_score(preds, y_test)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;R2: 0.6208433062823728
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Random Forests for Time Series</title>
+      <link>/post/random-forests-for-time-series/</link>
+      <pubDate>Tue, 05 Nov 2019 21:07:55 +0100</pubDate>
+      <guid>/post/random-forests-for-time-series/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>The Guts of Gams</title>
