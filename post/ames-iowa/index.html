@@ -114,9 +114,9 @@ import pandas as pd import numpy as np from sklearn.">
   
   <meta property="twitter:card" content="summary">
   
-  <meta property="og:site_name" content="Academic">
+  <meta property="og:site_name" content="Tom Kealy&#39;s site">
   <meta property="og:url" content="/post/ames-iowa/">
-  <meta property="og:title" content="Ames Iowa | Academic">
+  <meta property="og:title" content="Ames Iowa | Tom Kealy&#39;s site">
   <meta property="og:description" content="Pipelines and Pandas This is a short post about how to use Scikit-Learn Pipelines so that you have &lsquo;Pandas in, pandas out&rsquo;. I&rsquo;ll build a small data pipeline on the Ames Iowa housing dataset. The first thing is to import the dataset, and inspect it! The data has 82 columns which include 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables (and 2 additional observation identifiers).
 import pandas as pd import numpy as np from sklearn."><meta property="og:image" content="/img/icon-192.png">
   <meta property="twitter:image" content="/img/icon-192.png"><meta property="og:locale" content="en-us">
@@ -164,7 +164,7 @@ import pandas as pd import numpy as np from sklearn."><meta property="og:image" 
   
   "publisher": {
     "@type": "Organization",
-    "name": "Academic",
+    "name": "Tom Kealy's site",
     "logo": {
       "@type": "ImageObject",
       "url": "/img/icon-512.png"
@@ -188,7 +188,7 @@ import pandas as pd import numpy as np from sklearn."><meta property="og:image" 
 
 
 
-  <title>Ames Iowa | Academic</title>
+  <title>Ames Iowa | Tom Kealy&#39;s site</title>
 
 </head>
 
@@ -231,7 +231,7 @@ import pandas as pd import numpy as np from sklearn."><meta property="og:image" 
   <div class="container">
 
     
-      <a class="navbar-brand" href="/">Academic</a>
+      <a class="navbar-brand" href="/">Tom Kealy&#39;s site</a>
       
       <button type="button" class="navbar-toggler" data-toggle="collapse"
               data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -600,18 +600,9 @@ import pandas as pd import numpy as np from sklearn."><meta property="og:image" 
 <h1 id="pipelines-and-pandas">Pipelines and Pandas</h1>
 
 <p>This is a short post about how to use Scikit-Learn Pipelines so that you have &lsquo;Pandas in, pandas out&rsquo;. I&rsquo;ll build a small data pipeline on the Ames Iowa housing dataset. The first thing is to import the dataset, and inspect it! The data has 82 columns which include 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables (and 2 additional observation identifiers).</p>
-
-<pre><code class="language-python">import pandas as pd
-import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
-</code></pre>
-
-<pre><code class="language-python">ames = pd.read_csv('ames.csv')
-</code></pre>
-
-<pre><code class="language-python">ames.head(10)
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">import</span> <span style="font-weight:bold">pandas</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">pd</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">numpy</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">np</span>
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.base</span> <span style="font-weight:bold">import</span> BaseEstimator, TransformerMixin</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ames = pd.read_csv(<span style="font-style:italic">&#39;ames.csv&#39;</span>)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ames.head(10)</code></pre></div>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -900,13 +891,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 </div>
 
 <p>It&rsquo;s always a good idea to set an index on a DataFrame if you have one. In this case, the <code>PID</code> column is a unique identifier.</p>
-
-<pre><code class="language-python">ames = ames.set_index('PID').copy()
-</code></pre>
-
-<pre><code class="language-python">ames.describe().T
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ames = ames.set_index(<span style="font-style:italic">&#39;PID&#39;</span>).copy()</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ames.describe().T</code></pre></div>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -1359,11 +1344,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 </div>
 
 <p>The main comment is that there&rsquo;s a lof of missing data, and that some columns should be dropped entirely (in particular Alley, Pool QC, Fence, Misc Feature, Fireplace QC) - or the dataset documentation needs to be checked to see that N/A isn&rsquo;t a default category in these cases. There&rsquo;s also a mixture of categorical and numerical features, which is a little tricky to handle. Luckily sklearn has the <code>FeatureUnion</code> and <code>Pipeline</code> objects to help us.</p>
-
-<pre><code class="language-python">ames.isnull().sum()
-</code></pre>
-
-<pre><code>Order                0
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ames.isnull().sum()</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Order                0
 MS.SubClass          0
 MS.Zoning            0
 Lot.Frontage       490
@@ -1424,138 +1405,112 @@ Yr.Sold              0
 Sale.Type            0
 Sale.Condition       0
 SalePrice            0
-Length: 81, dtype: int64
-</code></pre>
-
+Length: 81, dtype: int64</pre></div>
 <p>First of all, let&rsquo;s build a transformer which drops the columns we suggest. A sklearn compatible transformer is a class which has to have two methods <code>fit</code> (which returns <code>self</code>), and <code>transform</code> (which can return whatever you want). It&rsquo;s a good idea to inherit from <code>sklearn.base.TransformerMixin</code> and <code>sklearn.base.BaseEstimator</code>. The general pattern of a Transformer is:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.base</span> <span style="font-weight:bold">import</span> BaseEstimator, TransformerMixin
 
-<pre><code class="language-python">from sklearn.base import BaseEstimator, TransformerMixin
-
-class ExampleTransformer(BaseEstimator, TransformerMixin):
+<span style="font-weight:bold">class</span> <span style="font-weight:bold">ExampleTransformer</span>(BaseEstimator, TransformerMixin):
     
-    def __init__(self):
-        pass
+    <span style="font-weight:bold">def</span> __init__(self):
+        <span style="font-weight:bold">pass</span>
     
-    def fit(self, X, y=None):
-        return self
+    <span style="font-weight:bold">def</span> fit(self, X, y=None):
+        <span style="font-weight:bold">return</span> self
     
-    def transform(self, X):
-        return do_something_to(self, X)
-</code></pre>
-
+    <span style="font-weight:bold">def</span> transform(self, X):
+        <span style="font-weight:bold">return</span> do_something_to(self, X)</code></pre></div>
 <p>These are actually quite simple, and can be quite flexible. Later on, we might see a transformer that uses the <code>fit</code> method. Anyway, here&rsquo;s a column dropper.</p>
-
-<pre><code class="language-python">from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.linear_model import LarsCV
-from sklearn.model_selection import  train_test_split
-from sklearn.metrics import mean_squared_error, mean_squared_log_error
-</code></pre>
-
-<pre><code class="language-python">class ColumnDropper(BaseEstimator, TransformerMixin):
-    '''
-    Transformer to drop a list of cols
-    '''
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.preprocessing</span> <span style="font-weight:bold">import</span> StandardScaler
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.pipeline</span> <span style="font-weight:bold">import</span> Pipeline, FeatureUnion
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.linear_model</span> <span style="font-weight:bold">import</span> LarsCV
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.model_selection</span> <span style="font-weight:bold">import</span>  train_test_split
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.metrics</span> <span style="font-weight:bold">import</span> mean_squared_error, mean_squared_log_error</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">ColumnDropper</span>(BaseEstimator, TransformerMixin):
+    <span style="font-style:italic">&#39;&#39;&#39;
+</span><span style="font-style:italic">    Transformer to drop a list of cols
+</span><span style="font-style:italic">    &#39;&#39;&#39;</span>
     
-    def __init__(self, drop_cols):
+    <span style="font-weight:bold">def</span> __init__(self, drop_cols):
         self._drop_cols = drop_cols
     
-    def fit(self, X, y=None):
-        return self
+    <span style="font-weight:bold">def</span> fit(self, X, y=None):
+        <span style="font-weight:bold">return</span> self
     
-    def transform(self, X):
+    <span style="font-weight:bold">def</span> transform(self, X):
         df = X.copy()
         df = df.drop(self._drop_cols, axis=1)
-        return df
-</code></pre>
-
-<pre><code class="language-python">y = ames['SalePrice'].copy()
-X = ames.drop('SalePrice', axis=1).copy()
-X.columns
-</code></pre>
-
-<pre><code>Index(['Order', 'MS.SubClass', 'MS.Zoning', 'Lot.Frontage', 'Lot.Area',
-       'Street', 'Alley', 'Lot.Shape', 'Land.Contour', 'Utilities',
-       'Lot.Config', 'Land.Slope', 'Neighborhood', 'Condition.1',
-       'Condition.2', 'Bldg.Type', 'House.Style', 'Overall.Qual',
-       'Overall.Cond', 'Year.Built', 'Year.Remod.Add', 'Roof.Style',
-       'Roof.Matl', 'Exterior.1st', 'Exterior.2nd', 'Mas.Vnr.Type',
-       'Mas.Vnr.Area', 'Exter.Qual', 'Exter.Cond', 'Foundation', 'Bsmt.Qual',
-       'Bsmt.Cond', 'Bsmt.Exposure', 'BsmtFin.Type.1', 'BsmtFin.SF.1',
-       'BsmtFin.Type.2', 'BsmtFin.SF.2', 'Bsmt.Unf.SF', 'Total.Bsmt.SF',
-       'Heating', 'Heating.QC', 'Central.Air', 'Electrical', 'X1st.Flr.SF',
-       'X2nd.Flr.SF', 'Low.Qual.Fin.SF', 'Gr.Liv.Area', 'Bsmt.Full.Bath',
-       'Bsmt.Half.Bath', 'Full.Bath', 'Half.Bath', 'Bedroom.AbvGr',
-       'Kitchen.AbvGr', 'Kitchen.Qual', 'TotRms.AbvGrd', 'Functional',
-       'Fireplaces', 'Fireplace.Qu', 'Garage.Type', 'Garage.Yr.Blt',
-       'Garage.Finish', 'Garage.Cars', 'Garage.Area', 'Garage.Qual',
-       'Garage.Cond', 'Paved.Drive', 'Wood.Deck.SF', 'Open.Porch.SF',
-       'Enclosed.Porch', 'X3Ssn.Porch', 'Screen.Porch', 'Pool.Area', 'Pool.QC',
-       'Fence', 'Misc.Feature', 'Misc.Val', 'Mo.Sold', 'Yr.Sold', 'Sale.Type',
-       'Sale.Condition'],
-      dtype='object')
-</code></pre>
-
-<pre><code class="language-python">pipe = Pipeline([('dropper', ColumnDropper(['Alley', 'Pool.QC', 'Fence', 'Misc.Feature', 'Fireplace.Qu', 'Order']))])
+        <span style="font-weight:bold">return</span> df</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">y = ames[<span style="font-style:italic">&#39;SalePrice&#39;</span>].copy()
+X = ames.drop(<span style="font-style:italic">&#39;SalePrice&#39;</span>, axis=1).copy()
+X.columns</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Index([&#39;Order&#39;, &#39;MS.SubClass&#39;, &#39;MS.Zoning&#39;, &#39;Lot.Frontage&#39;, &#39;Lot.Area&#39;,
+       &#39;Street&#39;, &#39;Alley&#39;, &#39;Lot.Shape&#39;, &#39;Land.Contour&#39;, &#39;Utilities&#39;,
+       &#39;Lot.Config&#39;, &#39;Land.Slope&#39;, &#39;Neighborhood&#39;, &#39;Condition.1&#39;,
+       &#39;Condition.2&#39;, &#39;Bldg.Type&#39;, &#39;House.Style&#39;, &#39;Overall.Qual&#39;,
+       &#39;Overall.Cond&#39;, &#39;Year.Built&#39;, &#39;Year.Remod.Add&#39;, &#39;Roof.Style&#39;,
+       &#39;Roof.Matl&#39;, &#39;Exterior.1st&#39;, &#39;Exterior.2nd&#39;, &#39;Mas.Vnr.Type&#39;,
+       &#39;Mas.Vnr.Area&#39;, &#39;Exter.Qual&#39;, &#39;Exter.Cond&#39;, &#39;Foundation&#39;, &#39;Bsmt.Qual&#39;,
+       &#39;Bsmt.Cond&#39;, &#39;Bsmt.Exposure&#39;, &#39;BsmtFin.Type.1&#39;, &#39;BsmtFin.SF.1&#39;,
+       &#39;BsmtFin.Type.2&#39;, &#39;BsmtFin.SF.2&#39;, &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;,
+       &#39;Heating&#39;, &#39;Heating.QC&#39;, &#39;Central.Air&#39;, &#39;Electrical&#39;, &#39;X1st.Flr.SF&#39;,
+       &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;, &#39;Gr.Liv.Area&#39;, &#39;Bsmt.Full.Bath&#39;,
+       &#39;Bsmt.Half.Bath&#39;, &#39;Full.Bath&#39;, &#39;Half.Bath&#39;, &#39;Bedroom.AbvGr&#39;,
+       &#39;Kitchen.AbvGr&#39;, &#39;Kitchen.Qual&#39;, &#39;TotRms.AbvGrd&#39;, &#39;Functional&#39;,
+       &#39;Fireplaces&#39;, &#39;Fireplace.Qu&#39;, &#39;Garage.Type&#39;, &#39;Garage.Yr.Blt&#39;,
+       &#39;Garage.Finish&#39;, &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;, &#39;Garage.Qual&#39;,
+       &#39;Garage.Cond&#39;, &#39;Paved.Drive&#39;, &#39;Wood.Deck.SF&#39;, &#39;Open.Porch.SF&#39;,
+       &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;, &#39;Screen.Porch&#39;, &#39;Pool.Area&#39;, &#39;Pool.QC&#39;,
+       &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Misc.Val&#39;, &#39;Mo.Sold&#39;, &#39;Yr.Sold&#39;, &#39;Sale.Type&#39;,
+       &#39;Sale.Condition&#39;],
+      dtype=&#39;object&#39;)</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pipe = Pipeline([(<span style="font-style:italic">&#39;dropper&#39;</span>, ColumnDropper([<span style="font-style:italic">&#39;Alley&#39;</span>, <span style="font-style:italic">&#39;Pool.QC&#39;</span>, <span style="font-style:italic">&#39;Fence&#39;</span>, <span style="font-style:italic">&#39;Misc.Feature&#39;</span>, <span style="font-style:italic">&#39;Fireplace.Qu&#39;</span>, <span style="font-style:italic">&#39;Order&#39;</span>]))])
 X_trans = pipe.fit_transform(X)
-X_trans.columns
-</code></pre>
-
-<pre><code>Index(['MS.SubClass', 'MS.Zoning', 'Lot.Frontage', 'Lot.Area', 'Street',
-       'Lot.Shape', 'Land.Contour', 'Utilities', 'Lot.Config', 'Land.Slope',
-       'Neighborhood', 'Condition.1', 'Condition.2', 'Bldg.Type',
-       'House.Style', 'Overall.Qual', 'Overall.Cond', 'Year.Built',
-       'Year.Remod.Add', 'Roof.Style', 'Roof.Matl', 'Exterior.1st',
-       'Exterior.2nd', 'Mas.Vnr.Type', 'Mas.Vnr.Area', 'Exter.Qual',
-       'Exter.Cond', 'Foundation', 'Bsmt.Qual', 'Bsmt.Cond', 'Bsmt.Exposure',
-       'BsmtFin.Type.1', 'BsmtFin.SF.1', 'BsmtFin.Type.2', 'BsmtFin.SF.2',
-       'Bsmt.Unf.SF', 'Total.Bsmt.SF', 'Heating', 'Heating.QC', 'Central.Air',
-       'Electrical', 'X1st.Flr.SF', 'X2nd.Flr.SF', 'Low.Qual.Fin.SF',
-       'Gr.Liv.Area', 'Bsmt.Full.Bath', 'Bsmt.Half.Bath', 'Full.Bath',
-       'Half.Bath', 'Bedroom.AbvGr', 'Kitchen.AbvGr', 'Kitchen.Qual',
-       'TotRms.AbvGrd', 'Functional', 'Fireplaces', 'Garage.Type',
-       'Garage.Yr.Blt', 'Garage.Finish', 'Garage.Cars', 'Garage.Area',
-       'Garage.Qual', 'Garage.Cond', 'Paved.Drive', 'Wood.Deck.SF',
-       'Open.Porch.SF', 'Enclosed.Porch', 'X3Ssn.Porch', 'Screen.Porch',
-       'Pool.Area', 'Misc.Val', 'Mo.Sold', 'Yr.Sold', 'Sale.Type',
-       'Sale.Condition'],
-      dtype='object')
-</code></pre>
-
+X_trans.columns</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Index([&#39;MS.SubClass&#39;, &#39;MS.Zoning&#39;, &#39;Lot.Frontage&#39;, &#39;Lot.Area&#39;, &#39;Street&#39;,
+       &#39;Lot.Shape&#39;, &#39;Land.Contour&#39;, &#39;Utilities&#39;, &#39;Lot.Config&#39;, &#39;Land.Slope&#39;,
+       &#39;Neighborhood&#39;, &#39;Condition.1&#39;, &#39;Condition.2&#39;, &#39;Bldg.Type&#39;,
+       &#39;House.Style&#39;, &#39;Overall.Qual&#39;, &#39;Overall.Cond&#39;, &#39;Year.Built&#39;,
+       &#39;Year.Remod.Add&#39;, &#39;Roof.Style&#39;, &#39;Roof.Matl&#39;, &#39;Exterior.1st&#39;,
+       &#39;Exterior.2nd&#39;, &#39;Mas.Vnr.Type&#39;, &#39;Mas.Vnr.Area&#39;, &#39;Exter.Qual&#39;,
+       &#39;Exter.Cond&#39;, &#39;Foundation&#39;, &#39;Bsmt.Qual&#39;, &#39;Bsmt.Cond&#39;, &#39;Bsmt.Exposure&#39;,
+       &#39;BsmtFin.Type.1&#39;, &#39;BsmtFin.SF.1&#39;, &#39;BsmtFin.Type.2&#39;, &#39;BsmtFin.SF.2&#39;,
+       &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;, &#39;Heating&#39;, &#39;Heating.QC&#39;, &#39;Central.Air&#39;,
+       &#39;Electrical&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;,
+       &#39;Gr.Liv.Area&#39;, &#39;Bsmt.Full.Bath&#39;, &#39;Bsmt.Half.Bath&#39;, &#39;Full.Bath&#39;,
+       &#39;Half.Bath&#39;, &#39;Bedroom.AbvGr&#39;, &#39;Kitchen.AbvGr&#39;, &#39;Kitchen.Qual&#39;,
+       &#39;TotRms.AbvGrd&#39;, &#39;Functional&#39;, &#39;Fireplaces&#39;, &#39;Garage.Type&#39;,
+       &#39;Garage.Yr.Blt&#39;, &#39;Garage.Finish&#39;, &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;,
+       &#39;Garage.Qual&#39;, &#39;Garage.Cond&#39;, &#39;Paved.Drive&#39;, &#39;Wood.Deck.SF&#39;,
+       &#39;Open.Porch.SF&#39;, &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;, &#39;Screen.Porch&#39;,
+       &#39;Pool.Area&#39;, &#39;Misc.Val&#39;, &#39;Mo.Sold&#39;, &#39;Yr.Sold&#39;, &#39;Sale.Type&#39;,
+       &#39;Sale.Condition&#39;],
+      dtype=&#39;object&#39;)</pre></div>
 <p>Another option, especially with columns with missing values, is to impute the value but to include a column telling the model where the imputed values are.</p>
-
-<pre><code class="language-python">class ImputeWithDummy(BaseEstimator, TransformerMixin):
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">ImputeWithDummy</span>(BaseEstimator, TransformerMixin):
     
-    def __init__(self, cols_to_impute, strategy, fill='NA'):
+    <span style="font-weight:bold">def</span> __init__(self, cols_to_impute, strategy, fill=<span style="font-style:italic">&#39;NA&#39;</span>):
         self.cols_to_impute = cols_to_impute
         self.strategy = strategy
         self.fill = fill
         
-    def fit(self, X, y=None, **kwargs):
-        if self.strategy == 'mean':
+    <span style="font-weight:bold">def</span> fit(self, X, y=None, **kwargs):
+        <span style="font-weight:bold">if</span> self.strategy == <span style="font-style:italic">&#39;mean&#39;</span>:
             self.fill = X.mean()
-        elif self.strategy == 'median':
+        <span style="font-weight:bold">elif</span> self.strategy == <span style="font-style:italic">&#39;median&#39;</span>:
             self.fill = X.median()
-        elif self.strategy == 'mode':
+        <span style="font-weight:bold">elif</span> self.strategy == <span style="font-style:italic">&#39;mode&#39;</span>:
             self.fill = X.mode().iloc[0]
-        elif self.strategy == 'fill':
-            if type(self.fill) is list and type(X) is pd.DataFrame:
-                self.fill = dict([(cname, v) for cname,v in zip(X.columns, self.fill)])
-        return self
+        <span style="font-weight:bold">elif</span> self.strategy == <span style="font-style:italic">&#39;fill&#39;</span>:
+            <span style="font-weight:bold">if</span> type(self.fill) <span style="font-weight:bold">is</span> list <span style="font-weight:bold">and</span> type(X) <span style="font-weight:bold">is</span> pd.DataFrame:
+                self.fill = dict([(cname, v) <span style="font-weight:bold">for</span> cname,v <span style="font-weight:bold">in</span> zip(X.columns, self.fill)])
+        <span style="font-weight:bold">return</span> self
     
-    def transform(self, X):
+    <span style="font-weight:bold">def</span> transform(self, X):
         df = X.copy()
-        for col in self.cols_to_impute:
-            df['{}_missing'.format(col)] = df[col].isnull().astype(int)
+        <span style="font-weight:bold">for</span> col <span style="font-weight:bold">in</span> self.cols_to_impute:
+            df[<span style="font-style:italic">&#39;{}_missing&#39;</span>.format(col)] = df[col].isnull().astype(int)
             df[col] = df[col].fillna(self.fill[col])
-        return df
+        <span style="font-weight:bold">return</span> df
     
-X = pd.read_csv('ames.csv')
-imputer = ImputeWithDummy(['Alley'], strategy='mode')
+X = pd.read_csv(<span style="font-style:italic">&#39;ames.csv&#39;</span>)
+imputer = ImputeWithDummy([<span style="font-style:italic">&#39;Alley&#39;</span>], strategy=<span style="font-style:italic">&#39;mode&#39;</span>)
 X_transformed = imputer.fit_transform(X)
-X_transformed[['Alley', 'Alley_missing']].head()
-</code></pre>
-
+X_transformed[[<span style="font-style:italic">&#39;Alley&#39;</span>, <span style="font-style:italic">&#39;Alley_missing&#39;</span>]].head()</code></pre></div>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -1609,104 +1564,89 @@ X_transformed[['Alley', 'Alley_missing']].head()
 </div>
 
 <p>Of course, you should always read the data documentation (<a href="https://ww2.amstat.org/publications/jse/v19n3/decock/datadocumentation.txt" target="_blank">https://ww2.amstat.org/publications/jse/v19n3/decock/datadocumentation.txt</a>), and there you&rsquo;ll see for Alley that NaN means No Alley Access, and that we don&rsquo;t need to any imputation at all!</p>
-
-<pre><code class="language-python">class NaNImpute(BaseEstimator, TransformerMixin):
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">NaNImpute</span>(BaseEstimator, TransformerMixin):
     
-    def __init__(self, cols, fill_vals):
+    <span style="font-weight:bold">def</span> __init__(self, cols, fill_vals):
         self.cols = cols
         self.fill_vals = fill_vals
         
-    def fit(self, X, y=None, **kwargs):
-        return self
+    <span style="font-weight:bold">def</span> fit(self, X, y=None, **kwargs):
+        <span style="font-weight:bold">return</span> self
     
-    def transform(self, X):
+    <span style="font-weight:bold">def</span> transform(self, X):
         df = X.copy()
-        for i, col in enumerate(self.cols):
-            df[col].fillna(self.fill_vals[i])
-</code></pre>
-
+        <span style="font-weight:bold">for</span> i, col <span style="font-weight:bold">in</span> enumerate(self.cols):
+            df[col].fillna(self.fill_vals[i])</code></pre></div>
 <p>The other thing we&rsquo;ll need to consider is that some columns will need to be converted to numeric features first, before an estimator can be fitted. First we&rsquo;ll fit an imputer, and then encode.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">DummyEncoding</span>(BaseEstimator, TransformerMixin):
 
-<pre><code class="language-python">class DummyEncoding(BaseEstimator, TransformerMixin):
-
-    def __init__(self, columns=None):
+    <span style="font-weight:bold">def</span> __init__(self, columns=None):
 
         self.columns = columns
 
-    def fit(self, X, y=None, **kwargs):
-        return self
+    <span style="font-weight:bold">def</span> fit(self, X, y=None, **kwargs):
+        <span style="font-weight:bold">return</span> self
     
-    def transform(self, X, y=None, **kwargs):
-        return pd.get_dummies(X, columns=self.columns, drop_first=True)
-</code></pre>
-
-<pre><code class="language-python">impute_cols = ['Alley', 'Pool.QC', 'Fence', 'Misc.Feature', 'Fireplace.Qu']
-pipe = Pipeline([('impute', ImputeWithDummy(impute_cols, strategy='mode')), ('encode', DummyEncoding(impute_cols))])
-X = pd.read_csv('ames.csv')
+    <span style="font-weight:bold">def</span> transform(self, X, y=None, **kwargs):
+        <span style="font-weight:bold">return</span> pd.get_dummies(X, columns=self.columns, drop_first=True)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">impute_cols = [<span style="font-style:italic">&#39;Alley&#39;</span>, <span style="font-style:italic">&#39;Pool.QC&#39;</span>, <span style="font-style:italic">&#39;Fence&#39;</span>, <span style="font-style:italic">&#39;Misc.Feature&#39;</span>, <span style="font-style:italic">&#39;Fireplace.Qu&#39;</span>]
+pipe = Pipeline([(<span style="font-style:italic">&#39;impute&#39;</span>, ImputeWithDummy(impute_cols, strategy=<span style="font-style:italic">&#39;mode&#39;</span>)), (<span style="font-style:italic">&#39;encode&#39;</span>, DummyEncoding(impute_cols))])
+X = pd.read_csv(<span style="font-style:italic">&#39;ames.csv&#39;</span>)
 X_trans = pipe.fit_transform(X)
-X_trans.columns
-</code></pre>
-
-<pre><code>Index(['Order', 'PID', 'MS.SubClass', 'MS.Zoning', 'Lot.Frontage', 'Lot.Area',
-       'Street', 'Lot.Shape', 'Land.Contour', 'Utilities', 'Lot.Config',
-       'Land.Slope', 'Neighborhood', 'Condition.1', 'Condition.2', 'Bldg.Type',
-       'House.Style', 'Overall.Qual', 'Overall.Cond', 'Year.Built',
-       'Year.Remod.Add', 'Roof.Style', 'Roof.Matl', 'Exterior.1st',
-       'Exterior.2nd', 'Mas.Vnr.Type', 'Mas.Vnr.Area', 'Exter.Qual',
-       'Exter.Cond', 'Foundation', 'Bsmt.Qual', 'Bsmt.Cond', 'Bsmt.Exposure',
-       'BsmtFin.Type.1', 'BsmtFin.SF.1', 'BsmtFin.Type.2', 'BsmtFin.SF.2',
-       'Bsmt.Unf.SF', 'Total.Bsmt.SF', 'Heating', 'Heating.QC', 'Central.Air',
-       'Electrical', 'X1st.Flr.SF', 'X2nd.Flr.SF', 'Low.Qual.Fin.SF',
-       'Gr.Liv.Area', 'Bsmt.Full.Bath', 'Bsmt.Half.Bath', 'Full.Bath',
-       'Half.Bath', 'Bedroom.AbvGr', 'Kitchen.AbvGr', 'Kitchen.Qual',
-       'TotRms.AbvGrd', 'Functional', 'Fireplaces', 'Garage.Type',
-       'Garage.Yr.Blt', 'Garage.Finish', 'Garage.Cars', 'Garage.Area',
-       'Garage.Qual', 'Garage.Cond', 'Paved.Drive', 'Wood.Deck.SF',
-       'Open.Porch.SF', 'Enclosed.Porch', 'X3Ssn.Porch', 'Screen.Porch',
-       'Pool.Area', 'Misc.Val', 'Mo.Sold', 'Yr.Sold', 'Sale.Type',
-       'Sale.Condition', 'SalePrice', 'Alley_missing', 'Pool.QC_missing',
-       'Fence_missing', 'Misc.Feature_missing', 'Fireplace.Qu_missing',
-       'Alley_Pave', 'Pool.QC_Fa', 'Pool.QC_Gd', 'Pool.QC_TA', 'Fence_GdWo',
-       'Fence_MnPrv', 'Fence_MnWw', 'Misc.Feature_Gar2', 'Misc.Feature_Othr',
-       'Misc.Feature_Shed', 'Misc.Feature_TenC', 'Fireplace.Qu_Fa',
-       'Fireplace.Qu_Gd', 'Fireplace.Qu_Po', 'Fireplace.Qu_TA'],
-      dtype='object')
-</code></pre>
-
+X_trans.columns</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Index([&#39;Order&#39;, &#39;PID&#39;, &#39;MS.SubClass&#39;, &#39;MS.Zoning&#39;, &#39;Lot.Frontage&#39;, &#39;Lot.Area&#39;,
+       &#39;Street&#39;, &#39;Lot.Shape&#39;, &#39;Land.Contour&#39;, &#39;Utilities&#39;, &#39;Lot.Config&#39;,
+       &#39;Land.Slope&#39;, &#39;Neighborhood&#39;, &#39;Condition.1&#39;, &#39;Condition.2&#39;, &#39;Bldg.Type&#39;,
+       &#39;House.Style&#39;, &#39;Overall.Qual&#39;, &#39;Overall.Cond&#39;, &#39;Year.Built&#39;,
+       &#39;Year.Remod.Add&#39;, &#39;Roof.Style&#39;, &#39;Roof.Matl&#39;, &#39;Exterior.1st&#39;,
+       &#39;Exterior.2nd&#39;, &#39;Mas.Vnr.Type&#39;, &#39;Mas.Vnr.Area&#39;, &#39;Exter.Qual&#39;,
+       &#39;Exter.Cond&#39;, &#39;Foundation&#39;, &#39;Bsmt.Qual&#39;, &#39;Bsmt.Cond&#39;, &#39;Bsmt.Exposure&#39;,
+       &#39;BsmtFin.Type.1&#39;, &#39;BsmtFin.SF.1&#39;, &#39;BsmtFin.Type.2&#39;, &#39;BsmtFin.SF.2&#39;,
+       &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;, &#39;Heating&#39;, &#39;Heating.QC&#39;, &#39;Central.Air&#39;,
+       &#39;Electrical&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;,
+       &#39;Gr.Liv.Area&#39;, &#39;Bsmt.Full.Bath&#39;, &#39;Bsmt.Half.Bath&#39;, &#39;Full.Bath&#39;,
+       &#39;Half.Bath&#39;, &#39;Bedroom.AbvGr&#39;, &#39;Kitchen.AbvGr&#39;, &#39;Kitchen.Qual&#39;,
+       &#39;TotRms.AbvGrd&#39;, &#39;Functional&#39;, &#39;Fireplaces&#39;, &#39;Garage.Type&#39;,
+       &#39;Garage.Yr.Blt&#39;, &#39;Garage.Finish&#39;, &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;,
+       &#39;Garage.Qual&#39;, &#39;Garage.Cond&#39;, &#39;Paved.Drive&#39;, &#39;Wood.Deck.SF&#39;,
+       &#39;Open.Porch.SF&#39;, &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;, &#39;Screen.Porch&#39;,
+       &#39;Pool.Area&#39;, &#39;Misc.Val&#39;, &#39;Mo.Sold&#39;, &#39;Yr.Sold&#39;, &#39;Sale.Type&#39;,
+       &#39;Sale.Condition&#39;, &#39;SalePrice&#39;, &#39;Alley_missing&#39;, &#39;Pool.QC_missing&#39;,
+       &#39;Fence_missing&#39;, &#39;Misc.Feature_missing&#39;, &#39;Fireplace.Qu_missing&#39;,
+       &#39;Alley_Pave&#39;, &#39;Pool.QC_Fa&#39;, &#39;Pool.QC_Gd&#39;, &#39;Pool.QC_TA&#39;, &#39;Fence_GdWo&#39;,
+       &#39;Fence_MnPrv&#39;, &#39;Fence_MnWw&#39;, &#39;Misc.Feature_Gar2&#39;, &#39;Misc.Feature_Othr&#39;,
+       &#39;Misc.Feature_Shed&#39;, &#39;Misc.Feature_TenC&#39;, &#39;Fireplace.Qu_Fa&#39;,
+       &#39;Fireplace.Qu_Gd&#39;, &#39;Fireplace.Qu_Po&#39;, &#39;Fireplace.Qu_TA&#39;],
+      dtype=&#39;object&#39;)</pre></div>
 <p>This dataset has several types of columns - continuous features encoded as ints and floats, but also some ordinal variables have snick in as ints. We&rsquo;ll properly define all the int and float colukmns first:</p>
-
-<pre><code class="language-python">float_cols = ['Lot.Frontage', 
-              'Mas.Vnr.Area', 
-              'BsmtFin.SF.1', 
-              'BsmtFin.SF.2', 
-              'Bsmt.Unf.SF',
-              'Total.Bsmt.SF',
-              'Garage.Cars',
-              'Garage.Area'
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">float_cols = [<span style="font-style:italic">&#39;Lot.Frontage&#39;</span>, 
+              <span style="font-style:italic">&#39;Mas.Vnr.Area&#39;</span>, 
+              <span style="font-style:italic">&#39;BsmtFin.SF.1&#39;</span>, 
+              <span style="font-style:italic">&#39;BsmtFin.SF.2&#39;</span>, 
+              <span style="font-style:italic">&#39;Bsmt.Unf.SF&#39;</span>,
+              <span style="font-style:italic">&#39;Total.Bsmt.SF&#39;</span>,
+              <span style="font-style:italic">&#39;Garage.Cars&#39;</span>,
+              <span style="font-style:italic">&#39;Garage.Area&#39;</span>
              ]
 
-int_cols = ['MS.SubClass', 
-            'Lot.Area',
-            'X1st.Flr.SF',
-            'X2nd.Flr.SF', 
-            'Low.Qual.Fin.SF', 
-            'Gr.Liv.Area', 
-            'Full.Bath',
-            'Half.Bath', 
-            'Bedroom.AbvGr', 
-            'Kitchen.AbvGr', 
-            'TotRms.AbvGrd',
-            'Fireplaces', 
-            'Wood.Deck.SF', 
-            'Open.Porch.SF', 
-            'Enclosed.Porch',
-            'X3Ssn.Porch', 
-            'Screen.Porch', 
-            'Pool.Area', 
-            'Misc.Val'
-           ]
-</code></pre>
-
+int_cols = [<span style="font-style:italic">&#39;MS.SubClass&#39;</span>, 
+            <span style="font-style:italic">&#39;Lot.Area&#39;</span>,
+            <span style="font-style:italic">&#39;X1st.Flr.SF&#39;</span>,
+            <span style="font-style:italic">&#39;X2nd.Flr.SF&#39;</span>, 
+            <span style="font-style:italic">&#39;Low.Qual.Fin.SF&#39;</span>, 
+            <span style="font-style:italic">&#39;Gr.Liv.Area&#39;</span>, 
+            <span style="font-style:italic">&#39;Full.Bath&#39;</span>,
+            <span style="font-style:italic">&#39;Half.Bath&#39;</span>, 
+            <span style="font-style:italic">&#39;Bedroom.AbvGr&#39;</span>, 
+            <span style="font-style:italic">&#39;Kitchen.AbvGr&#39;</span>, 
+            <span style="font-style:italic">&#39;TotRms.AbvGrd&#39;</span>,
+            <span style="font-style:italic">&#39;Fireplaces&#39;</span>, 
+            <span style="font-style:italic">&#39;Wood.Deck.SF&#39;</span>, 
+            <span style="font-style:italic">&#39;Open.Porch.SF&#39;</span>, 
+            <span style="font-style:italic">&#39;Enclosed.Porch&#39;</span>,
+            <span style="font-style:italic">&#39;X3Ssn.Porch&#39;</span>, 
+            <span style="font-style:italic">&#39;Screen.Porch&#39;</span>, 
+            <span style="font-style:italic">&#39;Pool.Area&#39;</span>, 
+            <span style="font-style:italic">&#39;Misc.Val&#39;</span>
+           ]</code></pre></div>
 <p>Finally, we need some way to deal with ordinal features:</p>
 
 <ul>
@@ -1734,166 +1674,145 @@ int_cols = ['MS.SubClass',
 </ul>
 
 <p>To do this we could use the OrdinalEncoder from <a href="http://contrib.scikit-learn.org/categorical-encoding/" target="_blank">http://contrib.scikit-learn.org/categorical-encoding/</a>, which will be included in sklearn in a future release  - but I have trouble getting this to work with Pandas. Another choice is just to write our own. What we&rsquo;ll do instead is to mix ordinal and categorical variables, and use the OneHotEncoder from the category_encoders package.</p>
-
-<pre><code class="language-python">ord_cols     = ['Lot.Shape',
-                'Utilities',
-                'Land.Slope',
-                'Overall.Qual',
-                'Overall.Cond',
-                'Exter.Qual', 
-                'Exter.Cond',
-                'Bsmt.Qual',
-                'Bsmt.Cond', 
-                'Bsmt.Exposure', 
-                'BsmtFin.Type.1', 
-                'BsmtFin.SF.1',
-                'Heating.QC',
-                'Electrical',
-                'Fireplace.Qu',
-                'Garage.Finish',
-                'Garage.Qual',
-                'Garage.Cond',
-                'Paved.Drive',
-                'Pool.QC',
-                'Fence',
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ord_cols     = [<span style="font-style:italic">&#39;Lot.Shape&#39;</span>,
+                <span style="font-style:italic">&#39;Utilities&#39;</span>,
+                <span style="font-style:italic">&#39;Land.Slope&#39;</span>,
+                <span style="font-style:italic">&#39;Overall.Qual&#39;</span>,
+                <span style="font-style:italic">&#39;Overall.Cond&#39;</span>,
+                <span style="font-style:italic">&#39;Exter.Qual&#39;</span>, 
+                <span style="font-style:italic">&#39;Exter.Cond&#39;</span>,
+                <span style="font-style:italic">&#39;Bsmt.Qual&#39;</span>,
+                <span style="font-style:italic">&#39;Bsmt.Cond&#39;</span>, 
+                <span style="font-style:italic">&#39;Bsmt.Exposure&#39;</span>, 
+                <span style="font-style:italic">&#39;BsmtFin.Type.1&#39;</span>, 
+                <span style="font-style:italic">&#39;BsmtFin.SF.1&#39;</span>,
+                <span style="font-style:italic">&#39;Heating.QC&#39;</span>,
+                <span style="font-style:italic">&#39;Electrical&#39;</span>,
+                <span style="font-style:italic">&#39;Fireplace.Qu&#39;</span>,
+                <span style="font-style:italic">&#39;Garage.Finish&#39;</span>,
+                <span style="font-style:italic">&#39;Garage.Qual&#39;</span>,
+                <span style="font-style:italic">&#39;Garage.Cond&#39;</span>,
+                <span style="font-style:italic">&#39;Paved.Drive&#39;</span>,
+                <span style="font-style:italic">&#39;Pool.QC&#39;</span>,
+                <span style="font-style:italic">&#39;Fence&#39;</span>,
                ]
 
-cat_cols = ['MS.SubClass',
-            'MS.Zoning',
-            'Street',
-            'Alley',
-            'Land.Contour',
-            'Lot.Config',
-            'Neighborhood',
-            'Condition.1',
-            'Condition.2',
-            'Bldg.Type',
-            'House.Style',
-            'Roof.Style',
-            'Exterior.1st', 
-            'Exterior.2nd',
-            'Mas.Vnr.Type',
-            'Foundation',
-            'Heating',
-            'Central.Air',
-            'Garage.Type',
-            'Misc.Feature',
-            'Sale.Type',
-            'Sale.Condition'
-]
-</code></pre>
-
+cat_cols = [<span style="font-style:italic">&#39;MS.SubClass&#39;</span>,
+            <span style="font-style:italic">&#39;MS.Zoning&#39;</span>,
+            <span style="font-style:italic">&#39;Street&#39;</span>,
+            <span style="font-style:italic">&#39;Alley&#39;</span>,
+            <span style="font-style:italic">&#39;Land.Contour&#39;</span>,
+            <span style="font-style:italic">&#39;Lot.Config&#39;</span>,
+            <span style="font-style:italic">&#39;Neighborhood&#39;</span>,
+            <span style="font-style:italic">&#39;Condition.1&#39;</span>,
+            <span style="font-style:italic">&#39;Condition.2&#39;</span>,
+            <span style="font-style:italic">&#39;Bldg.Type&#39;</span>,
+            <span style="font-style:italic">&#39;House.Style&#39;</span>,
+            <span style="font-style:italic">&#39;Roof.Style&#39;</span>,
+            <span style="font-style:italic">&#39;Exterior.1st&#39;</span>, 
+            <span style="font-style:italic">&#39;Exterior.2nd&#39;</span>,
+            <span style="font-style:italic">&#39;Mas.Vnr.Type&#39;</span>,
+            <span style="font-style:italic">&#39;Foundation&#39;</span>,
+            <span style="font-style:italic">&#39;Heating&#39;</span>,
+            <span style="font-style:italic">&#39;Central.Air&#39;</span>,
+            <span style="font-style:italic">&#39;Garage.Type&#39;</span>,
+            <span style="font-style:italic">&#39;Misc.Feature&#39;</span>,
+            <span style="font-style:italic">&#39;Sale.Type&#39;</span>,
+            <span style="font-style:italic">&#39;Sale.Condition&#39;</span>
+]</code></pre></div>
 <p>Finally, we define a few useful transforms and put together our first pipeline.</p>
-
-<pre><code class="language-python">class DataFrameSelector(BaseEstimator, TransformerMixin):
-    '''
-    Select columns from pandas dataframe by specifying a list of column names
-    '''
-    def __init__(self, col_names):
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">DataFrameSelector</span>(BaseEstimator, TransformerMixin):
+    <span style="font-style:italic">&#39;&#39;&#39;
+</span><span style="font-style:italic">    Select columns from pandas dataframe by specifying a list of column names
+</span><span style="font-style:italic">    &#39;&#39;&#39;</span>
+    <span style="font-weight:bold">def</span> __init__(self, col_names):
         self.col_names = col_names
 
-    def fit(self, X, y=None):
-        return self
+    <span style="font-weight:bold">def</span> fit(self, X, y=None):
+        <span style="font-weight:bold">return</span> self
 
-    def transform(self, X):
-        return X[self.col_names]
-</code></pre>
-
-<pre><code class="language-python">class Scale(BaseEstimator, TransformerMixin):
+    <span style="font-weight:bold">def</span> transform(self, X):
+        <span style="font-weight:bold">return</span> X[self.col_names]</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">Scale</span>(BaseEstimator, TransformerMixin):
     
-    def __init__(self, cols):
+    <span style="font-weight:bold">def</span> __init__(self, cols):
         self.scaler = StandardScaler()
         self.cols = cols
         self.index = []
         
-    def fit(self, X, y=None, **kwargs):
+    <span style="font-weight:bold">def</span> fit(self, X, y=None, **kwargs):
         self.scaler.fit(X)
         self.cols = X.columns
         self.index = X.index
-        return self
+        <span style="font-weight:bold">return</span> self
         
-    def transform(self, X):
+    <span style="font-weight:bold">def</span> transform(self, X):
         df = X.copy()
         df = self.scaler.transform(df)
         df = pd.DataFrame(df, columns=self.cols, index=self.index)
-        return df
-</code></pre>
-
-<pre><code class="language-python">from sklearn.externals.joblib import Parallel, delayed
-from sklearn.pipeline import FeatureUnion, _fit_transform_one, _transform_one
-from scipy import sparse
+        <span style="font-weight:bold">return</span> df</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.externals.joblib</span> <span style="font-weight:bold">import</span> Parallel, delayed
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.pipeline</span> <span style="font-weight:bold">import</span> FeatureUnion, _fit_transform_one, _transform_one
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">scipy</span> <span style="font-weight:bold">import</span> sparse
 
 
-class FeatureUnion(FeatureUnion):
-    def fit_transform(self, X, y=None, **fit_params):
+<span style="font-weight:bold">class</span> <span style="font-weight:bold">FeatureUnion</span>(FeatureUnion):
+    <span style="font-weight:bold">def</span> fit_transform(self, X, y=None, **fit_params):
         self._validate_transformers()
         result = Parallel(n_jobs=self.n_jobs)(
             delayed(_fit_transform_one)(trans, weight, X, y,
                                         **fit_params)
-            for name, trans, weight in self._iter())
+            <span style="font-weight:bold">for</span> name, trans, weight <span style="font-weight:bold">in</span> self._iter())
 
-        if not result:
-            # All transformers are None
-            return np.zeros((X.shape[0], 0))
+        <span style="font-weight:bold">if</span> <span style="font-weight:bold">not</span> result:
+            <span style="font-style:italic"># All transformers are None</span>
+            <span style="font-weight:bold">return</span> np.zeros((X.shape[0], 0))
         Xs, transformers = zip(*result)
         self._update_transformer_list(transformers)
-        if any(sparse.issparse(f) for f in Xs):
+        <span style="font-weight:bold">if</span> any(sparse.issparse(f) <span style="font-weight:bold">for</span> f <span style="font-weight:bold">in</span> Xs):
             Xs = sparse.hstack(Xs).tocsr()
-        else:
+        <span style="font-weight:bold">else</span>:
             Xs = self.merge_dataframes_by_column(Xs)
-        return Xs
+        <span style="font-weight:bold">return</span> Xs
 
-    def merge_dataframes_by_column(self, Xs):
-        return pd.concat(Xs, axis=&quot;columns&quot;, copy=False)
+    <span style="font-weight:bold">def</span> merge_dataframes_by_column(self, Xs):
+        <span style="font-weight:bold">return</span> pd.concat(Xs, axis=<span style="font-style:italic">&#34;columns&#34;</span>, copy=False)
 
-    def transform(self, X):
+    <span style="font-weight:bold">def</span> transform(self, X):
         Xs = Parallel(n_jobs=self.n_jobs)(
             delayed(_transform_one)(trans, weight, X)
-            for name, trans, weight in self._iter())
-        if not Xs:
-            # All transformers are None
-            return np.zeros((X.shape[0], 0))
-        if any(sparse.issparse(f) for f in Xs):
+            <span style="font-weight:bold">for</span> name, trans, weight <span style="font-weight:bold">in</span> self._iter())
+        <span style="font-weight:bold">if</span> <span style="font-weight:bold">not</span> Xs:
+            <span style="font-style:italic"># All transformers are None</span>
+            <span style="font-weight:bold">return</span> np.zeros((X.shape[0], 0))
+        <span style="font-weight:bold">if</span> any(sparse.issparse(f) <span style="font-weight:bold">for</span> f <span style="font-weight:bold">in</span> Xs):
             Xs = sparse.hstack(Xs).tocsr()
-        else:
+        <span style="font-weight:bold">else</span>:
             Xs = self.merge_dataframes_by_column(Xs)
-        return Xs
-</code></pre>
-
-<pre><code class="language-python">from sklearn.preprocessing import StandardScaler, LabelEncoder, LabelBinarizer
-from category_encoders import OneHotEncoder
+        <span style="font-weight:bold">return</span> Xs</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.preprocessing</span> <span style="font-weight:bold">import</span> StandardScaler, LabelEncoder, LabelBinarizer
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">category_encoders</span> <span style="font-weight:bold">import</span> OneHotEncoder
 
 numerical_cols = int_cols + float_cols
 
 pipe = Pipeline([
-    ('features', FeatureUnion(n_jobs=1, transformer_list=[
-        ('numericals', Pipeline([
-             ('selector', DataFrameSelector(numerical_cols)),
-             ('imputer', ImputeWithDummy(numerical_cols, strategy='mean')),
-             #('scaling', Scale(numerical_cols))
+    (<span style="font-style:italic">&#39;features&#39;</span>, FeatureUnion(n_jobs=1, transformer_list=[
+        (<span style="font-style:italic">&#39;numericals&#39;</span>, Pipeline([
+             (<span style="font-style:italic">&#39;selector&#39;</span>, DataFrameSelector(numerical_cols)),
+             (<span style="font-style:italic">&#39;imputer&#39;</span>, ImputeWithDummy(numerical_cols, strategy=<span style="font-style:italic">&#39;mean&#39;</span>)),
+             <span style="font-style:italic">#(&#39;scaling&#39;, Scale(numerical_cols))</span>
         ])),
         
-        #('categoricals', Pipeline([
-        #     ('selector', DataFrameSelector(cat_cols)), 
-        #     ('encode', OneHotEncoder(cat_cols, return_df=True)),
-        #])),
+        <span style="font-style:italic">#(&#39;categoricals&#39;, Pipeline([</span>
+        <span style="font-style:italic">#     (&#39;selector&#39;, DataFrameSelector(cat_cols)), </span>
+        <span style="font-style:italic">#     (&#39;encode&#39;, OneHotEncoder(cat_cols, return_df=True)),</span>
+        <span style="font-style:italic">#])),</span>
         
-        #('NanImpute', Pipeline([
-        ##     ('selector', DataFrameSelector(['Alley', 'Pool.QC', 'Fence', 'Misc.Feature', 'Fireplace.Qu'])),
-        #     ('nan_impute', NaNImpute(['Alley', 'Pool.QC', 'Fence', 'Misc.Feature', 'Fireplace.Qu'], 'Not Applicable'))
-        #])),
+        <span style="font-style:italic">#(&#39;NanImpute&#39;, Pipeline([</span>
+        <span style="font-style:italic">##     (&#39;selector&#39;, DataFrameSelector([&#39;Alley&#39;, &#39;Pool.QC&#39;, &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Fireplace.Qu&#39;])),</span>
+        <span style="font-style:italic">#     (&#39;nan_impute&#39;, NaNImpute([&#39;Alley&#39;, &#39;Pool.QC&#39;, &#39;Fence&#39;, &#39;Misc.Feature&#39;, &#39;Fireplace.Qu&#39;], &#39;Not Applicable&#39;))</span>
+        <span style="font-style:italic">#])),</span>
     ])), 
-])  
-</code></pre>
-
-<pre><code class="language-python">X = pd.read_csv('ames.csv')
-X = X.set_index('PID').copy()
-</code></pre>
-
-<pre><code class="language-python">X_trans = pipe.fit_transform(X)
-X_trans
-</code></pre>
-
+])  </code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">X = pd.read_csv(<span style="font-style:italic">&#39;ames.csv&#39;</span>)
+X = X.set_index(<span style="font-style:italic">&#39;PID&#39;</span>).copy()</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">X_trans = pipe.fit_transform(X)
+X_trans</code></pre></div>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -3428,80 +3347,41 @@ X_trans
 </table>
 <p>2930 rows × 54 columns</p>
 </div>
-
-<pre><code class="language-python">l = list(X_trans.isnull().sum())
-</code></pre>
-
-<pre><code class="language-python">import warnings
-warnings.filterwarnings(&quot;ignore&quot;)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">l = list(X_trans.isnull().sum())</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">import</span> <span style="font-weight:bold">warnings</span>
+warnings.filterwarnings(<span style="font-style:italic">&#34;ignore&#34;</span>)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=42)
-model = Pipeline([('pipeline', pipe), ('clf', LarsCV())])
-model.fit(X_train, y_train)
-</code></pre>
+model = Pipeline([(<span style="font-style:italic">&#39;pipeline&#39;</span>, pipe), (<span style="font-style:italic">&#39;clf&#39;</span>, LarsCV())])
+model.fit(X_train, y_train)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Pipeline(memory=None,
+     steps=[(&#39;pipeline&#39;, Pipeline(memory=None,
+     steps=[(&#39;features&#39;, FeatureUnion(n_jobs=1,
+       transformer_list=[(&#39;numericals&#39;, Pipeline(memory=None,
+     steps=[(&#39;selector&#39;, DataFrameSelector(col_names=[&#39;MS.SubClass&#39;, &#39;Lot.Area&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;, &#39;Low.Qual.Fin.SF&#39;, &#39;Gr.Liv.Area&#39;, &#39;Fu...max_n_alphas=1000, n_jobs=1, normalize=True,
+    positive=False, precompute=&#39;auto&#39;, verbose=False))])</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pipe.fit_transform(X_test).columns</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Index([&#39;MS.SubClass&#39;, &#39;Lot.Area&#39;, &#39;X1st.Flr.SF&#39;, &#39;X2nd.Flr.SF&#39;,
+       &#39;Low.Qual.Fin.SF&#39;, &#39;Gr.Liv.Area&#39;, &#39;Full.Bath&#39;, &#39;Half.Bath&#39;,
+       &#39;Bedroom.AbvGr&#39;, &#39;Kitchen.AbvGr&#39;, &#39;TotRms.AbvGrd&#39;, &#39;Fireplaces&#39;,
+       &#39;Wood.Deck.SF&#39;, &#39;Open.Porch.SF&#39;, &#39;Enclosed.Porch&#39;, &#39;X3Ssn.Porch&#39;,
+       &#39;Screen.Porch&#39;, &#39;Pool.Area&#39;, &#39;Misc.Val&#39;, &#39;Lot.Frontage&#39;, &#39;Mas.Vnr.Area&#39;,
+       &#39;BsmtFin.SF.1&#39;, &#39;BsmtFin.SF.2&#39;, &#39;Bsmt.Unf.SF&#39;, &#39;Total.Bsmt.SF&#39;,
+       &#39;Garage.Cars&#39;, &#39;Garage.Area&#39;, &#39;MS.SubClass_missing&#39;, &#39;Lot.Area_missing&#39;,
+       &#39;X1st.Flr.SF_missing&#39;, &#39;X2nd.Flr.SF_missing&#39;, &#39;Low.Qual.Fin.SF_missing&#39;,
+       &#39;Gr.Liv.Area_missing&#39;, &#39;Full.Bath_missing&#39;, &#39;Half.Bath_missing&#39;,
+       &#39;Bedroom.AbvGr_missing&#39;, &#39;Kitchen.AbvGr_missing&#39;,
+       &#39;TotRms.AbvGrd_missing&#39;, &#39;Fireplaces_missing&#39;, &#39;Wood.Deck.SF_missing&#39;,
+       &#39;Open.Porch.SF_missing&#39;, &#39;Enclosed.Porch_missing&#39;,
+       &#39;X3Ssn.Porch_missing&#39;, &#39;Screen.Porch_missing&#39;, &#39;Pool.Area_missing&#39;,
+       &#39;Misc.Val_missing&#39;, &#39;Lot.Frontage_missing&#39;, &#39;Mas.Vnr.Area_missing&#39;,
+       &#39;BsmtFin.SF.1_missing&#39;, &#39;BsmtFin.SF.2_missing&#39;, &#39;Bsmt.Unf.SF_missing&#39;,
+       &#39;Total.Bsmt.SF_missing&#39;, &#39;Garage.Cars_missing&#39;, &#39;Garage.Area_missing&#39;],
+      dtype=&#39;object&#39;)</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">preds = model.predict(X_test)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.model_selection</span> <span style="font-weight:bold">import</span> cross_val_score
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.model_selection</span> <span style="font-weight:bold">import</span> KFold
 
-<pre><code>Pipeline(memory=None,
-     steps=[('pipeline', Pipeline(memory=None,
-     steps=[('features', FeatureUnion(n_jobs=1,
-       transformer_list=[('numericals', Pipeline(memory=None,
-     steps=[('selector', DataFrameSelector(col_names=['MS.SubClass', 'Lot.Area', 'X1st.Flr.SF', 'X2nd.Flr.SF', 'Low.Qual.Fin.SF', 'Gr.Liv.Area', 'Fu...max_n_alphas=1000, n_jobs=1, normalize=True,
-    positive=False, precompute='auto', verbose=False))])
-</code></pre>
+<span style="font-weight:bold">def</span> rmse_cv(model, X, y):
+    rmse= np.sqrt(-cross_val_score(model, X, y, scoring=<span style="font-style:italic">&#34;neg_mean_squared_error&#34;</span>, cv=2))
+    <span style="font-weight:bold">return</span>(rmse)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">rmse_cv(model, X, y)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">array([37647.53964453, 71123.27879506])</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.metrics</span> <span style="font-weight:bold">import</span> r2_score
 
-<pre><code class="language-python">pipe.fit_transform(X_test).columns
-</code></pre>
-
-<pre><code>Index(['MS.SubClass', 'Lot.Area', 'X1st.Flr.SF', 'X2nd.Flr.SF',
-       'Low.Qual.Fin.SF', 'Gr.Liv.Area', 'Full.Bath', 'Half.Bath',
-       'Bedroom.AbvGr', 'Kitchen.AbvGr', 'TotRms.AbvGrd', 'Fireplaces',
-       'Wood.Deck.SF', 'Open.Porch.SF', 'Enclosed.Porch', 'X3Ssn.Porch',
-       'Screen.Porch', 'Pool.Area', 'Misc.Val', 'Lot.Frontage', 'Mas.Vnr.Area',
-       'BsmtFin.SF.1', 'BsmtFin.SF.2', 'Bsmt.Unf.SF', 'Total.Bsmt.SF',
-       'Garage.Cars', 'Garage.Area', 'MS.SubClass_missing', 'Lot.Area_missing',
-       'X1st.Flr.SF_missing', 'X2nd.Flr.SF_missing', 'Low.Qual.Fin.SF_missing',
-       'Gr.Liv.Area_missing', 'Full.Bath_missing', 'Half.Bath_missing',
-       'Bedroom.AbvGr_missing', 'Kitchen.AbvGr_missing',
-       'TotRms.AbvGrd_missing', 'Fireplaces_missing', 'Wood.Deck.SF_missing',
-       'Open.Porch.SF_missing', 'Enclosed.Porch_missing',
-       'X3Ssn.Porch_missing', 'Screen.Porch_missing', 'Pool.Area_missing',
-       'Misc.Val_missing', 'Lot.Frontage_missing', 'Mas.Vnr.Area_missing',
-       'BsmtFin.SF.1_missing', 'BsmtFin.SF.2_missing', 'Bsmt.Unf.SF_missing',
-       'Total.Bsmt.SF_missing', 'Garage.Cars_missing', 'Garage.Area_missing'],
-      dtype='object')
-</code></pre>
-
-<pre><code class="language-python">preds = model.predict(X_test)
-</code></pre>
-
-<pre><code class="language-python">from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold
-
-def rmse_cv(model, X, y):
-    rmse= np.sqrt(-cross_val_score(model, X, y, scoring=&quot;neg_mean_squared_error&quot;, cv=2))
-    return(rmse)
-</code></pre>
-
-<pre><code class="language-python">rmse_cv(model, X, y)
-</code></pre>
-
-<pre><code>array([37647.53964453, 71123.27879506])
-</code></pre>
-
-<pre><code class="language-python">from sklearn.metrics import r2_score
-
-def get_score(prediction, labels):    
-    print('R2: {}'.format(r2_score(prediction, labels)))
-</code></pre>
-
-<pre><code class="language-python">get_score(preds, y_test)
-</code></pre>
-
-<pre><code>R2: 0.6208433062823728
-</code></pre>
-
-<pre><code class="language-python">
-</code></pre>
-
+<span style="font-weight:bold">def</span> get_score(prediction, labels):    
+    <span style="font-weight:bold">print</span>(<span style="font-style:italic">&#39;R2: {}&#39;</span>.format(r2_score(prediction, labels)))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">get_score(preds, y_test)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">R2: 0.6208433062823728</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"></code></pre></div>
     </div>
 
     

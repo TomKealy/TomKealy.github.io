@@ -119,9 +119,9 @@ import pystan import matplotlib as mpl import matplotlib.">
   
   <meta property="twitter:card" content="summary">
   
-  <meta property="og:site_name" content="Academic">
+  <meta property="og:site_name" content="Tom Kealy&#39;s site">
   <meta property="og:url" content="/post/local-linear-models-for-time-series/">
-  <meta property="og:title" content="Local Linear Models for Time Series | Academic">
+  <meta property="og:title" content="Local Linear Models for Time Series | Tom Kealy&#39;s site">
   <meta property="og:description" content="Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:
 \[ v_{t&#43;1} \sim N\left(v_t, \sigma_v^2\right) \]
 \[ x_t \sim N\left(x_{t-1} &#43; v_{t-1}, \sigma_x^2\right) \]
@@ -174,7 +174,7 @@ import pystan import matplotlib as mpl import matplotlib."><meta property="og:im
   
   "publisher": {
     "@type": "Organization",
-    "name": "Academic",
+    "name": "Tom Kealy's site",
     "logo": {
       "@type": "ImageObject",
       "url": "/img/icon-512.png"
@@ -198,7 +198,7 @@ import pystan import matplotlib as mpl import matplotlib."><meta property="og:im
 
 
 
-  <title>Local Linear Models for Time Series | Academic</title>
+  <title>Local Linear Models for Time Series | Tom Kealy&#39;s site</title>
 
 </head>
 
@@ -241,7 +241,7 @@ import pystan import matplotlib as mpl import matplotlib."><meta property="og:im
   <div class="container">
 
     
-      <a class="navbar-brand" href="/">Academic</a>
+      <a class="navbar-brand" href="/">Tom Kealy&#39;s site</a>
       
       <button type="button" class="navbar-toggler" data-toggle="collapse"
               data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -616,157 +616,94 @@ import pystan import matplotlib as mpl import matplotlib."><meta property="og:im
 <p>Where \(\sigma_x^2\) is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance</p>
 
 <p>We will model this in pystan, using the air passengers dataset.</p>
-
-<pre><code class="language-python">import pystan
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-plt.style.use('ggplot')
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">import</span> <span style="font-weight:bold">pystan</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">matplotlib</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">mpl</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">matplotlib.pyplot</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">plt</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">numpy</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">np</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">pandas</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">pd</span>
+plt.style.use(<span style="font-style:italic">&#39;ggplot&#39;</span>)
 %matplotlib inline
 
-passengers = pd.read_csv('passengers.csv', header=0, sep=';')
-passengers['Month'] = pd.to_datetime(passengers['Month'])
-passengers.set_index('Month', inplace=True)
-passengers.plot(figsize=(15, 10))
-</code></pre>
-
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1eb1f828&gt;
-</code></pre>
-
+passengers = pd.read_csv(<span style="font-style:italic">&#39;passengers.csv&#39;</span>, header=0, sep=<span style="font-style:italic">&#39;;&#39;</span>)
+passengers[<span style="font-style:italic">&#39;Month&#39;</span>] = pd.to_datetime(passengers[<span style="font-style:italic">&#39;Month&#39;</span>])
+passengers.set_index(<span style="font-style:italic">&#39;Month&#39;</span>, inplace=True)
+passengers.plot(figsize=(15, 10))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1eb1f828&gt;</pre></div>
 <p><figure><img src="./local-linear-trend-models-for-time-series_1_1.png" alt="png"></figure></p>
 
 <p>In stan we can write out model as follows:</p>
-
-<pre><code class="language-python">stan_code = &quot;&quot;&quot;data {
-    int N;
-    vector[N] X;
-}
-
-parameters {
-    vector[N] u;
-    vector[N] v;
-    real&lt;lower=0&gt; s_u;
-    real&lt;lower=0&gt; s_v;
-    real&lt;lower=0&gt; s_x;
-}
-
-model {
-    v[2:N] ~ normal(v[1:N-1], s_v);
-    u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
-    X ~ normal(u, s_x);
-}&quot;&quot;&quot;
-</code></pre>
-
-<pre><code class="language-python">data_feed = {'X': passengers['Passengers'].values, 'N': passengers.shape[0]}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">stan_code = <span style="font-style:italic">&#34;&#34;&#34;data {
+</span><span style="font-style:italic">    int N;
+</span><span style="font-style:italic">    vector[N] X;
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">parameters {
+</span><span style="font-style:italic">    vector[N] u;
+</span><span style="font-style:italic">    vector[N] v;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_u;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_v;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_x;
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">model {
+</span><span style="font-style:italic">    v[2:N] ~ normal(v[1:N-1], s_v);
+</span><span style="font-style:italic">    u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
+</span><span style="font-style:italic">    X ~ normal(u, s_x);
+</span><span style="font-style:italic">}&#34;&#34;&#34;</span></code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data_feed = {<span style="font-style:italic">&#39;X&#39;</span>: passengers[<span style="font-style:italic">&#39;Passengers&#39;</span>].values, <span style="font-style:italic">&#39;N&#39;</span>: passengers.shape[0]}
 sm = pystan.StanModel(model_code=stan_code)
-fit = sm.sampling(data=data_feed, iter=1000)
-</code></pre>
-
-<pre><code>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_ae1b8f06975ee0f66c2a6bd10f156f5b NOW.
-</code></pre>
-
+fit = sm.sampling(data=data_feed, iter=1000)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_ae1b8f06975ee0f66c2a6bd10f156f5b NOW.</pre></div>
 <p>We can visually check the fit and the parameters with:</p>
-
-<pre><code class="language-python">with mpl.rc_context():
-    mpl.rc('figure', figsize=(30, 10))
-    fit.plot()
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">with</span> mpl.rc_context():
+    mpl.rc(<span style="font-style:italic">&#39;figure&#39;</span>, figsize=(30, 10))
+    fit.plot()</code></pre></div>
 <p><figure><img src="./local-linear-trend-models-for-time-series_6_0.png" alt="png"></figure></p>
 
 <p>And we can also check the in sample fit visually:</p>
-
-<pre><code class="language-python">samples = fit.extract(permuted=True)
-u_mean = samples['u'].mean(axis=0)
-</code></pre>
-
-<pre><code class="language-python">passengers['pred'] = u_mean
-passengers.plot(figsize=(30, 10))
-</code></pre>
-
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ff665c0&gt;
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">samples = fit.extract(permuted=True)
+u_mean = samples[<span style="font-style:italic">&#39;u&#39;</span>].mean(axis=0)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">passengers[<span style="font-style:italic">&#39;pred&#39;</span>] = u_mean
+passengers.plot(figsize=(30, 10))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ff665c0&gt;</pre></div>
 <p><figure><img src="./local-linear-trend-models-for-time-series_9_1.png" alt="png"></figure></p>
 
 <p>To predict future points, we have to include the extra points in the original stan code</p>
-
-<pre><code class="language-python">stan_code = &quot;&quot;&quot;data {
-    int N;
-    vector[N] X;
-    int pred_num;
-}
-
-parameters {
-    vector[N] u;
-    vector[N] v;
-    real&lt;lower=0&gt; s_u;
-    real&lt;lower=0&gt; s_v;
-    real&lt;lower=0&gt; s_x;
-}
-
-model {
-    v[2:N] ~ normal(v[1:N-1], s_v);
-    u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
-    X ~ normal(u, s_x);
-}
-
-generated quantities {
-    vector[N + pred_num] u_pred;
-    vector[pred_num] x_pred;
-    u_pred[1:N] = u;
-    for (i in 1:pred_num) {
-        u_pred[N+i] = normal_rng(u_pred[N+i-1], s_u);
-        x_pred[i] = normal_rng(u_pred[N+i], s_x);
-    }
-}
-&quot;&quot;&quot;
-</code></pre>
-
-<pre><code class="language-python">data_feed = {'X': passengers['Passengers'].values, 'N': passengers.shape[0], 'pred_num':10}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">stan_code = <span style="font-style:italic">&#34;&#34;&#34;data {
+</span><span style="font-style:italic">    int N;
+</span><span style="font-style:italic">    vector[N] X;
+</span><span style="font-style:italic">    int pred_num;
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">parameters {
+</span><span style="font-style:italic">    vector[N] u;
+</span><span style="font-style:italic">    vector[N] v;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_u;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_v;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_x;
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">model {
+</span><span style="font-style:italic">    v[2:N] ~ normal(v[1:N-1], s_v);
+</span><span style="font-style:italic">    u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
+</span><span style="font-style:italic">    X ~ normal(u, s_x);
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">generated quantities {
+</span><span style="font-style:italic">    vector[N + pred_num] u_pred;
+</span><span style="font-style:italic">    vector[pred_num] x_pred;
+</span><span style="font-style:italic">    u_pred[1:N] = u;
+</span><span style="font-style:italic">    for (i in 1:pred_num) {
+</span><span style="font-style:italic">        u_pred[N+i] = normal_rng(u_pred[N+i-1], s_u);
+</span><span style="font-style:italic">        x_pred[i] = normal_rng(u_pred[N+i], s_x);
+</span><span style="font-style:italic">    }
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">&#34;&#34;&#34;</span></code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data_feed = {<span style="font-style:italic">&#39;X&#39;</span>: passengers[<span style="font-style:italic">&#39;Passengers&#39;</span>].values, <span style="font-style:italic">&#39;N&#39;</span>: passengers.shape[0], <span style="font-style:italic">&#39;pred_num&#39;</span>:10}
 sm = pystan.StanModel(model_code=stan_code)
-fit = sm.sampling(data=data_feed, iter=1000)
-</code></pre>
+fit = sm.sampling(data=data_feed, iter=1000)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_cc645429411ff4903a697d8562e07c6d NOW.</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">samples = fit.extract(permuted=True)
+u_mean = samples[<span style="font-style:italic">&#39;u&#39;</span>].mean(axis=0)
 
-<pre><code>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_cc645429411ff4903a697d8562e07c6d NOW.
-</code></pre>
-
-<pre><code class="language-python">samples = fit.extract(permuted=True)
-u_mean = samples['u'].mean(axis=0)
-
-u_pred = samples['u_pred'][:]
-pred_df = pd.DataFrame(data=u_pred).T
-</code></pre>
-
-<pre><code class="language-python">passengers['pred'] = u_mean
-passengers.plot(figsize=(30, 10))
-</code></pre>
-
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a204ff0b8&gt;
-</code></pre>
-
+u_pred = samples[<span style="font-style:italic">&#39;u_pred&#39;</span>][:]
+pred_df = pd.DataFrame(data=u_pred).T</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">passengers[<span style="font-style:italic">&#39;pred&#39;</span>] = u_mean
+passengers.plot(figsize=(30, 10))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a204ff0b8&gt;</pre></div>
 <p><figure><img src="./local-linear-trend-models-for-time-series_14_1.png" alt="png"></figure></p>
-
-<pre><code class="language-python">index = pd.date_range('1961-01', periods=10, freq='MS')
-</code></pre>
-
-<pre><code class="language-python">df_ = pd.DataFrame(index=passengers.index.append(index), columns=passengers.columns)
-</code></pre>
-
-<pre><code class="language-python">df_['Passengers'] = passengers['Passengers']
-</code></pre>
-
-<pre><code class="language-python">pred_df.set_index(passengers.index.append(index), inplace=True)
-df_ = pd.concat([df_, pred_df], axis=1)
-</code></pre>
-
-<pre><code class="language-python">df_[['Passengers', 'pred',  0, 1, 2, 3, 4, 5, 6, 7, 8, 9]].plot(figsize=(30, 10))
-</code></pre>
-
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1f9f33c8&gt;
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">index = pd.date_range(<span style="font-style:italic">&#39;1961-01&#39;</span>, periods=10, freq=<span style="font-style:italic">&#39;MS&#39;</span>)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">df_ = pd.DataFrame(index=passengers.index.append(index), columns=passengers.columns)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">df_[<span style="font-style:italic">&#39;Passengers&#39;</span>] = passengers[<span style="font-style:italic">&#39;Passengers&#39;</span>]</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pred_df.set_index(passengers.index.append(index), inplace=True)
+df_ = pd.concat([df_, pred_df], axis=1)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">df_[[<span style="font-style:italic">&#39;Passengers&#39;</span>, <span style="font-style:italic">&#39;pred&#39;</span>,  0, 1, 2, 3, 4, 5, 6, 7, 8, 9]].plot(figsize=(30, 10))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1f9f33c8&gt;</pre></div>
 <p><figure><img src="./local-linear-trend-models-for-time-series_19_1.png" alt="png"></figure></p>
 
 <p>So, even though our model has a good in-sample fit, the out of sample predictions are very poor. To solve this, we can add a seasonal component:</p>
@@ -776,85 +713,61 @@ df_ = pd.concat([df_, pred_df], axis=1)
 <p><span  class="math">\[ s_t \sim N\left(-\sum^n_{l=1}s_{t-l}, \sigma_s\right) \]</span></p>
 
 <p><span  class="math">\[ y_t \sim N\left(u_t + s_t, \sigma_y^2\right) \]</span></p>
-
-<pre><code class="language-python">stan_code = &quot;&quot;&quot;data {
-    int N;
-    int pred_num;
-    vector[N] y;
-}
-
-parameters {
-    vector[N] s;
-    vector[N] u;
-    real&lt;lower=0&gt; s_s;
-    real&lt;lower=0&gt; s_u;
-    real&lt;lower=0&gt; s_y;
-}
-
-model {
-    s[12:N] ~ normal(-s[1:N-11]-s[2:N-10]-s[3:N-9]-s[4:N-8]-s[5:N-7]-s[6:N-6]-s[7:N-5]-s[8:N-4]-s[9:N-3]-s[10:N-2]-s[11:N-1], s_s);
-    u[2:N] ~ normal(u[1:N-1], s_u);
-    y ~ normal(u+s, s_y);
-}
-
-generated quantities {
-    vector[N+pred_num] s_pred;
-    vector[N+pred_num] u_pred;
-    vector[N+pred_num] y_pred;
-
-    s_pred[1:N] = s;
-    u_pred[1:N] = u;
-    y_pred[1:N] = y;
-
-    for (t in (N+1):(N+pred_num)){
-        s_pred[t] = normal_rng(-s_pred[t-11]-s_pred[t-10]-s_pred[t-9]-s_pred[t-8]-s_pred[t-7]-s_pred[t-6]-s_pred[t-5]-s_pred[t-4]-s_pred[t-3]-s_pred[t-2]-s_pred[t-1], s_s);
-        u_pred[t] = normal_rng(u_pred[t-1], s_u);
-        y_pred[t] = normal_rng(u_pred[t]+s_pred[t], s_y);
-    }
-}
-&quot;&quot;&quot;
-</code></pre>
-
-<pre><code class="language-python">data_feed = {'y': passengers['Passengers'].values, 'N': passengers.shape[0], 'pred_num':10}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">stan_code = <span style="font-style:italic">&#34;&#34;&#34;data {
+</span><span style="font-style:italic">    int N;
+</span><span style="font-style:italic">    int pred_num;
+</span><span style="font-style:italic">    vector[N] y;
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">parameters {
+</span><span style="font-style:italic">    vector[N] s;
+</span><span style="font-style:italic">    vector[N] u;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_s;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_u;
+</span><span style="font-style:italic">    real&lt;lower=0&gt; s_y;
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">model {
+</span><span style="font-style:italic">    s[12:N] ~ normal(-s[1:N-11]-s[2:N-10]-s[3:N-9]-s[4:N-8]-s[5:N-7]-s[6:N-6]-s[7:N-5]-s[8:N-4]-s[9:N-3]-s[10:N-2]-s[11:N-1], s_s);
+</span><span style="font-style:italic">    u[2:N] ~ normal(u[1:N-1], s_u);
+</span><span style="font-style:italic">    y ~ normal(u+s, s_y);
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">generated quantities {
+</span><span style="font-style:italic">    vector[N+pred_num] s_pred;
+</span><span style="font-style:italic">    vector[N+pred_num] u_pred;
+</span><span style="font-style:italic">    vector[N+pred_num] y_pred;
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">    s_pred[1:N] = s;
+</span><span style="font-style:italic">    u_pred[1:N] = u;
+</span><span style="font-style:italic">    y_pred[1:N] = y;
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">    for (t in (N+1):(N+pred_num)){
+</span><span style="font-style:italic">        s_pred[t] = normal_rng(-s_pred[t-11]-s_pred[t-10]-s_pred[t-9]-s_pred[t-8]-s_pred[t-7]-s_pred[t-6]-s_pred[t-5]-s_pred[t-4]-s_pred[t-3]-s_pred[t-2]-s_pred[t-1], s_s);
+</span><span style="font-style:italic">        u_pred[t] = normal_rng(u_pred[t-1], s_u);
+</span><span style="font-style:italic">        y_pred[t] = normal_rng(u_pred[t]+s_pred[t], s_y);
+</span><span style="font-style:italic">    }
+</span><span style="font-style:italic">}
+</span><span style="font-style:italic">&#34;&#34;&#34;</span></code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data_feed = {<span style="font-style:italic">&#39;y&#39;</span>: passengers[<span style="font-style:italic">&#39;Passengers&#39;</span>].values, <span style="font-style:italic">&#39;N&#39;</span>: passengers.shape[0], <span style="font-style:italic">&#39;pred_num&#39;</span>:10}
 sm = pystan.StanModel(model_code=stan_code)
-fit = sm.sampling(data=data_feed, iter=1000)
-</code></pre>
+fit = sm.sampling(data=data_feed, iter=1000)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_65ffdf38c841c93de59a3d4d247dc640 NOW.</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">samples = fit.extract(permuted=True)
+u_mean = samples[<span style="font-style:italic">&#39;u&#39;</span>].mean(axis=0)
 
-<pre><code>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_65ffdf38c841c93de59a3d4d247dc640 NOW.
-</code></pre>
-
-<pre><code class="language-python">samples = fit.extract(permuted=True)
-u_mean = samples['u'].mean(axis=0)
-
-u_pred = samples['y_pred'][:]
+u_pred = samples[<span style="font-style:italic">&#39;y_pred&#39;</span>][:]
 pred_df = pd.DataFrame(data=u_pred).T
 
 df_ = pd.DataFrame(index=passengers.index.append(index), columns=passengers.columns)
-df_['Passengers'] = passengers['Passengers']
+df_[<span style="font-style:italic">&#39;Passengers&#39;</span>] = passengers[<span style="font-style:italic">&#39;Passengers&#39;</span>]
 pred_df.set_index(passengers.index.append(index), inplace=True)
 df_ = pd.concat([df_, pred_df], axis=1)
-df_[['Passengers', 'pred',  0, 1, 2, 3, 4, 5, 6, 7, 8, 9]].plot(figsize=(30, 10))
-</code></pre>
-
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a2118a278&gt;
-</code></pre>
-
+df_[[<span style="font-style:italic">&#39;Passengers&#39;</span>, <span style="font-style:italic">&#39;pred&#39;</span>,  0, 1, 2, 3, 4, 5, 6, 7, 8, 9]].plot(figsize=(30, 10))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a2118a278&gt;</pre></div>
 <p><figure><img src="./local-linear-trend-models-for-time-series_23_1.png" alt="png"></figure></p>
-
-<pre><code class="language-python">s_pred = samples['s_pred'].mean(axis=0)
-plt.plot(list(range(0, s_pred.shape[0])), s_pred)
-</code></pre>
-
-<pre><code>[&lt;matplotlib.lines.Line2D at 0x1a25972710&gt;]
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">s_pred = samples[<span style="font-style:italic">&#39;s_pred&#39;</span>].mean(axis=0)
+plt.plot(list(range(0, s_pred.shape[0])), s_pred)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">[&lt;matplotlib.lines.Line2D at 0x1a25972710&gt;]</pre></div>
 <p><figure><img src="./local-linear-trend-models-for-time-series_24_1.png" alt="png"></figure></p>
 
 <p>These out of sample predicitons look much better!</p>
-
-<pre><code class="language-python">
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"></code></pre></div>
     </div>
 
     

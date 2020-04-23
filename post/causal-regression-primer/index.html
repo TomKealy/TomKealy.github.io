@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.5.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Thomas Kealy">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="import numpy as np import pandas as pd from pathlib import Path import statsmodels.api as sm import statsmodels.formula.api as smf from sklearn.linear_model import LogisticRegression from sklearn.calibration import CalibratedClassifierCV from sklearn.preprocessing import StandardScaler from imblearn.over_sampling import SMOTE from imblearn.pipeline import Pipeline import matplotlib.pyplot as plt import seaborn as sns %matplotlib inline plt.style.use(&#39;ggplot&#39;) np.random.RandomState(42)RandomState(MT19937) at 0x1A45597360data = pd.read_stata(&#39;COVID.dta&#39;)data.set_index(&#39;StateName&#39;, inplace=True)data[&#39;Lockdown&#39;] = 1 - data[&#39;Strategy&#39;] data[&#39;CasesPerCap&#39;] = data[&#39;Cases&#39;]/(data[&#39;Population&#39;]) data[&#39;Intercept&#39;] = 1data.head()  .dataframe tbody tr th:only-of-type { vertical-align: middle; } .">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/causal-regression-primer/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#795548">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="anonymous">
+    
+
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cutive+Mono%7CLora:400,700%7CRoboto:400,700&display=swap">
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.min.f541c509784f6c80721eedef01316126.css">
+
+  
+
+  
+
+
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon-32.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="/post/causal-regression-primer/">
+
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Tom Kealy&#39;s site">
+  <meta property="og:url" content="/post/causal-regression-primer/">
+  <meta property="og:title" content="Causal Regression Primer | Tom Kealy&#39;s site">
+  <meta property="og:description" content="import numpy as np import pandas as pd from pathlib import Path import statsmodels.api as sm import statsmodels.formula.api as smf from sklearn.linear_model import LogisticRegression from sklearn.calibration import CalibratedClassifierCV from sklearn.preprocessing import StandardScaler from imblearn.over_sampling import SMOTE from imblearn.pipeline import Pipeline import matplotlib.pyplot as plt import seaborn as sns %matplotlib inline plt.style.use(&#39;ggplot&#39;) np.random.RandomState(42)RandomState(MT19937) at 0x1A45597360data = pd.read_stata(&#39;COVID.dta&#39;)data.set_index(&#39;StateName&#39;, inplace=True)data[&#39;Lockdown&#39;] = 1 - data[&#39;Strategy&#39;] data[&#39;CasesPerCap&#39;] = data[&#39;Cases&#39;]/(data[&#39;Population&#39;]) data[&#39;Intercept&#39;] = 1data.head()  .dataframe tbody tr th:only-of-type { vertical-align: middle; } ."><meta property="og:image" content="/img/icon-192.png">
+  <meta property="twitter:image" content="/img/icon-192.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2020-04-23T14:17:03&#43;02:00">
+    
+    <meta property="article:modified_time" content="2020-04-23T14:17:03&#43;02:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/causal-regression-primer/"
+  },
+  "headline": "Causal Regression Primer",
+  
+  "datePublished": "2020-04-23T14:17:03+02:00",
+  "dateModified": "2020-04-23T14:17:03+02:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Thomas Kealy"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Tom Kealy's site",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "/img/icon-512.png"
+    }
+  },
+  "description": "import numpy as np import pandas as pd from pathlib import Path import statsmodels.api as sm import statsmodels.formula.api as smf from sklearn.linear_model import LogisticRegression from sklearn.calibration import CalibratedClassifierCV from sklearn.preprocessing import StandardScaler from imblearn.over_sampling import SMOTE from imblearn.pipeline import Pipeline import matplotlib.pyplot as plt import seaborn as sns %matplotlib inline plt.style.use(\u0026#39;ggplot\u0026#39;) np.random.RandomState(42)RandomState(MT19937) at 0x1A45597360data = pd.read_stata(\u0026#39;COVID.dta\u0026#39;)data.set_index(\u0026#39;StateName\u0026#39;, inplace=True)data[\u0026#39;Lockdown\u0026#39;] = 1 - data[\u0026#39;Strategy\u0026#39;] data[\u0026#39;CasesPerCap\u0026#39;] = data[\u0026#39;Cases\u0026#39;]/(data[\u0026#39;Population\u0026#39;]) data[\u0026#39;Intercept\u0026#39;] = 1data.head()  .dataframe tbody tr th:only-of-type { vertical-align: middle; } ."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Causal Regression Primer | Tom Kealy&#39;s site</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0 compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Tom Kealy&#39;s site</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#projects"><span>Projects</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#featured"><span>Publications</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Causal Regression Primer</h1>
+
+  
+
+  
+    
+
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Apr 23, 2020
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    4 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/causal-regression-primer/&amp;text=Causal%20Regression%20Primer" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/causal-regression-primer/&amp;t=Causal%20Regression%20Primer" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Causal%20Regression%20Primer&amp;body=/post/causal-regression-primer/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/causal-regression-primer/&amp;title=Causal%20Regression%20Primer" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Causal%20Regression%20Primer%20/post/causal-regression-primer/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/causal-regression-primer/&amp;title=Causal%20Regression%20Primer" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">import</span> <span style="font-weight:bold">numpy</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">np</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">pandas</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">pd</span>
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">pathlib</span> <span style="font-weight:bold">import</span> Path
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">statsmodels.api</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">sm</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">statsmodels.formula.api</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">smf</span>
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.linear_model</span> <span style="font-weight:bold">import</span> LogisticRegression
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.calibration</span> <span style="font-weight:bold">import</span> CalibratedClassifierCV
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">sklearn.preprocessing</span> <span style="font-weight:bold">import</span> StandardScaler
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">imblearn.over_sampling</span> <span style="font-weight:bold">import</span> SMOTE
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">imblearn.pipeline</span> <span style="font-weight:bold">import</span> Pipeline
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">matplotlib.pyplot</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">plt</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">seaborn</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">sns</span>
+%matplotlib inline
+plt.style.use(<span style="font-style:italic">&#39;ggplot&#39;</span>)
+
+np.random.RandomState(42)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">RandomState(MT19937) at 0x1A45597360</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data = pd.read_stata(<span style="font-style:italic">&#39;COVID.dta&#39;</span>)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data.set_index(<span style="font-style:italic">&#39;StateName&#39;</span>, inplace=True)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data[<span style="font-style:italic">&#39;Lockdown&#39;</span>] = 1 - data[<span style="font-style:italic">&#39;Strategy&#39;</span>]
+data[<span style="font-style:italic">&#39;CasesPerCap&#39;</span>] = data[<span style="font-style:italic">&#39;Cases&#39;</span>]/(data[<span style="font-style:italic">&#39;Population&#39;</span>])
+data[<span style="font-style:italic">&#39;Intercept&#39;</span>] = 1</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data.head()</code></pre></div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Population</th>
+      <th>Density</th>
+      <th>Age</th>
+      <th>Income</th>
+      <th>POC</th>
+      <th>Strategy</th>
+      <th>Cases</th>
+      <th>Deaths</th>
+      <th>Governor</th>
+      <th>Lockdown</th>
+      <th>CasesPerCap</th>
+      <th>Intercept</th>
+    </tr>
+    <tr>
+      <th>StateName</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Alabama</th>
+      <td>4.9</td>
+      <td>93.500000</td>
+      <td>39.900002</td>
+      <td>48.099998</td>
+      <td>31.500000</td>
+      <td>0.0</td>
+      <td>4241.0</td>
+      <td>123.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>865.510193</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Alaska</th>
+      <td>1.3</td>
+      <td>1.300000</td>
+      <td>34.000000</td>
+      <td>73.000000</td>
+      <td>33.299999</td>
+      <td>0.0</td>
+      <td>293.0</td>
+      <td>9.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>225.384628</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Arizona</th>
+      <td>7.3</td>
+      <td>57.000000</td>
+      <td>37.400002</td>
+      <td>56.599998</td>
+      <td>27.000000</td>
+      <td>0.0</td>
+      <td>3692.0</td>
+      <td>142.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>505.753418</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Arkansas</th>
+      <td>3.0</td>
+      <td>56.400002</td>
+      <td>37.900002</td>
+      <td>45.900002</td>
+      <td>23.000000</td>
+      <td>1.0</td>
+      <td>1599.0</td>
+      <td>34.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>533.000000</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>California</th>
+      <td>39.5</td>
+      <td>253.600006</td>
+      <td>36.299999</td>
+      <td>71.199997</td>
+      <td>27.900000</td>
+      <td>0.0</td>
+      <td>26838.0</td>
+      <td>864.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>679.443054</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">f, ax1 = plt.subplots(1, 1,
+                       figsize=(12, 5),
+)
+
+sns.distplot(data[<span style="font-style:italic">&#39;CasesPerCap&#39;</span>], ax=ax1)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a4dd8c048&gt;</pre></div>
+<p><img src="./Untitled_5_1.png" alt="png" /></p>
+
+<h3 id="model-1-predict-the-strategy">Model 1: Predict the Strategy</h3>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">X = data[[<span style="font-style:italic">&#39;Population&#39;</span>, <span style="font-style:italic">&#39;Density&#39;</span>, <span style="font-style:italic">&#39;Age&#39;</span>, <span style="font-style:italic">&#39;Income&#39;</span>, <span style="font-style:italic">&#39;POC&#39;</span>, <span style="font-style:italic">&#39;Governor&#39;</span>]].copy()
+y = data[<span style="font-style:italic">&#39;Lockdown&#39;</span>]
+
+lr = Pipeline(
+    steps = [(<span style="font-style:italic">&#39;scale&#39;</span>, StandardScaler()),
+             (<span style="font-style:italic">&#39;smote&#39;</span>, SMOTE()),
+             (<span style="font-style:italic">&#39;clf&#39;</span>, CalibratedClassifierCV(LogisticRegression()))
+            ]   
+)
+
+lr.fit(X, y)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Pipeline(memory=None,
+         steps=[(&#39;scale&#39;,
+                 StandardScaler(copy=True, with_mean=True, with_std=True)),
+                (&#39;smote&#39;,
+                 SMOTE(k_neighbors=5, n_jobs=None, random_state=None,
+                       sampling_strategy=&#39;auto&#39;)),
+                (&#39;clf&#39;,
+                 CalibratedClassifierCV(base_estimator=LogisticRegression(C=1.0,
+                                                                          class_weight=None,
+                                                                          dual=False,
+                                                                          fit_intercept=True,
+                                                                          intercept_scaling=1,
+                                                                          l1_ratio=None,
+                                                                          max_iter=100,
+                                                                          multi_class=&#39;auto&#39;,
+                                                                          n_jobs=None,
+                                                                          penalty=&#39;l2&#39;,
+                                                                          random_state=None,
+                                                                          solver=&#39;lbfgs&#39;,
+                                                                          tol=0.0001,
+                                                                          verbose=0,
+                                                                          warm_start=False),
+                                        cv=None, method=&#39;sigmoid&#39;))],
+         verbose=False)</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">propensity = pd.DataFrame(lr.predict_proba(X), index=data.index)
+propensity.sort_values(by=1)</code></pre></div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+    </tr>
+    <tr>
+      <th>StateName</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Utah</th>
+      <td>0.885211</td>
+      <td>0.114789</td>
+    </tr>
+    <tr>
+      <th>Idaho</th>
+      <td>0.829723</td>
+      <td>0.170277</td>
+    </tr>
+    <tr>
+      <th>Wyoming</th>
+      <td>0.787564</td>
+      <td>0.212436</td>
+    </tr>
+    <tr>
+      <th>Nebraska</th>
+      <td>0.780540</td>
+      <td>0.219460</td>
+    </tr>
+    <tr>
+      <th>North Dakota</th>
+      <td>0.777525</td>
+      <td>0.222475</td>
+    </tr>
+    <tr>
+      <th>Alaska</th>
+      <td>0.731256</td>
+      <td>0.268744</td>
+    </tr>
+    <tr>
+      <th>South Dakota</th>
+      <td>0.713944</td>
+      <td>0.286056</td>
+    </tr>
+    <tr>
+      <th>Iowa</th>
+      <td>0.694327</td>
+      <td>0.305673</td>
+    </tr>
+    <tr>
+      <th>Arkansas</th>
+      <td>0.691609</td>
+      <td>0.308391</td>
+    </tr>
+    <tr>
+      <th>Oklahoma</th>
+      <td>0.689812</td>
+      <td>0.310188</td>
+    </tr>
+    <tr>
+      <th>Miss.</th>
+      <td>0.628254</td>
+      <td>0.371746</td>
+    </tr>
+    <tr>
+      <th>westVa</th>
+      <td>0.599544</td>
+      <td>0.400456</td>
+    </tr>
+    <tr>
+      <th>Indiana</th>
+      <td>0.587710</td>
+      <td>0.412290</td>
+    </tr>
+    <tr>
+      <th>Missouri</th>
+      <td>0.572347</td>
+      <td>0.427653</td>
+    </tr>
+    <tr>
+      <th>Arizona</th>
+      <td>0.521740</td>
+      <td>0.478260</td>
+    </tr>
+    <tr>
+      <th>Vermont</th>
+      <td>0.517116</td>
+      <td>0.482884</td>
+    </tr>
+    <tr>
+      <th>Tennessee</th>
+      <td>0.484107</td>
+      <td>0.515893</td>
+    </tr>
+    <tr>
+      <th>Alabama</th>
+      <td>0.457458</td>
+      <td>0.542542</td>
+    </tr>
+    <tr>
+      <th>South Carolina</th>
+      <td>0.455838</td>
+      <td>0.544162</td>
+    </tr>
+    <tr>
+      <th>NH</th>
+      <td>0.409368</td>
+      <td>0.590632</td>
+    </tr>
+    <tr>
+      <th>Georgia</th>
+      <td>0.360213</td>
+      <td>0.639787</td>
+    </tr>
+    <tr>
+      <th>Kansas</th>
+      <td>0.326550</td>
+      <td>0.673450</td>
+    </tr>
+    <tr>
+      <th>Montana</th>
+      <td>0.275294</td>
+      <td>0.724706</td>
+    </tr>
+    <tr>
+      <th>Ohio</th>
+      <td>0.255613</td>
+      <td>0.744387</td>
+    </tr>
+    <tr>
+      <th>Kentucky</th>
+      <td>0.235285</td>
+      <td>0.764715</td>
+    </tr>
+    <tr>
+      <th>Louisiana</th>
+      <td>0.204839</td>
+      <td>0.795161</td>
+    </tr>
+    <tr>
+      <th>Colorado</th>
+      <td>0.198929</td>
+      <td>0.801071</td>
+    </tr>
+    <tr>
+      <th>Oregon</th>
+      <td>0.189515</td>
+      <td>0.810485</td>
+    </tr>
+    <tr>
+      <th>Nevada</th>
+      <td>0.187040</td>
+      <td>0.812960</td>
+    </tr>
+    <tr>
+      <th>Minnesota</th>
+      <td>0.172457</td>
+      <td>0.827543</td>
+    </tr>
+    <tr>
+      <th>Mass.</th>
+      <td>0.170310</td>
+      <td>0.829690</td>
+    </tr>
+    <tr>
+      <th>Texas</th>
+      <td>0.159084</td>
+      <td>0.840916</td>
+    </tr>
+    <tr>
+      <th>Wisconsin</th>
+      <td>0.159045</td>
+      <td>0.840955</td>
+    </tr>
+    <tr>
+      <th>Maine</th>
+      <td>0.132447</td>
+      <td>0.867553</td>
+    </tr>
+    <tr>
+      <th>Washington</th>
+      <td>0.129153</td>
+      <td>0.870847</td>
+    </tr>
+    <tr>
+      <th>New Mexico</th>
+      <td>0.126684</td>
+      <td>0.873316</td>
+    </tr>
+    <tr>
+      <th>Maryland</th>
+      <td>0.117469</td>
+      <td>0.882531</td>
+    </tr>
+    <tr>
+      <th>Michigan</th>
+      <td>0.090870</td>
+      <td>0.909130</td>
+    </tr>
+    <tr>
+      <th>Delaware</th>
+      <td>0.086381</td>
+      <td>0.913619</td>
+    </tr>
+    <tr>
+      <th>North Carolina</th>
+      <td>0.083646</td>
+      <td>0.916354</td>
+    </tr>
+    <tr>
+      <th>Florida</th>
+      <td>0.076075</td>
+      <td>0.923925</td>
+    </tr>
+    <tr>
+      <th>Virginia</th>
+      <td>0.067992</td>
+      <td>0.932008</td>
+    </tr>
+    <tr>
+      <th>Illinois</th>
+      <td>0.067635</td>
+      <td>0.932365</td>
+    </tr>
+    <tr>
+      <th>RI</th>
+      <td>0.063837</td>
+      <td>0.936163</td>
+    </tr>
+    <tr>
+      <th>Penn.</th>
+      <td>0.051516</td>
+      <td>0.948484</td>
+    </tr>
+    <tr>
+      <th>Hawaii</th>
+      <td>0.051411</td>
+      <td>0.948589</td>
+    </tr>
+    <tr>
+      <th>Connecticut</th>
+      <td>0.042087</td>
+      <td>0.957913</td>
+    </tr>
+    <tr>
+      <th>New York</th>
+      <td>0.022219</td>
+      <td>0.977781</td>
+    </tr>
+    <tr>
+      <th>New jersey</th>
+      <td>0.013840</td>
+      <td>0.986160</td>
+    </tr>
+    <tr>
+      <th>California</th>
+      <td>0.008292</td>
+      <td>0.991708</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">f, ax1 = plt.subplots(1, 1,
+                       figsize=(12, 5),
+)
+
+sns.distplot(propensity[1], ax=ax1)
+ax1.set_xlim(0, 1)
+ax1.set_title(<span style="font-style:italic">&#34;Propensity scores per State&#34;</span>)
+ax1.set_xlabel(<span style="font-style:italic">&#34;Propensity scores&#34;</span>)
+ax1.set_ylabel(<span style="font-style:italic">&#39;Density&#39;</span>);</code></pre></div>
+<p><img src="./Untitled_9_0.png" alt="png" /></p>
+
+<h3 id="model-2-use-the-strategy-probabilities-as-weights-in-a-subsequent-regression">Model 2: Use the Strategy probabilities as weights in a subsequent regression</h3>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">data[<span style="font-style:italic">&#39;Iptw&#39;</span>] =  1./ propensity.lookup(data.index, data[<span style="font-style:italic">&#39;Strategy&#39;</span>])</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">X = data[[<span style="font-style:italic">&#39;Population&#39;</span>, <span style="font-style:italic">&#39;Density&#39;</span>, <span style="font-style:italic">&#39;Age&#39;</span>, <span style="font-style:italic">&#39;Income&#39;</span>, <span style="font-style:italic">&#39;POC&#39;</span>, <span style="font-style:italic">&#39;Lockdown&#39;</span>, <span style="font-style:italic">&#39;Governor&#39;</span>, <span style="font-style:italic">&#39;Intercept&#39;</span>]].copy()
+y = data[<span style="font-style:italic">&#39;CasesPerCap&#39;</span>]
+
+glm = sm.GLM(y, X, 
+             family=sm.families.NegativeBinomial(),
+             freq_weights=data[<span style="font-style:italic">&#39;Iptw&#39;</span>])
+res = glm.fit()
+res.summary()</code></pre></div>
+<table class="simpletable">
+<caption>Generalized Linear Model Regression Results</caption>
+<tr>
+  <th>Dep. Variable:</th>      <td>CasesPerCap</td>   <th>  No. Observations:  </th>  <td>    50</td> 
+</tr>
+<tr>
+  <th>Model:</th>                  <td>GLM</td>       <th>  Df Residuals:      </th> <td>  535.02</td>
+</tr>
+<tr>
+  <th>Model Family:</th>    <td>NegativeBinomial</td> <th>  Df Model:          </th>  <td>     7</td> 
+</tr>
+<tr>
+  <th>Link Function:</th>          <td>log</td>       <th>  Scale:             </th> <td>  1.0000</td>
+</tr>
+<tr>
+  <th>Method:</th>                <td>IRLS</td>       <th>  Log-Likelihood:    </th> <td> -4704.4</td>
+</tr>
+<tr>
+  <th>Date:</th>            <td>Thu, 23 Apr 2020</td> <th>  Deviance:          </th> <td>  326.75</td>
+</tr>
+<tr>
+  <th>Time:</th>                <td>19:51:48</td>     <th>  Pearson chi2:      </th>  <td>  497.</td> 
+</tr>
+<tr>
+  <th>No. Iterations:</th>         <td>16</td>        <th>                     </th>     <td> </td>   
+</tr>
+<tr>
+  <th>Covariance Type:</th>     <td>nonrobust</td>    <th>                     </th>     <td> </td>   
+</tr>
+</table>
+<table class="simpletable">
+<tr>
+       <td></td>         <th>coef</th>     <th>std err</th>      <th>z</th>      <th>P>|z|</th>  <th>[0.025</th>    <th>0.975]</th>  
+</tr>
+<tr>
+  <th>Population</th> <td>   -0.0015</td> <td>    0.004</td> <td>   -0.344</td> <td> 0.731</td> <td>   -0.010</td> <td>    0.007</td>
+</tr>
+<tr>
+  <th>Density</th>    <td>    0.0027</td> <td>    0.000</td> <td>   15.224</td> <td> 0.000</td> <td>    0.002</td> <td>    0.003</td>
+</tr>
+<tr>
+  <th>Age</th>        <td>    0.0133</td> <td>    0.031</td> <td>    0.427</td> <td> 0.670</td> <td>   -0.048</td> <td>    0.074</td>
+</tr>
+<tr>
+  <th>Income</th>     <td>   -0.0522</td> <td>    0.007</td> <td>   -7.409</td> <td> 0.000</td> <td>   -0.066</td> <td>   -0.038</td>
+</tr>
+<tr>
+  <th>POC</th>        <td>    0.0088</td> <td>    0.004</td> <td>    2.428</td> <td> 0.015</td> <td>    0.002</td> <td>    0.016</td>
+</tr>
+<tr>
+  <th>Lockdown</th>   <td>   -0.3632</td> <td>    0.260</td> <td>   -1.396</td> <td> 0.163</td> <td>   -0.873</td> <td>    0.147</td>
+</tr>
+<tr>
+  <th>Governor</th>   <td>    0.7309</td> <td>    0.141</td> <td>    5.170</td> <td> 0.000</td> <td>    0.454</td> <td>    1.008</td>
+</tr>
+<tr>
+  <th>Intercept</th>  <td>    9.0590</td> <td>    1.300</td> <td>    6.970</td> <td> 0.000</td> <td>    6.512</td> <td>   11.606</td>
+</tr>
+</table>
+
+<p>We are modelling</p>
+
+<p>$$ \log{CasesPerCap} = \beta<em>0 + \beta</em>{Lockdown}*X<em>{Lockdown} + \beta</em>{Density}*X<em>{Density} + \beta</em>{Age}*X<em>{age} + \beta</em>{Income}*X<em>{Income} + \beta</em>{POC}*X<em>{POC} + + \beta</em>{Governor}*X_{Governor} $$</p>
+
+<p>which means conditional on all other covariates being the same, when a state has lockdown the mean number of Cases per Capita decreases by:</p>
+
+<p>$$ \log{Y_1} - \log{Y_0} = \log{\frac{Y_1}{Y_0}} \sim -0.36 $$</p>
+
+<p>Where</p>
+
+<p>$$ Y<em>1 = \mathrm{CasesPerCap}, X</em>{Lockdown = 1} $$</p>
+
+<p>and Y_0 is defined similarly.</p>
+
+<p>Which means, that keeping all other covariates the same, imposing a lockdown caused about 36% fewer cases per capita, and this has an 16% chance of happening by random.</p>
+
+<p>Given the small sample size this is probably the best p-value we will get.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"></code></pre></div>
+    </div>
+
+    
+
+
+
+
+    
+
+
+
+    
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  <div class="media author-card">
+    
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hu52a603635ecebd45650b162dadabb4e5_12861_250x250_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Thomas Kealy</a></h5>
+      <h6 class="card-subtitle">Data Scientist</h6>
+      <p class="card-text">I am a Data Scientist in Berlin.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="/#contact" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/ThomasKealy" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/TomKealy" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+      
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d6bd04fdad2ad213aa8111c5a3b72fc5.js"></script>
+
+    
+
+
+
+
+
+
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

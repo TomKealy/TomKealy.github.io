@@ -114,9 +114,9 @@ One of the most important ideas in mathematics, is that you can build complex th
   
   <meta property="twitter:card" content="summary">
   
-  <meta property="og:site_name" content="Academic">
+  <meta property="og:site_name" content="Tom Kealy&#39;s site">
   <meta property="og:url" content="/post/fourier-transform/">
-  <meta property="og:title" content="Fourier Transform | Academic">
+  <meta property="og:title" content="Fourier Transform | Tom Kealy&#39;s site">
   <meta property="og:description" content="Breaking it all down Since it&#39;s Joseph Fourier&#39;s birthday, I&#39;ll write a little about his central idea and why it&#39;s so important.
 One of the most important ideas in mathematics, is that you can build complex things out of simple things. In the context I&#39;m talking about this time: we can often break a vector on a vector space down into a sum of simpler vectors which span the space we&#39;re interested in."><meta property="og:image" content="/img/icon-192.png">
   <meta property="twitter:image" content="/img/icon-192.png"><meta property="og:locale" content="en-us">
@@ -164,7 +164,7 @@ One of the most important ideas in mathematics, is that you can build complex th
   
   "publisher": {
     "@type": "Organization",
-    "name": "Academic",
+    "name": "Tom Kealy's site",
     "logo": {
       "@type": "ImageObject",
       "url": "/img/icon-512.png"
@@ -188,7 +188,7 @@ One of the most important ideas in mathematics, is that you can build complex th
 
 
 
-  <title>Fourier Transform | Academic</title>
+  <title>Fourier Transform | Tom Kealy&#39;s site</title>
 
 </head>
 
@@ -231,7 +231,7 @@ One of the most important ideas in mathematics, is that you can build complex th
   <div class="container">
 
     
-      <a class="navbar-brand" href="/">Academic</a>
+      <a class="navbar-brand" href="/">Tom Kealy&#39;s site</a>
       
       <button type="button" class="navbar-toggler" data-toggle="collapse"
               data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -632,32 +632,23 @@ One of the most important ideas in mathematics, is that you can build complex th
 <p>with <span  class="math">\( W_{kn} = e^{-i2\pi kn/N} \)</span></p>
 
 <p>Naively, we could simply compute the FT by doing some matrix multiplication:</p>
-
-<pre><code class="language-python">import numpy as np
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">import</span> <span style="font-weight:bold">numpy</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">np</span>
 
 x = np.random.randn(1024)
 
-def DFT(x):
+<span style="font-weight:bold">def</span> DFT(x):
 
     X = np.zeros_like(x)
     N = x.shape[0]
     n = np.arange(N)
     k = n.reshape((N, 1))
     W = np.exp(-1.0*(2j * np.pi * k * n /N))
-    X = W @ x
-    return X
+    X = W <span style="">@</span> x
+    <span style="font-weight:bold">return</span> X
 
-X = DFT(x)
-</code></pre>
-
+X = DFT(x)</code></pre></div>
 <p>We can check to see if we're right:</p>
-
-<pre><code class="language-python">np.allclose(X, np.fft.fft(x))
-</code></pre>
-
-<pre><code>True
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">np.allclose(X, np.fft.fft(x))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">True</pre></div>
 <p>However, there's a much better way of computing the FT by exploiting some symmetries of W. First of all we'll show that $ X_{k + N} = X_k $ and then how this insight can be turned into a recursive algorithm for computing $X_k$.</p>
 
 <p>Firstly</p>
@@ -681,26 +672,17 @@ X = DFT(x)
 <p><img src="radix2fft.png"></p>
 
 <p>In python, we can write the FFT as like so:</p>
-
-<pre><code class="language-python">def FFT(x):
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">def</span> FFT(x):
     N = x.shape[0]
 
-    if N % 2 &gt; 0:
-        return x
-    else:
+    <span style="font-weight:bold">if</span> N % 2 &gt; 0:
+        <span style="font-weight:bold">return</span> x
+    <span style="font-weight:bold">else</span>:
         X_even = FFT(x[::2])
         X_odd = FFT(x[1::2])
         factor = np.exp(-2j * np.pi * np.arange(N) / N)
-        return np.concatenate([X_even + factor[:(N // 2)] * X_odd, X_even + factor[(N // 2):] * X_odd])
-</code></pre>
-
-<pre><code class="language-python">X = FFT(x)
-np.allclose(X, np.fft.fft(x))
-</code></pre>
-
-<pre><code>True
-</code></pre>
-
+        <span style="font-weight:bold">return</span> np.concatenate([X_even + factor[:(N // 2)] * X_odd, X_even + factor[(N // 2):] * X_odd])</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">X = FFT(x)
+np.allclose(X, np.fft.fft(x))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">True</pre></div>
     </div>
 
     

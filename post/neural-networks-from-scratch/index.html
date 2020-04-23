@@ -117,9 +117,9 @@ $$ h = \mathrm{sigmoid}(M x) $$">
   
   <meta property="twitter:card" content="summary">
   
-  <meta property="og:site_name" content="Academic">
+  <meta property="og:site_name" content="Tom Kealy&#39;s site">
   <meta property="og:url" content="/post/neural-networks-from-scratch/">
-  <meta property="og:title" content="Neural Networks From Scratch | Academic">
+  <meta property="og:title" content="Neural Networks From Scratch | Tom Kealy&#39;s site">
   <meta property="og:description" content="It&rsquo;s useful sometimes to write simple versions of complex things, so that you understand them. In this post we write a simple neural network from scratch.
 In a normal classification problem, we have some labels (y) and inputs (x) and we would like to learn a linear function
 $$ y = W x $$
@@ -170,7 +170,7 @@ $$ h = \mathrm{sigmoid}(M x) $$"><meta property="og:image" content="/img/icon-19
   
   "publisher": {
     "@type": "Organization",
-    "name": "Academic",
+    "name": "Tom Kealy's site",
     "logo": {
       "@type": "ImageObject",
       "url": "/img/icon-512.png"
@@ -194,7 +194,7 @@ $$ h = \mathrm{sigmoid}(M x) $$"><meta property="og:image" content="/img/icon-19
 
 
 
-  <title>Neural Networks From Scratch | Academic</title>
+  <title>Neural Networks From Scratch | Tom Kealy&#39;s site</title>
 
 </head>
 
@@ -237,7 +237,7 @@ $$ h = \mathrm{sigmoid}(M x) $$"><meta property="og:image" content="/img/icon-19
   <div class="container">
 
     
-      <a class="navbar-brand" href="/">Academic</a>
+      <a class="navbar-brand" href="/">Tom Kealy&#39;s site</a>
       
       <button type="button" class="navbar-toggler" data-toggle="collapse"
               data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -618,195 +618,174 @@ $$ h = \mathrm{sigmoid}(M x) $$"><meta property="og:image" content="/img/icon-19
 <p>Thus we are esentially fitting a linear classifier on the basis expansion \( \mathrm{sigmoid}(M x) \), the difference being that we fit the basis expansion, as well as the linear classifier. That is, the Network learns a data dependent basis on which to clssify.</p>
 
 <p>Enough with the maths, lets do some coding!</p>
-
-<pre><code class="language-python">from __future__ import print_function
-import numpy as np
-np.random.seed(42)
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">__future__</span> <span style="font-weight:bold">import</span> print_function
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">numpy</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">np</span>
+np.random.seed(42)</code></pre></div>
 <p>Neural networks are made up of Layers, the simplest just returns what it recieves as input.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">Layer</span>(object):
+    <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">    A building block. Each layer is capable of performing two things:
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">    - Process input to get output:           output = layer.forward(input)
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">    - Propagate gradients through itself:    grad_input = layer.backward(input, grad_output)
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">    Some layers also have learnable parameters which they update during layer.backward.
+</span><span style="font-style:italic">    &#34;&#34;&#34;</span>
 
-<pre><code class="language-python">class Layer(object):
-    &quot;&quot;&quot;
-    A building block. Each layer is capable of performing two things:
+    <span style="font-weight:bold">def</span> __init__(self):
+        <span style="font-style:italic">&#34;&#34;&#34;This is an identity layer so it doesn&#39;t need to do anything.&#34;&#34;&#34;</span>
+        <span style="font-weight:bold">pass</span>
 
-    - Process input to get output:           output = layer.forward(input)
+    <span style="font-weight:bold">def</span> forward(self, input):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        output: Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
+        <span style="font-weight:bold">return</span> input
 
-    - Propagate gradients through itself:    grad_input = layer.backward(input, grad_output)
-
-    Some layers also have learnable parameters which they update during layer.backward.
-    &quot;&quot;&quot;
-
-    def __init__(self):
-        &quot;&quot;&quot;This is an identity layer so it doesn't need to do anything.&quot;&quot;&quot;
-        pass
-
-    def forward(self, input):
-        &quot;&quot;&quot;
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
-
-        Returns
-        ----------
-        output: Tensor of shape [batch_size, num_output_units]
-
-        &quot;&quot;&quot;
-        return input
-
-    def backward(self, input, grad_output):
-        &quot;&quot;&quot;
-        Performs a backpropagation step through the layer, with respect to the given input.
-
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
-
-        grad_output : Tensor of shape  [batch_size, num_input_units]
-
-        Returns
-        ----------
-
-        grad_output : Tensor of shape [batch_size, num_output_units]
-
-        &quot;&quot;&quot;
+    <span style="font-weight:bold">def</span> backward(self, input, grad_output):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Performs a backpropagation step through the layer, with respect to the given input.
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        grad_output : Tensor of shape  [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        grad_output : Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
 
         num_units = input.shape[1]
 
         d_layer_d_input = np.eye(num_units)
 
-        return np.dot(grad_output, d_layer_d_input) # chain rule
-</code></pre>
-
+        <span style="font-weight:bold">return</span> np.dot(grad_output, d_layer_d_input) <span style="font-style:italic"># chain rule</span></code></pre></div>
 <p>Lets add some non-linearity layers: a ReLU layer, and a Sigmoid layer</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">ReLU</span>(Layer):
+    <span style="font-weight:bold">def</span> __init__(self):
+        <span style="font-style:italic">&#34;&#34;&#34;ReLU layer simply applies elementwise rectified linear unit to all inputs&#34;&#34;&#34;</span>
+        <span style="font-weight:bold">pass</span>
 
-<pre><code class="language-python">class ReLU(Layer):
-    def __init__(self):
-        &quot;&quot;&quot;ReLU layer simply applies elementwise rectified linear unit to all inputs&quot;&quot;&quot;
-        pass
-
-    def forward(self, input):
-        &quot;&quot;&quot;
-        Apply elementwise ReLU to [batch, input_units] matrix
-
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
-
-        Returns
-        ----------
-        output: Tensor of shape [batch_size, num_output_units]
-
-        &quot;&quot;&quot;
-        return np.maximum(0, input)
+    <span style="font-weight:bold">def</span> forward(self, input):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Apply elementwise ReLU to [batch, input_units] matrix
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        output: Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
+        <span style="font-weight:bold">return</span> np.maximum(0, input)
 
 
-    def backward(self, input, grad_output):
-        &quot;&quot;&quot;
-        Compute gradient of loss w.r.t. ReLU input
-
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
-
-        grad_output : Tensor of shape  [batch_size, num_input_units]
-
-        Returns
-        ----------
-
-        grad_output : Tensor of shape [batch_size, num_output_units]
-        &quot;&quot;&quot;
+    <span style="font-weight:bold">def</span> backward(self, input, grad_output):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Compute gradient of loss w.r.t. ReLU input
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        grad_output : Tensor of shape  [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        grad_output : Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
         relu_grad = input &gt; 0
-        return grad_output*relu_grad        
-</code></pre>
+        <span style="font-weight:bold">return</span> grad_output*relu_grad        </code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">Sigmoid</span>(Layer):
+    <span style="font-weight:bold">def</span> __init__(self):
+        <span style="font-style:italic">&#34;&#34;&#34;Sigmoid layer simply applies elementwise sigmoid unit to all inputs&#34;&#34;&#34;</span>
+        <span style="font-weight:bold">pass</span>
 
-<pre><code class="language-python">class Sigmoid(Layer):
-    def __init__(self):
-        &quot;&quot;&quot;Sigmoid layer simply applies elementwise sigmoid unit to all inputs&quot;&quot;&quot;
-        pass
-
-    def forward(self, input):
-        &quot;&quot;&quot;
-        Apply elementwise ReLU to [batch, input_units] matrix
-
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
-
-        Returns
-        ----------
-        output: Tensor of shape [batch_size, num_output_units]
-
-        &quot;&quot;&quot;
-        return np.tanh(input)
+    <span style="font-weight:bold">def</span> forward(self, input):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Apply elementwise ReLU to [batch, input_units] matrix
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        output: Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
+        <span style="font-weight:bold">return</span> np.tanh(input)
 
 
-    def backward(self, input, grad_output):
-        &quot;&quot;&quot;
-        Compute gradient of loss w.r.t. ReLU input
-
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
-
-        grad_output : Tensor of shape  [batch_size, num_input_units]
-
-        Returns
-        ----------
-
-        grad_output : Tensor of shape [batch_size, num_output_units]
-        &quot;&quot;&quot;
+    <span style="font-weight:bold">def</span> backward(self, input, grad_output):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Compute gradient of loss w.r.t. ReLU input
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        grad_output : Tensor of shape  [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        grad_output : Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
         sigmoid_grad = 1 - np.tanh(input)*np.tanh(input)
-        return grad_output*sigmoid_grad        
-</code></pre>
-
+        <span style="font-weight:bold">return</span> grad_output*sigmoid_grad        </code></pre></div>
 <p>We can test this by evaluating the numerical gradients:</p>
-
-<pre><code class="language-python">def eval_numerical_gradient(f, x, verbose=False, h=0.00001):
-    &quot;&quot;&quot;Evaluates gradient df/dx via finite differences:
-    df/dx ~ (f(x+h) - f(x-h)) / 2h
-    Adopted from https://github.com/ddtm/dl-course/ (our ysda course).
-    &quot;&quot;&quot;
-    fx = f(x) # evaluate function value at original point
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">def</span> eval_numerical_gradient(f, x, verbose=False, h=0.00001):
+    <span style="font-style:italic">&#34;&#34;&#34;Evaluates gradient df/dx via finite differences:
+</span><span style="font-style:italic">    df/dx ~ (f(x+h) - f(x-h)) / 2h
+</span><span style="font-style:italic">    Adopted from https://github.com/ddtm/dl-course/ (our ysda course).
+</span><span style="font-style:italic">    &#34;&#34;&#34;</span>
+    fx = f(x) <span style="font-style:italic"># evaluate function value at original point</span>
     grad = np.zeros_like(x)
-    # iterate over all indexes in x
-    it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
-    while not it.finished:
+    <span style="font-style:italic"># iterate over all indexes in x</span>
+    it = np.nditer(x, flags=[<span style="font-style:italic">&#39;multi_index&#39;</span>], op_flags=[<span style="font-style:italic">&#39;readwrite&#39;</span>])
+    <span style="font-weight:bold">while</span> <span style="font-weight:bold">not</span> it.finished:
 
-        # evaluate function at x+h
+        <span style="font-style:italic"># evaluate function at x+h</span>
         ix = it.multi_index
         oldval = x[ix]
-        x[ix] = oldval + h # increment by h
-        fxph = f(x) # evalute f(x + h)
+        x[ix] = oldval + h <span style="font-style:italic"># increment by h</span>
+        fxph = f(x) <span style="font-style:italic"># evalute f(x + h)</span>
         x[ix] = oldval - h
-        fxmh = f(x) # evaluate f(x - h)
-        x[ix] = oldval # restore
+        fxmh = f(x) <span style="font-style:italic"># evaluate f(x - h)</span>
+        x[ix] = oldval <span style="font-style:italic"># restore</span>
 
-        # compute the partial derivative with centered formula
-        grad[ix] = (fxph - fxmh) / (2 * h) # the slope
-        if verbose:
-            print (ix, grad[ix])
-        it.iternext() # step to next dimension
+        <span style="font-style:italic"># compute the partial derivative with centered formula</span>
+        grad[ix] = (fxph - fxmh) / (2 * h) <span style="font-style:italic"># the slope</span>
+        <span style="font-weight:bold">if</span> verbose:
+            <span style="font-weight:bold">print</span> (ix, grad[ix])
+        it.iternext() <span style="font-style:italic"># step to next dimension</span>
 
-    return grad
-</code></pre>
-
-<pre><code class="language-python">x = np.linspace(-1,1,10*32).reshape([10,32])
+    <span style="font-weight:bold">return</span> grad</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">x = np.linspace(-1,1,10*32).reshape([10,32])
 l = ReLU()
 grads = l.backward(x,np.ones([10,32])/(32*10))
-numeric_grads = eval_numerical_gradient(lambda x: l.forward(x).mean(), x=x)
-assert np.allclose(grads, numeric_grads, rtol=1e-3, atol=0),\
-    &quot;gradient returned by your layer does not match the numerically computed gradient&quot;
-</code></pre>
-
-<pre><code class="language-python">x = np.linspace(-1,1,10*32).reshape([10,32])
+numeric_grads = eval_numerical_gradient(<span style="font-weight:bold">lambda</span> x: l.forward(x).mean(), x=x)
+<span style="font-weight:bold">assert</span> np.allclose(grads, numeric_grads, rtol=1e-3, atol=0),\
+    <span style="font-style:italic">&#34;gradient returned by your layer does not match the numerically computed gradient&#34;</span></code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">x = np.linspace(-1,1,10*32).reshape([10,32])
 l = Sigmoid()
 grads = l.backward(x,np.ones([10,32])/(32*10))
-numeric_grads = eval_numerical_gradient(lambda x: l.forward(x).mean(), x=x)
-assert np.allclose(grads, numeric_grads, rtol=1e-3, atol=0),\
-    &quot;gradient returned by your layer does not match the numerically computed gradient&quot;
-</code></pre>
-
+numeric_grads = eval_numerical_gradient(<span style="font-weight:bold">lambda</span> x: l.forward(x).mean(), x=x)
+<span style="font-weight:bold">assert</span> np.allclose(grads, numeric_grads, rtol=1e-3, atol=0),\
+    <span style="font-style:italic">&#34;gradient returned by your layer does not match the numerically computed gradient&#34;</span></code></pre></div>
 <p>The next type of layer we will implement will be a Dense or Fully Connected layer. Unlike nonlinearity, this layer actually has something to learn.</p>
 
 <p>A dense layer applies affine transformation. In a vectorized form, it can be described as:
@@ -818,174 +797,146 @@ $$f(X)= W \cdot X + \vec b $$</p>
 *and b is a vector of num_outputs biases.</p>
 
 <p>Both W and b are initialized during layer creation and updated each time backward is called.</p>
-
-<pre><code class="language-python">class Dense(Layer):
-    def __init__(self, input_units, output_units, learning_rate=0.1):
-        &quot;&quot;&quot;
-        A dense layer is a layer which performs a learned affine transformation:
-        f(x) = &lt;W*x&gt; + b
-
-        Weights initialised by Xavier initialisation: http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf
-
-        &quot;&quot;&quot;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">Dense</span>(Layer):
+    <span style="font-weight:bold">def</span> __init__(self, input_units, output_units, learning_rate=0.1):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        A dense layer is a layer which performs a learned affine transformation:
+</span><span style="font-style:italic">        f(x) = &lt;W*x&gt; + b
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Weights initialised by Xavier initialisation: http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
         self.learning_rate = learning_rate
         self.weights = np.random.randn(input_units, output_units) * np.sqrt(2.0/(input_units+output_units))
         self.biases = np.zeros(output_units)
 
-    def forward(self,input):
-        &quot;&quot;&quot;
-        Perform an affine transformation:
-        f(x) = &lt;W*x&gt; + b
+    <span style="font-weight:bold">def</span> forward(self,input):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Perform an affine transformation:
+</span><span style="font-style:italic">        f(x) = &lt;W*x&gt; + b
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        output: Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
+        <span style="font-weight:bold">return</span> input <span style="">@</span> self.weights + self.biases
 
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
+    <span style="font-weight:bold">def</span> backward(self, input, grad_output):  
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Parameters
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        input : Tensor of shape [batch_size, num_input_units]
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        Returns
+</span><span style="font-style:italic">        ----------
+</span><span style="font-style:italic">        grad_output: Tensor of shape [batch_size, num_output_units]
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
+        grad_input = grad_output <span style="">@</span> self.weights.T
 
-        Returns
-        ----------
-        output: Tensor of shape [batch_size, num_output_units]
-        &quot;&quot;&quot;
-        return input @ self.weights + self.biases
-
-    def backward(self, input, grad_output):  
-        &quot;&quot;&quot;
-        Parameters
-        ----------
-        input : Tensor of shape [batch_size, num_input_units]
-
-        Returns
-        ----------
-        grad_output: Tensor of shape [batch_size, num_output_units]
-        &quot;&quot;&quot;
-        grad_input = grad_output @ self.weights.T
-
-        grad_weights = (input.T @ grad_output)
+        grad_weights = (input.T <span style="">@</span> grad_output)
         grad_biases = grad_output.sum(axis=0)
 
-        assert grad_weights.shape == self.weights.shape and grad_biases.shape == self.biases.shape
+        <span style="font-weight:bold">assert</span> grad_weights.shape == self.weights.shape <span style="font-weight:bold">and</span> grad_biases.shape == self.biases.shape
 
         self.weights = self.weights - self.learning_rate * grad_weights
         self.biases = self.biases - self.learning_rate * grad_biases
 
-        return grad_input
-</code></pre>
-
+        <span style="font-weight:bold">return</span> grad_input</code></pre></div>
 <p>Next, some tests:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">l = Dense(128, 150)
 
-<pre><code class="language-python">l = Dense(128, 150)
+<span style="font-weight:bold">assert</span> -0.05 &lt; l.weights.mean() &lt; 0.05 <span style="font-weight:bold">and</span> 1e-3 &lt; l.weights.std() &lt; 1e-1,\
+    <span style="font-style:italic">&#34;The initial weights must have zero mean and small variance. &#34;</span>\
+    <span style="font-style:italic">&#34;If you know what you&#39;re doing, remove this assertion.&#34;</span>
+<span style="font-weight:bold">assert</span> -0.05 &lt; l.biases.mean() &lt; 0.05, <span style="font-style:italic">&#34;Biases must be zero mean. Ignore if you have a reason to do otherwise.&#34;</span>
 
-assert -0.05 &lt; l.weights.mean() &lt; 0.05 and 1e-3 &lt; l.weights.std() &lt; 1e-1,\
-    &quot;The initial weights must have zero mean and small variance. &quot;\
-    &quot;If you know what you're doing, remove this assertion.&quot;
-assert -0.05 &lt; l.biases.mean() &lt; 0.05, &quot;Biases must be zero mean. Ignore if you have a reason to do otherwise.&quot;
-
-# To test the outputs, we explicitly set weights with fixed values. DO NOT DO THAT IN ACTUAL NETWORK!
+<span style="font-style:italic"># To test the outputs, we explicitly set weights with fixed values. DO NOT DO THAT IN ACTUAL NETWORK!</span>
 l = Dense(3,4)
 
 x = np.linspace(-1,1,2*3).reshape([2,3])
 l.weights = np.linspace(-1,1,3*4).reshape([3,4])
 l.biases = np.linspace(-1,1,4)
 
-assert np.allclose(l.forward(x),np.array([[ 0.07272727,  0.41212121,  0.75151515,  1.09090909],
-                                          [-0.90909091,  0.08484848,  1.07878788,  2.07272727]]))
-</code></pre>
-
-<pre><code class="language-python">x = np.linspace(-1,1,10*32).reshape([10,32])
+<span style="font-weight:bold">assert</span> np.allclose(l.forward(x),np.array([[ 0.07272727,  0.41212121,  0.75151515,  1.09090909],
+                                          [-0.90909091,  0.08484848,  1.07878788,  2.07272727]]))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">x = np.linspace(-1,1,10*32).reshape([10,32])
 l = Dense(32,64,learning_rate=0)
 
-numeric_grads = eval_numerical_gradient(lambda x: l.forward(x).sum(),x)
+numeric_grads = eval_numerical_gradient(<span style="font-weight:bold">lambda</span> x: l.forward(x).sum(),x)
 grads = l.backward(x,np.ones([10,64]))
 
-assert np.allclose(grads,numeric_grads,rtol=1e-3,atol=0), &quot;input gradient does not match numeric grad&quot;
-</code></pre>
-
-<pre><code class="language-python">def compute_out_given_wb(w,b):
+<span style="font-weight:bold">assert</span> np.allclose(grads,numeric_grads,rtol=1e-3,atol=0), <span style="font-style:italic">&#34;input gradient does not match numeric grad&#34;</span></code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">def</span> compute_out_given_wb(w,b):
     l = Dense(32,64,learning_rate=1)
     l.weights = np.array(w)
     l.biases = np.array(b)
     x = np.linspace(-1,1,10*32).reshape([10,32])
-    return l.forward(x)
+    <span style="font-weight:bold">return</span> l.forward(x)
 
-def compute_grad_by_params(w,b):
+<span style="font-weight:bold">def</span> compute_grad_by_params(w,b):
     l = Dense(32,64,learning_rate=1)
     l.weights = np.array(w)
     l.biases = np.array(b)
     x = np.linspace(-1,1,10*32).reshape([10,32])
     l.backward(x,np.ones([10,64]) / 10.)
-    return w - l.weights, b - l.biases
+    <span style="font-weight:bold">return</span> w - l.weights, b - l.biases
 
 w,b = np.random.randn(32,64), np.linspace(-1,1,64)
 
-numeric_dw = eval_numerical_gradient(lambda w: compute_out_given_wb(w,b).mean(0).sum(),w )
-numeric_db = eval_numerical_gradient(lambda b: compute_out_given_wb(w,b).mean(0).sum(),b )
+numeric_dw = eval_numerical_gradient(<span style="font-weight:bold">lambda</span> w: compute_out_given_wb(w,b).mean(0).sum(),w )
+numeric_db = eval_numerical_gradient(<span style="font-weight:bold">lambda</span> b: compute_out_given_wb(w,b).mean(0).sum(),b )
 grad_w,grad_b = compute_grad_by_params(w,b)
 
-assert np.allclose(numeric_dw,grad_w,rtol=1e-3,atol=0), &quot;weight gradient does not match numeric weight gradient&quot;
-assert np.allclose(numeric_db,grad_b,rtol=1e-3,atol=0), &quot;weight gradient does not match numeric weight gradient&quot;
-</code></pre>
-
+<span style="font-weight:bold">assert</span> np.allclose(numeric_dw,grad_w,rtol=1e-3,atol=0), <span style="font-style:italic">&#34;weight gradient does not match numeric weight gradient&#34;</span>
+<span style="font-weight:bold">assert</span> np.allclose(numeric_db,grad_b,rtol=1e-3,atol=0), <span style="font-style:italic">&#34;weight gradient does not match numeric weight gradient&#34;</span></code></pre></div>
 <p>We will optimise the following loss, which is a more numerically stable version of logg loss (courtesy of Coursera advanced ML):</p>
-
-<pre><code class="language-python">def softmax_crossentropy_with_logits(logits, reference_answers):
-    &quot;&quot;&quot;Compute crossentropy from logits[batch,n_classes] and ids of correct answers&quot;&quot;&quot;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">def</span> softmax_crossentropy_with_logits(logits, reference_answers):
+    <span style="font-style:italic">&#34;&#34;&#34;Compute crossentropy from logits[batch,n_classes] and ids of correct answers&#34;&#34;&#34;</span>
     logits_for_answers = logits[np.arange(len(logits)),reference_answers]
 
     xentropy = - logits_for_answers + np.log(np.sum(np.exp(logits),axis=-1))
 
-    return xentropy
+    <span style="font-weight:bold">return</span> xentropy
 
-def grad_softmax_crossentropy_with_logits(logits, reference_answers):
-    &quot;&quot;&quot;Compute crossentropy gradient from logits[batch,n_classes] and ids of correct answers&quot;&quot;&quot;
+<span style="font-weight:bold">def</span> grad_softmax_crossentropy_with_logits(logits, reference_answers):
+    <span style="font-style:italic">&#34;&#34;&#34;Compute crossentropy gradient from logits[batch,n_classes] and ids of correct answers&#34;&#34;&#34;</span>
     ones_for_answers = np.zeros_like(logits)
     ones_for_answers[np.arange(len(logits)),reference_answers] = 1
 
     softmax = np.exp(logits) / np.exp(logits).sum(axis=-1,keepdims=True)
 
-    return (- ones_for_answers + softmax) / logits.shape[0]
-</code></pre>
-
-<pre><code class="language-python">logits = np.linspace(-1,1,500).reshape([50,10])
+    <span style="font-weight:bold">return</span> (- ones_for_answers + softmax) / logits.shape[0]</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">logits = np.linspace(-1,1,500).reshape([50,10])
 answers = np.arange(50)%10
 
 softmax_crossentropy_with_logits(logits,answers)
 grads = grad_softmax_crossentropy_with_logits(logits,answers)
-numeric_grads = eval_numerical_gradient(lambda l: softmax_crossentropy_with_logits(l,answers).mean(),logits)
+numeric_grads = eval_numerical_gradient(<span style="font-weight:bold">lambda</span> l: softmax_crossentropy_with_logits(l,answers).mean(),logits)
 
-assert np.allclose(numeric_grads,grads,rtol=1e-3,atol=0)
-</code></pre>
-
+<span style="font-weight:bold">assert</span> np.allclose(numeric_grads,grads,rtol=1e-3,atol=0)</code></pre></div>
 <p>We&rsquo;ll use the following function to load the mnist dataset:</p>
-
-<pre><code class="language-python">def load_dataset(flatten=False):
-    import keras
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">def</span> load_dataset(flatten=False):
+    <span style="font-weight:bold">import</span> <span style="font-weight:bold">keras</span>
     (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
 
-    # normalize x
+    <span style="font-style:italic"># normalize x</span>
     X_train = X_train.astype(float) / 255.
     X_test = X_test.astype(float) / 255.
 
-    # we reserve the last 10000 training examples for validation
+    <span style="font-style:italic"># we reserve the last 10000 training examples for validation</span>
     X_train, X_val = X_train[:-10000], X_train[-10000:]
     y_train, y_val = y_train[:-10000], y_train[-10000:]
 
-    if flatten:
+    <span style="font-weight:bold">if</span> flatten:
         X_train = X_train.reshape([X_train.shape[0], -1])
         X_val = X_val.reshape([X_val.shape[0], -1])
         X_test = X_test.reshape([X_test.shape[0], -1])
 
-    return X_train, y_train, X_val, y_val, X_test, y_test
-</code></pre>
-
-<pre><code class="language-python">X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(flatten=True)
-</code></pre>
-
-<pre><code>/Users/thomas.kealy/anaconda3/lib/python3.6/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+    <span style="font-weight:bold">return</span> X_train, y_train, X_val, y_val, X_test, y_test</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">X_train, y_train, X_val, y_val, X_test, y_test = load_dataset(flatten=True)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">/Users/thomas.kealy/anaconda3/lib/python3.6/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
   from ._conv import register_converters as _register_converters
-Using TensorFlow backend.
-</code></pre>
-
-<pre><code class="language-python">class Network(object):
-    def __init__(self):
+Using TensorFlow backend.</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">class</span> <span style="font-weight:bold">Network</span>(object):
+    <span style="font-weight:bold">def</span> __init__(self):
         network = []
         network.append(Dense(X_train.shape[1],100))
         network.append(ReLU())
@@ -994,107 +945,93 @@ Using TensorFlow backend.
         network.append(Dense(200,10))
         self.network = network
 
-    def forward(self, X):
-        &quot;&quot;&quot;
-        comppute activations of all network layers by applying them sequentially.
-        Return a list of activations for each layer.
-        Make sure last activation corresponds to network logits.
-        &quot;&quot;&quot;
+    <span style="font-weight:bold">def</span> forward(self, X):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        comppute activations of all network layers by applying them sequentially.
+</span><span style="font-style:italic">        Return a list of activations for each layer.
+</span><span style="font-style:italic">        Make sure last activation corresponds to network logits.
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
         activations = []
         input = X
 
-        for layer in self.network:
+        <span style="font-weight:bold">for</span> layer <span style="font-weight:bold">in</span> self.network:
             activations.append(layer.forward(input))
             input = activations[-1]
 
-        assert len(activations) == len(self.network)
-        return activations
+        <span style="font-weight:bold">assert</span> len(activations) == len(self.network)
+        <span style="font-weight:bold">return</span> activations
 
-    def predict(self,X):
-        &quot;&quot;&quot;
-        Compute network predictions.
-        &quot;&quot;&quot;
+    <span style="font-weight:bold">def</span> predict(self,X):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Compute network predictions.
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
         logits = self.forward(X)[-1]
-        return logits.argmax(axis=-1)
+        <span style="font-weight:bold">return</span> logits.argmax(axis=-1)
 
-    def fit(self,X,y):
-        &quot;&quot;&quot;
-        Train your network on a given batch of X and y.
-        You first need to run forward to get all layer activations.
-        Then you can run layer.backward going from last to first layer.
+    <span style="font-weight:bold">def</span> fit(self,X,y):
+        <span style="font-style:italic">&#34;&#34;&#34;
+</span><span style="font-style:italic">        Train your network on a given batch of X and y.
+</span><span style="font-style:italic">        You first need to run forward to get all layer activations.
+</span><span style="font-style:italic">        Then you can run layer.backward going from last to first layer.
+</span><span style="font-style:italic">
+</span><span style="font-style:italic">        After you called backward for all layers, all Dense layers have already made one gradient step.
+</span><span style="font-style:italic">        &#34;&#34;&#34;</span>
 
-        After you called backward for all layers, all Dense layers have already made one gradient step.
-        &quot;&quot;&quot;
-
-        # Get the layer activations
+        <span style="font-style:italic"># Get the layer activations</span>
         layer_activations = self.forward(X)
         layer_inputs = [X]+layer_activations
         logits = layer_activations[-1]
 
-        # Compute the loss and the initial gradient
+        <span style="font-style:italic"># Compute the loss and the initial gradient</span>
         loss = softmax_crossentropy_with_logits(logits,y)
         loss_grad = grad_softmax_crossentropy_with_logits(logits,y)
 
-        for layer_i in range(len(self.network))[::-1]:
+        <span style="font-weight:bold">for</span> layer_i <span style="font-weight:bold">in</span> range(len(self.network))[::-1]:
             layer = self.network[layer_i]
 
             loss_grad = layer.backward(layer_inputs[layer_i],loss_grad)
 
-        return np.mean(loss)
-</code></pre>
-
+        <span style="font-weight:bold">return</span> np.mean(loss)</code></pre></div>
 <p>Finally, we can train our nework!</p>
-
-<pre><code class="language-python">from tqdm import trange
-def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
-    assert len(inputs) == len(targets)
-    if shuffle:
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">tqdm</span> <span style="font-weight:bold">import</span> trange
+<span style="font-weight:bold">def</span> iterate_minibatches(inputs, targets, batchsize, shuffle=False):
+    <span style="font-weight:bold">assert</span> len(inputs) == len(targets)
+    <span style="font-weight:bold">if</span> shuffle:
         indices = np.random.permutation(len(inputs))
-    for start_idx in trange(0, len(inputs) - batchsize + 1, batchsize):
-        if shuffle:
+    <span style="font-weight:bold">for</span> start_idx <span style="font-weight:bold">in</span> trange(0, len(inputs) - batchsize + 1, batchsize):
+        <span style="font-weight:bold">if</span> shuffle:
             excerpt = indices[start_idx:start_idx + batchsize]
-        else:
+        <span style="font-weight:bold">else</span>:
             excerpt = slice(start_idx, start_idx + batchsize)
-        yield inputs[excerpt], targets[excerpt]
-</code></pre>
-
-<pre><code class="language-python">from IPython.display import clear_output
-import matplotlib.pyplot as plt
+        <span style="font-weight:bold">yield</span> inputs[excerpt], targets[excerpt]</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">from</span> <span style="font-weight:bold">IPython.display</span> <span style="font-weight:bold">import</span> clear_output
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">matplotlib.pyplot</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">plt</span>
 %matplotlib inline
 
 network = Network()
 train_log = []
 val_log = []
 
-for epoch in range(25):
+<span style="font-weight:bold">for</span> epoch <span style="font-weight:bold">in</span> range(25):
 
-    for x_batch,y_batch in iterate_minibatches(X_train,y_train,batchsize=32,shuffle=True):
+    <span style="font-weight:bold">for</span> x_batch,y_batch <span style="font-weight:bold">in</span> iterate_minibatches(X_train,y_train,batchsize=32,shuffle=True):
         network.fit(x_batch,y_batch)
 
     train_log.append(np.mean(network.predict(X_train)==y_train))
     val_log.append(np.mean(network.predict(X_val)==y_val))
 
     clear_output()
-    print(&quot;Epoch&quot;,epoch)
-    print(&quot;Train accuracy:&quot;,train_log[-1])
-    print(&quot;Val accuracy:&quot;,val_log[-1])
-    plt.plot(train_log,label='train accuracy')
-    plt.plot(val_log,label='val accuracy')
-    plt.legend(loc='best')
+    <span style="font-weight:bold">print</span>(<span style="font-style:italic">&#34;Epoch&#34;</span>,epoch)
+    <span style="font-weight:bold">print</span>(<span style="font-style:italic">&#34;Train accuracy:&#34;</span>,train_log[-1])
+    <span style="font-weight:bold">print</span>(<span style="font-style:italic">&#34;Val accuracy:&#34;</span>,val_log[-1])
+    plt.plot(train_log,label=<span style="font-style:italic">&#39;train accuracy&#39;</span>)
+    plt.plot(val_log,label=<span style="font-style:italic">&#39;val accuracy&#39;</span>)
+    plt.legend(loc=<span style="font-style:italic">&#39;best&#39;</span>)
     plt.grid()
-    plt.show()
-</code></pre>
-
-<pre><code>Epoch 24
+    plt.show()</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Epoch 24
 Train accuracy: 1.0
-Val accuracy: 0.9819
-</code></pre>
-
+Val accuracy: 0.9819</pre></div>
 <p><img src="./neural-networks-from-scratch_26_1.png" alt="png" /></p>
-
-<pre><code class="language-python">
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"></code></pre></div>
     </div>
 
     

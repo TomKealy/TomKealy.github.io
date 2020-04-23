@@ -119,9 +119,9 @@ We will model this in tensorflow-probability, using the air passengers dataset.
   
   <meta property="twitter:card" content="summary">
   
-  <meta property="og:site_name" content="Academic">
+  <meta property="og:site_name" content="Tom Kealy&#39;s site">
   <meta property="og:url" content="/post/structural-timeseries-with-tensorflow-probability/">
-  <meta property="og:title" content="Structural Timeseries With Tensorflow Probability | Academic">
+  <meta property="og:title" content="Structural Timeseries With Tensorflow Probability | Tom Kealy&#39;s site">
   <meta property="og:description" content="Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:
 $$ v_{t&#43;1} \sim N\left(v_t, \sigma_v^2\right) $$
 $$ xt \sim N\left(x{t-1} &#43; v_{t-1}, \sigma_x^2\right) $$
@@ -174,7 +174,7 @@ We will model this in tensorflow-probability, using the air passengers dataset.
   
   "publisher": {
     "@type": "Organization",
-    "name": "Academic",
+    "name": "Tom Kealy's site",
     "logo": {
       "@type": "ImageObject",
       "url": "/img/icon-512.png"
@@ -198,7 +198,7 @@ We will model this in tensorflow-probability, using the air passengers dataset.
 
 
 
-  <title>Structural Timeseries With Tensorflow Probability | Academic</title>
+  <title>Structural Timeseries With Tensorflow Probability | Tom Kealy&#39;s site</title>
 
 </head>
 
@@ -241,7 +241,7 @@ We will model this in tensorflow-probability, using the air passengers dataset.
   <div class="container">
 
     
-      <a class="navbar-brand" href="/">Academic</a>
+      <a class="navbar-brand" href="/">Tom Kealy&#39;s site</a>
       
       <button type="button" class="navbar-toggler" data-toggle="collapse"
               data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -616,46 +616,33 @@ We will model this in tensorflow-probability, using the air passengers dataset.
 <p>Where $\sigma_x^2$ is the observation error, $\sigma_y^2$ is the level disturbance, and $\sigma_v^2$ is the slope distrubance</p>
 
 <p>We will model this in tensorflow-probability, using the air passengers dataset.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">%matplotlib inline
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">matplotlib</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">mpl</span>
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">matplotlib</span> <span style="font-weight:bold">import</span> pylab <span style="font-weight:bold">as</span> plt
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">matplotlib.dates</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">mdates</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">seaborn</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">sns</span>
 
-<pre><code class="language-python">%matplotlib inline
-import matplotlib as mpl
-from matplotlib import pylab as plt
-import matplotlib.dates as mdates
-import seaborn as sns
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">collections</span>
 
-import collections
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">numpy</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">np</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">pandas</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">pd</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">tensorflow</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">tf</span>
+<span style="font-weight:bold">import</span> <span style="font-weight:bold">tensorflow_probability</span> <span style="font-weight:bold">as</span> <span style="font-weight:bold">tfp</span>
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">tensorflow_probability</span> <span style="font-weight:bold">import</span> distributions <span style="font-weight:bold">as</span> tfd
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">tensorflow_probability</span> <span style="font-weight:bold">import</span> sts
 
-import numpy as np
-import pandas as pd
-import tensorflow as tf
-import tensorflow_probability as tfp
-from tensorflow_probability import distributions as tfd
-from tensorflow_probability import sts
-
-from pandas.plotting import register_matplotlib_converters
+<span style="font-weight:bold">from</span> <span style="font-weight:bold">pandas.plotting</span> <span style="font-weight:bold">import</span> register_matplotlib_converters
 register_matplotlib_converters()
 
-sns.set_context(&quot;notebook&quot;, font_scale=1.)
-sns.set_style(&quot;whitegrid&quot;)
-%config InlineBackend.figure_format = 'retina'
-</code></pre>
-
-<pre><code class="language-python">passengers = pd.read_csv('passengers.csv', header=0, sep=';')
-passengers['Passengers'] = passengers['Passengers'].astype(float)
-passengers['Month'] = pd.to_datetime(passengers['Month'])
-passengers.set_index('Month', inplace=True)
-passengers.plot(figsize=(12, 6))
-</code></pre>
-
-<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a3e0ac588&gt;
-</code></pre>
-
+sns.set_context(<span style="font-style:italic">&#34;notebook&#34;</span>, font_scale=1.)
+sns.set_style(<span style="font-style:italic">&#34;whitegrid&#34;</span>)
+%config InlineBackend.figure_format = <span style="font-style:italic">&#39;retina&#39;</span></code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">passengers = pd.read_csv(<span style="font-style:italic">&#39;passengers.csv&#39;</span>, header=0, sep=<span style="font-style:italic">&#39;;&#39;</span>)
+passengers[<span style="font-style:italic">&#39;Passengers&#39;</span>] = passengers[<span style="font-style:italic">&#39;Passengers&#39;</span>].astype(float)
+passengers[<span style="font-style:italic">&#39;Month&#39;</span>] = pd.to_datetime(passengers[<span style="font-style:italic">&#39;Month&#39;</span>])
+passengers.set_index(<span style="font-style:italic">&#39;Month&#39;</span>, inplace=True)
+passengers.plot(figsize=(12, 6))</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a3e0ac588&gt;</pre></div>
 <p><img src="./Untitled_2_1.png" alt="png" /></p>
-
-<pre><code class="language-python">train_df = passengers.loc[:'1959-01-01']
-</code></pre>
-
-<pre><code class="language-python">def build_model(observed_time_series):
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">train_df = passengers.loc[:<span style="font-style:italic">&#39;1959-01-01&#39;</span>]</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-weight:bold">def</span> build_model(observed_time_series):
     
     trend = tfp.sts.LocalLinearTrend(
         observed_time_series=observed_time_series
@@ -670,58 +657,46 @@ passengers.plot(figsize=(12, 6))
         [trend, seasonal], 
         observed_time_series=observed_time_series
     )
-    return model
-</code></pre>
-
-<pre><code class="language-python">model = build_model(train_df['Passengers'])
+    <span style="font-weight:bold">return</span> model</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">model = build_model(train_df[<span style="font-style:italic">&#39;Passengers&#39;</span>])
 
 variational_posteriors = tfp.sts.build_factored_surrogate_posterior(
-    model=model)
-</code></pre>
-
-<pre><code>WARNING:tensorflow:From /Users/thomas.kealy/anaconda3/envs/featuretools/lib/python3.6/site-packages/tensorflow_probability/python/sts/fitting.py:185: SeedStream.__init__ (from tensorflow_probability.python.util.seed_stream) is deprecated and will be removed after 2019-10-01.
+    model=model)</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">WARNING:tensorflow:From /Users/thomas.kealy/anaconda3/envs/featuretools/lib/python3.6/site-packages/tensorflow_probability/python/sts/fitting.py:185: SeedStream.__init__ (from tensorflow_probability.python.util.seed_stream) is deprecated and will be removed after 2019-10-01.
 Instructions for updating:
-SeedStream has moved to `tfp.util.SeedStream`.
-</code></pre>
+SeedStream has moved to `tfp.util.SeedStream`.</pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-style:italic">#@title Minimize the variational loss.</span>
 
-<pre><code class="language-python">#@title Minimize the variational loss.
-
-# Allow external control of optimization to reduce test runtimes.
-num_variational_steps = 200 # @param { isTemplate: true}
+<span style="font-style:italic"># Allow external control of optimization to reduce test runtimes.</span>
+num_variational_steps = 200 <span style="font-style:italic"># @param { isTemplate: true}</span>
 num_variational_steps = int(num_variational_steps)
 
 optimizer = tf.optimizers.Adam(learning_rate=.1)
-# Using fit_surrogate_posterior to build and optimize the variational loss function.
+<span style="font-style:italic"># Using fit_surrogate_posterior to build and optimize the variational loss function.</span>
 @tf.function()
-def train():
+<span style="font-weight:bold">def</span> train():
     
     elbo_loss_curve = tfp.vi.fit_surrogate_posterior(
         target_log_prob_fn=model.joint_log_prob(
-            observed_time_series=train_df['Passengers']
+            observed_time_series=train_df[<span style="font-style:italic">&#39;Passengers&#39;</span>]
         ),
         surrogate_posterior=variational_posteriors,
         optimizer=optimizer,
         num_steps=num_variational_steps
     )
     
-    return elbo_loss_curve
+    <span style="font-weight:bold">return</span> elbo_loss_curve
 
 elbo_loss_curve = train()
 
 plt.plot(elbo_loss_curve)
 plt.show()
 
-# Draw samples from the variational posterior.
-samples = variational_posteriors.sample(50)
-</code></pre>
-
+<span style="font-style:italic"># Draw samples from the variational posterior.</span>
+samples = variational_posteriors.sample(50)</code></pre></div>
 <p><img src="./Untitled_6_0.png" alt="png" /></p>
-
-<pre><code class="language-python">num_forecast_steps=24
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">num_forecast_steps=24
 
 forecast = tfp.sts.forecast(
     model,
-    observed_time_series=train_df['Passengers'],
+    observed_time_series=train_df[<span style="font-style:italic">&#39;Passengers&#39;</span>],
     parameter_samples=samples,
     num_steps_forecast=num_forecast_steps)
 
@@ -729,12 +704,9 @@ forecast = tfp.sts.forecast(
 forecast_mean, forecast_scale, forecast_samples = (
     forecast.mean().numpy()[..., 0],
     forecast.stddev().numpy()[..., 0],
-    forecast.sample(10).numpy()[..., 0])
-</code></pre>
+    forecast.sample(10).numpy()[..., 0])</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="font-style:italic"># Original source https://github.com/tensorflow/probability/blob/master/tensorflow_probability/examples/jupyter_notebooks/Structural_Time_Series_Modeling_Case_Studies_Atmospheric_CO2_and_Electricity_Demand.ipynb</span>
 
-<pre><code class="language-python"># Original source https://github.com/tensorflow/probability/blob/master/tensorflow_probability/examples/jupyter_notebooks/Structural_Time_Series_Modeling_Case_Studies_Atmospheric_CO2_and_Electricity_Demand.ipynb
-
-def plot_forecast(data_df,
+<span style="font-weight:bold">def</span> plot_forecast(data_df,
                   col_name,
                   forecast_start,
                   forecast_mean, 
@@ -743,7 +715,7 @@ def plot_forecast(data_df,
                   title, 
                   x_locator=None, 
                   x_formatter=None):
-    &quot;&quot;&quot;Plot a forecast distribution against the 'true' time series.&quot;&quot;&quot;
+    <span style="font-style:italic">&#34;&#34;&#34;Plot a forecast distribution against the &#39;true&#39; time series.&#34;&#34;&#34;</span>
     colors = sns.color_palette()
     c1, c2 = colors[0], colors[1]
     fig = plt.figure(figsize=(12, 6))
@@ -756,7 +728,7 @@ def plot_forecast(data_df,
     num_steps_forecast = forecast_mean.shape[-1]
     num_steps_train = num_steps - num_steps_forecast
 
-    ax.plot(x, y, lw=2, color=c1, label='ground truth')
+    ax.plot(x, y, lw=2, color=c1, label=<span style="font-style:italic">&#39;ground truth&#39;</span>)
 
     forecast_steps = data_df.loc[forecast_start:].index
 
@@ -769,9 +741,9 @@ def plot_forecast(data_df,
     ax.plot(forecast_steps, 
             forecast_mean, 
             lw=2, 
-            ls='--', 
+            ls=<span style="font-style:italic">&#39;--&#39;</span>, 
             color=c2,
-            label='forecast')
+            label=<span style="font-style:italic">&#39;forecast&#39;</span>)
 
     ax.fill_between(forecast_steps,
                    forecast_mean-2*forecast_scale,
@@ -783,28 +755,20 @@ def plot_forecast(data_df,
     yrange = ymax-ymin
     ax.set_ylim([ymin - yrange*0.1, ymax + yrange*0.1])
     ax.legend()
-    return fig, ax
-</code></pre>
-
-<pre><code class="language-python">fig, ax = plot_forecast(
+    <span style="font-weight:bold">return</span> fig, ax</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax = plot_forecast(
     passengers,
-    'Passengers',
-    '1959-01-01',
+    <span style="font-style:italic">&#39;Passengers&#39;</span>,
+    <span style="font-style:italic">&#39;1959-01-01&#39;</span>,
     forecast_mean, 
     forecast_scale, 
     forecast_samples,
-    title='Airplane Passenger Numbers')
-ax.legend(loc=&quot;upper left&quot;)
-ax.set_ylabel(&quot;Passenger Numbers&quot;)
-ax.set_xlabel(&quot;Month&quot;)
-fig.autofmt_xdate()
-</code></pre>
-
+    title=<span style="font-style:italic">&#39;Airplane Passenger Numbers&#39;</span>)
+ax.legend(loc=<span style="font-style:italic">&#34;upper left&#34;</span>)
+ax.set_ylabel(<span style="font-style:italic">&#34;Passenger Numbers&#34;</span>)
+ax.set_xlabel(<span style="font-style:italic">&#34;Month&#34;</span>)
+fig.autofmt_xdate()</code></pre></div>
 <p><img src="./Untitled_9_0.png" alt="png" /></p>
-
-<pre><code class="language-python">
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"></code></pre></div>
     </div>
 
     
