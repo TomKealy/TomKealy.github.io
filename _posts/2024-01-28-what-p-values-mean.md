@@ -1,8 +1,12 @@
 ---
 layout: post
 title: “What p-values really mean“
-categories: optimisation
+categories: statistics, hypothesis testing
 ---
+
+tl;dr Most people get _p_-values wrong. This is how to understand and apply them correctly.
+
+<!--more-->
 
 ## Introduction
 
@@ -35,10 +39,9 @@ When we try to interpret a *p*-value when comparing it to an error rate, we run 
 
 $$ \mathrm{P}\left( X \geq x \mid H_{0}\right) $$ 
 
-Where $$ X $$ is a random variable corresponding to some way of summarising the data, and $$ x $$ is the observed value of $$ X $$. 
+Where $$ X $$ is a random variable corresponding to some way of summarising the data, and $$ x $$ is the observed value of $$ X $$.
 
-What sticks out is that *p*-values are not part of any formal inferential calculus, their meaning and interpretation are elusive. 
-
+What sticks out is that *p*-values are not part of any formal inferential calculus, their meaning and interpretation are elusive.
 ## The mistakes/misconceptions
 
 ### Policies and decisions should be based on whether a _p_-value is < 0.05
@@ -65,7 +68,7 @@ Not so: you can combine *p*-values with [Fisher’s method.](https://en.wikipedi
 
 #### If you can’t reject *this* null, you can’t *reject* any null.
 
-Here’s another to melt your brain (courtesy of ~[Georgi Georgiev](https://blog.analytics-toolkit.com/2017/case-non-inferiority-designs-ab-testing/#authorStart)~):
+Here’s another to melt your brain (courtesy of~[Georgi Georgiev](https://blog.analytics-toolkit.com/2017/case-non-inferiority-designs-ab-testing/#authorStart)):
 
 > Say we have observed two groups of 4,000 users each in a randomized controlled experiment. The control converts at 10%, the variant at 11%, a 10% observed relative improvement. Is the result statistically significant at the 95% level, with a one-sided z-test?
 > 
@@ -77,6 +80,4 @@ Maybe you were trying to reject the wrong null all along.
 
 ### p < 0.05 is operationally important
 
-*p*-values carry no information about the size of your effect, and that it what is operationally important. 
-
-
+*p*-values carry no information about the size of your effect, and that it what is operationally important.
