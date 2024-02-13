@@ -1,3 +1,13 @@
+---
+layout: post
+title:  "Time Series with GAMs"
+date:   2021-08-13
+categories: curve-fitting, GAMs
+---
+{% newthought 'tl; dr Generalised Additive Models' %} are a flexible class of models which improve on polynomial regression. This post shows how to fit time series data with GAMs a bit like `prophet`.<!--more--> 
+
+## Introduction
+
 This is a short post introducing Generalised Additive Models (GAMs) - not the nuts and bolts, but some things you can do with them. We will be follwoing this post: https://petolau.github.io/Analyzing-double-seasonal-time-series-with-GAM-in-R/ but we won't go so deep into the theory, all the data come from the github repository linked in the post.
 
 GAMs are a very flexible modelling technique, but unfortunately there isn't a Python package as good as R's `mgcv` yet. It's something we're working on! In this post, I'll fit a simple GAM using `PyGAM` and in a later post I'll talk about some theory, and some extensions.
