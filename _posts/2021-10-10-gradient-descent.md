@@ -1,3 +1,10 @@
+---
+layout: post
+title:  "An introduction to Gradient Descent"
+date:   2020-04-13 09:46:04
+categories: optimisation
+---
+
 Some ideas are so ubiquitous and all-encompassing that it's difficult to remember that they were once invented. Other ideas are so simple and apparently obvious that they seem less invented and more handed down by God. Gradient descent is one such idea. It there is hardly a branch of applied mathematics which doesn't use it, or not it seems to have appeared fully formed as an algorithmic idea for both the primordial mathematical time.
 
 It's worth noting how Agoras trusted an idea, gradient descent is is it allows the researcher to numerically compute an optimal answer even when they can't analytically describe the function over which they are optimizing. Seen further, all that is required is some measurement of how our solution does as we form the optimal solution, and that the function we are optimizing over be smooth over our domain of interest.
