@@ -1,3 +1,12 @@
+---
+layout: post
+title:  "The guts of GAMs"
+date:   2021-08-10
+categories: GAMs
+---
+{% newthought 'tl; dr Generalised Additive Models' %} look harder than they actually are. We fit a single dimension GAM from scratch, including generating splines.
+<!--more-->
+
 This post will explain some of the internals of GAMs: how to estimate the feature functions. First we'll fit some simple splines on some wage data, then we'll fit more complicated splines on some accelerometer data, with a highly non-linear realtionship between in the input and the output.
 
 
