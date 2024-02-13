@@ -1,9 +1,9 @@
-
 ---
 layout: post
 title: “What _p_-values really mean“
 categories: optimisation
 ---
+
 ## Introduction
 
 P-values are the most misunderstood, misinterpreted, miscalculated, and misbegotten statistical quantities. The reason this is the case are a mixture of bad history, poor pedagogy, and lazy thinking. No matter how hard statisticians try, what the _p_-value really means hasn’t pierced the wider scientific and engineering consciousness. In fact, _p_-values are so difficult to interpret that when the Journal of the American Medical Association surveyed it’s members about how to interpret _p_-values, *none* of the options were correct.
@@ -38,6 +38,7 @@ $$ \mathrm{P}\left( X \geq x \mid H_{0}\right) $$
 Where $$ X $$ is a random variable corresponding to some way of summarising the data, and $$ x $$ is the observed value of $$ X $$. 
 
 What sticks out is that *p*-values are not part of any formal inferential calculus, their meaning and interpretation are elusive. 
+
 ## The mistakes/misconceptions
 
 ### Policies and decisions should be based on whether a _p_-value is < 0.05
