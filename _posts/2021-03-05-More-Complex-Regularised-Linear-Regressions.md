@@ -1,3 +1,11 @@
+---
+layout: post
+title:  "More Complex (Linear) Regressions"
+date:   2021-10-10
+categories: optimisation
+---
+{% newthought 'tl; dr We extend' %} our ideas of how to do regression to a more complex class of functions.<!--more--> 
+
 We have previously considered models of the form:
 
 $$ \hat{y} = \beta X + w $$
