@@ -3,12 +3,8 @@ layout: full-width
 title: About
 ---
 
-The *Tufte-Jekyll* theme is a natural extension of the work done by [Edward Tufte](https://github.com/edwardtufte/tufte-css) and his collaborators on Github who created a CSS file that allows web writers to use the same simple and elegant style employed in his published materials.
+this is the thechnial website of (thomas kealy)[https://github.com/TomKealy]. i am a data scientist with 7 years commercial experience. i drive business outcomes spearhead by running data science initiatives from conception to execution. i have extensive machine learning and statistical modelling experience, particularly in A/B testing and causal inference. this is a collection of my technical posts.
 
-To incorporate these styles into a Jekyll theme, I have made some very slight modifications that attempt to maintain the feel of the CSS styles in his Github repo.
+you can find my non-technical writing (on my substack)[https://thomaskealy.substack.com/] and my photography (on my portfolio page)[https://www.tomkealy.me/].
 
-Note that this is a full-width layout. This was accomplished by including ```layout: full-width``` in the YAML front matter for this page. Keep in mind that all the Tufte-Jekyll sidenote and marginnote goodness will not work on full-width layouts! 
-
-You can find the source code for Jekyll at [github.com/jekyll/jekyll](https://github.com/jekyll/jekyll).
-
-
+i also write plays and have made a short film. my play is available (here)[https://youtu.be/O2iD0qyP3eg?si=9YNZbZNcJAlOydSh] and my short film is available (here)[https://vimeo.com/356364396].
