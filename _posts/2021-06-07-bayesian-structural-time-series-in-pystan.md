@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Bayesian Structural Time Series in pystan."
-date:   2021-10-10
+date:   2021-06-07
 categories: optimisation
 ---
 {% newthought 'tl; dr Bayesian Structural Time Series' %} let us model time series component by component. Here's how to do it in Stan<!--more-->
