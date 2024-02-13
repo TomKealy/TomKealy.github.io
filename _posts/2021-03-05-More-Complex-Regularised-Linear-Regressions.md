@@ -4,7 +4,10 @@ title:  "More Complex (Linear) Regressions"
 date:   2021-03-05
 categories: optimisation
 ---
+
 {% newthought 'tl; dr We extend' %} our ideas of how to do regression to a more complex class of functions.<!--more--> 
+
+## Introduction
 
 We have previously considered models of the form:
 
