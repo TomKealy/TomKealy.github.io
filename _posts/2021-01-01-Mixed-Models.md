@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "An introduction to Gradient Descent"
+title:  "Mixed Models"
 date:   2021-01-01
 categories: optimisation
 ---
