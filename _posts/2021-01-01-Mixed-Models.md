@@ -1,3 +1,11 @@
+---
+layout: post
+title:  "An introduction to Gradient Descent"
+date:   2021-01-01
+categories: optimisation
+---
+{% newthought 'tl; dr Group Structure' %} is something we can exploit to improve our estimates. We introduce and explain mixed models and how to fit them.<!--more--> 
+
 Often, we have data which has a group structure. For example, in the dataset we use in this post, radon measurements were taken in ~900 houses in 85 counties. It's unreasonable to expect that radon levels do not vary by state as well as house, and so we will integrate this into our analysis. 
 
 Typically, in linear regression we assume that each data point is independent and regresses with a constant slope amongst each other:
