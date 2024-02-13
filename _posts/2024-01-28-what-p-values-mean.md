@@ -1,6 +1,6 @@
 ---
 layout: post
-title: “What _p_-values really mean“
+title: “What p-values really mean“
 categories: optimisation
 ---
 
