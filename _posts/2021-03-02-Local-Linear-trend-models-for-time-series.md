@@ -1,3 +1,12 @@
+
+---
+layout: post
+title:  "An introduction to Gradient Descent"
+date:   2021-03-02
+categories: time-series
+---
+{% newthought 'tl; dr Local Linear Trend models' %} are one of the simplest time series models. Here we code them up in python.<!--more--> 
+
 Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:
 
 $$ v_t \sim N\left(v_t, \sigma_v^2\right) $$
