@@ -1,16 +1,47 @@
 ---
 layout: post
-title: "The ins and outs of Gradient Descent"
+title: "The Ups and Downs of Gradient Descent"
+date:   2021-10-10
 categories: optimisation
 ---
 
-Gradient Descent is the simplest learning algorithm. 
+Some ideas are so ubiquitous and all-encompassing that it's difficult to remember that they were once invented. Other ideas are so simple and apparently obvious that they seem less invented and more handed down by God. Gradient descent is one such idea. It there is hardly a branch of applied mathematics which doesn't use it, or not it seems to have appeared fully formed as an algorithmic idea for both the primordial mathematical time.
 
-Suppose you have a set of observations of some process you wanted to model, for example the size of a house labelled as $ x_i \in \mathrm{R}^n $, and the house price labeleld as $ y_i \in \mathrm{R} $, $ i = 1 \ldots m$ (i.e. you have $m$ examples). One good choice for a model is linear:
+It's worth noting how Agoras trusted an idea, gradient descent is is it allows the researcher to numerically compute an optimal answer even when they can't analytically describe the function over which they are optimizing. Seen further, all that is required is some measurement of how our solution does as we form the optimal solution, and that the function we are optimizing over be smooth over our domain of interest.
 
-$$ \hat{y}\left(x\right) = Ax + b $$
+It's seems too good to be true! Yet the core issue in many applications such as signal processing, operations research, economics, and statistics boil down to the following minimization problem
 
-The goal is to find some suitable $ A \in \mathcal{R}^n $ and $ b \in \mathcal{R} $, to model this process corectly. An example is shown below (the data is taken from the Coursera Machine Learning class). 
+$$ \mathrm{min}_{\theta \in \mathcal{R^m}} J\left(\theta\right) $$
+
+where $ J\left(\theta\right) $ is what is called the *cost function,* which measures how well the model parameters $ \theta $ fit to a given dataset. A few examples would be
+
+* Logistic regression
+
+$$ J\left(\theta\right) = \sum_{n} \log{\left(1 + \exp{y_i X_{i}^T\theta}\right)} $$
+
+* Linear regression
+
+$$ J\left(\theta\right) = \frac{1}{2}\lvert\lvert X\theta - y \rvert\rvert^2 $$
+
+* Composite
+
+$$ J\left(\theta\right) = f\left(\theta\right) + g\left(\theta\right) $$
+
+with $ f $ being 'well behaved' and $ g $ causing us some trouble.
+
+We assume that $ J\left(\theta\right) $ is bounded from below (i.e. the minimum is not $-\infty $). This just guarantees the existence of a solution. If $ J $ is convex this is no problem, but if $ J $ is not (and also not smooth) then it's much more difficult. Always check that a solution exists before wasting time minimising!
+
+There are a couple of ways you could find such an $ \theta $, given a cost function. The most straigtforward is to start with some initital value, and then move in the direction of the negative gradient of the cost funtion:  
+
+$$ \theta_{k+1} = \theta_{k} - \eta\nabla_{\theta} J\left(\theta\right) $$ 
+
+with $ \Theta_0 = 0 $. Here. $\eta$ is the learning rate - a tuneable parameter. We terminate the algorithm once
+
+$$ \lvert \theta_{k+1} -  \theta_{k} \rvert \leq \varepsilon $$
+
+Gradient Descent is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.
+
+Intuitively, $ J\left(\theta\right) $ defines a surface over $ \theta\ $. We, the end-users, want to find the lowest point on that surface (or the lowest point subject to some intersection constraint). Gradient descent finds that lowest point by constructing a sequence of approximations to $\theta^*$ (the optimal point), with eath $\theta_{k}$ (the interations of the algorithm) always in the direction of steepest descent from $\theta_{k-1}$. We will formalise this intuition and provide performance guarantees later.
 
 
 ```python
@@ -27,14 +58,9 @@ plt.style.use(['seaborn-colorblind', 'seaborn-darkgrid'])
 
     <matplotlib.axes._subplots.AxesSubplot at 0x109cba630>
 
-
-
-
     
 ![png](2021-02-01-Gradietnt-Descent_files/2021-02-01-Gradietnt-Descent_2_1.png)
     
-
-
 We'll generate some data that we'll use for the rest of this post:
 
 
