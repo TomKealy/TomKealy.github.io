@@ -5,6 +5,10 @@ date:   2021-10-10
 categories: optimisation
 ---
 
+tl; dr Gradient Descent is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.
+
+## Introduction
+
 Some ideas are so ubiquitous and all-encompassing that it's difficult to remember that they were once invented. Other ideas are so simple and apparently obvious that they seem less invented and more handed down by God. Gradient descent is one such idea. It there is hardly a branch of applied mathematics which doesn't use it, or not it seems to have appeared fully formed as an algorithmic idea for both the primordial mathematical time.
 
 It's worth noting how Agoras trusted an idea, gradient descent is is it allows the researcher to numerically compute an optimal answer even when they can't analytically describe the function over which they are optimizing. Seen further, all that is required is some measurement of how our solution does as we form the optimal solution, and that the function we are optimizing over be smooth over our domain of interest.
@@ -13,7 +17,7 @@ It's seems too good to be true! Yet the core issue in many applications such as 
 
 $$ \mathrm{min}_{\theta \in \mathcal{R^m}} J\left(\theta\right) $$
 
-where $ J\left(\theta\right) $ is what is called the *cost function,* which measures how well the model parameters $ \theta $ fit to a given dataset. A few examples would be
+where $$ J\left(\theta\right) $$ is what is called the *cost function,* which measures how well the model parameters $$ \theta $$ fit to a given dataset. A few examples would be
 
 * Logistic regression
 
@@ -33,13 +37,11 @@ We assume that $$ J\left(\theta\right) $$ is bounded from below (i.e. the minimu
 
 There are a couple of ways you could find such an $ \theta $, given a cost function. The most straigtforward is to start with some initital value, and then move in the direction of the negative gradient of the cost funtion:  
 
-$$ \theta_{k+1} = \theta_{k} - \eta\nabla_{\theta} J\left(\theta\right) $$ 
+$$ \theta_{k+1} = \theta_{k} - \eta\nabla_{\theta} J\left(\theta\right) $$
 
 with $ \Theta_0 = 0 $. Here. $\eta$ is the learning rate - a tuneable parameter. We terminate the algorithm once
 
 $$ \lvert \theta_{k+1} -  \theta_{k} \rvert \leq \varepsilon $$
-
-Gradient Descent is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.
 
 Intuitively, $$ J\left(\theta\right) $$ defines a surface over $$ \theta\ $$. We, the end-users, want to find the lowest point on that surface (or the lowest point subject to some intersection constraint). Gradient descent finds that lowest point by constructing a sequence of approximations to $$\theta^*$$ (the optimal point), with eath $$\theta_{k}$$ (the interations of the algorithm) always in the direction of steepest descent from $$\theta_{k-1}$$. We will formalise this intuition and provide performance guarantees later.
 
@@ -71,10 +73,8 @@ N = 500
 X, y = generate_data(N)
 plt.scatter(X, y)
 ```
-## {% fullwidth 'assets/img/gradient-descent.png' "Napoleon's March *(Edward Tufte’s English translation)*" %}
 
-    
-## ![png](2021-02-01-Gradietnt-Descent_files/2021-02-01-Gradietnt-Descent_5_1.png)
+
     
 Suppose you have a set of observations of some process you wanted to model, for example the size of a house labelled as $$ x_i \in \mathrm{R}^n $$, and the house price labeleld as $$ y_i \in \mathrm{R} $$, $$ i = 1 \ldots m $$ (i.e. you have $$m$$ examples). One good choice for a model is linear:
 
@@ -136,13 +136,13 @@ def gradient_descent(X, y, cost, learning_rate=0.01, num_iters=250):
 
 Some notes on the algorithm: it may be mysterious as to why we divide the learning rate y the number of samples $$ m $$. But this is a way to average the gradient across all samples. This approach has several important implications:
 
-1. Scaling of the Gradient: When you compute the gradient of the cost function, you're essentially summing up the gradients calculated for each individual sample. If you don't average this sum by dividing by m, the magnitude of the gradient could become very large, especially with a large number of samples. This large gradient could lead to very large steps when updating your parameters, potentially causing overshooting and failure to converge to the minimum of the cost function.
+Scaling of the Gradient: When you compute the gradient of the cost function, you're essentially summing up the gradients calculated for each individual sample. If you don't average this sum by dividing by $$m$$, the magnitude of the gradient could become very large, especially with a large number of samples. This large gradient could lead to very large steps when updating your parameters, potentially causing overshooting and failure to converge to the minimum of the cost function.
 
-2. Consistent Learning Rate By dividing by $ m $, you ensure that the learning rate behaves consistently regardless of the number of samples. This means that the learning rate you choose is less dependent on the size of your dataset. Without this scaling, you might need to adjust your learning rate based on the size of your dataset, which is not ideal.
+Consistent Learning Rate By dividing by $$ m $$: you ensure that the learning rate behaves consistently regardless of the number of samples. This means that the learning rate you choose is less dependent on the size of your dataset. Without this scaling, you might need to adjust your learning rate based on the size of your dataset, which is not ideal.
 
-3. Numerical Stability: Scaling by m also contributes to numerical stability. It prevents the gradient values from becoming too large, which can cause numerical issues in computation (like overflow or underflow problems).
+Numerical Stability: Scaling by $$m$$ also contributes to numerical stability. It prevents the gradient values from becoming too large, which can cause numerical issues in computation (like overflow or underflow problems).
 
-4. Interpretability: It makes the learning rate parameter more interpretable and independent of the sample size. This is beneficial when you want to use the same learning rate for datasets of different sizes or when comparing the performance of the algorithm on different datasets.
+Interpretability: It makes the learning rate parameter more interpretable and independent of the sample size. This is beneficial when you want to use the same learning rate for datasets of different sizes or when comparing the performance of the algorithm on different datasets.
 
 Now we check graphically if the fitted parameters make sense:
 
