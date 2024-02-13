@@ -4,7 +4,7 @@ title:  "Bayesian Structural Time Series in pystan."
 date:   2021-10-10
 categories: optimisation
 ---
-{% newthought 'tl; dr Gradient Descent' %} is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.<!--more--> 
+{% newthought 'tl; dr Bayesian Structural Time Series' %} let us model time series component by component. Here's how to do it in Stan<!--more-->
 
 Let \\(y_t\\) denote observation \\(t\\) in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$
 
