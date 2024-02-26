@@ -20,7 +20,7 @@ Applied researchers are certainly not to blame for misinterpreting p-values: p-v
 
 ## How to Interpret Experiment Results {% sidenote 2 'This example was supplied by: https://www.scribbr.com/statistics/p-value/'%}
 
-Let’s say you want to know whether there’s a difference in longevity between two groups of mice fed on different diets, diet A and diet B. You can statistically test the difference between these two diets using a two-tailed t test.
+Let’s say you want to know whether there’s a difference in longevity between two groups of mice fed on different diets, diet A and diet B. You can statistically test the difference between these two diets using a two-tailed t-test. We consider the following hypotheses:
 
 * __Null hypothesis (H0)__: there is no difference in longevity between the two groups.
 * __Alternative hypothesis (H1)__: there is a difference in longevity between the two groups.
