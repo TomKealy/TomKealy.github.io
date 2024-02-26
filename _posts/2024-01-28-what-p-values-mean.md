@@ -18,7 +18,7 @@ This might be why p-values are the most misunderstood, misinterpreted, and occas
 
 Applied researchers are certainly not to blame for misinterpreting p-values: p-values are, after all,  the problem child of statistics—a quantity straightforward to calculate but philosophically and practically difficult to interpret. That being said, we still conduct experiments so we still have to interpret their outcomes—that means we have to interpret p-values.
 
-## How to Interpret Experiment Results {% This example was supplied by: https://www.scribbr.com/statistics/p-value/ %}
+## How to Interpret Experiment Results {% sidenote 2 This example was supplied by: https://www.scribbr.com/statistics/p-value/ %}
 
 Let’s say you want to know whether there’s a difference in longevity between two groups of mice fed on different diets, diet A and diet B. You can statistically test the difference between these two diets using a two-tailed t test.
 * Null hypothesis (H0): there is no difference in longevity between the two groups.
