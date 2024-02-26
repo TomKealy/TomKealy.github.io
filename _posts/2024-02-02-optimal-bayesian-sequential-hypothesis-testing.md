@@ -9,10 +9,10 @@ categories: hypothesis-testing
 
 ### A Bayesian Model
 Consider the following Bayesian model for the data:
-- $Y_1|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_1} \alpha + \frac{1}{2} \frac{1}{n_1} \delta, \sigma^2 I_{n_1}\right)$
-- $Y_2|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_2} \alpha - \frac{1}{2} \frac{1}{n_2} \delta, \sigma^2 I_{n_2}\right)$
-- $\delta|M_1 \sim \mathcal{N} (0, \tau^2)$
-- $p(\alpha|M_1) \propto 1$
+$$Y_1|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_1} \alpha + \frac{1}{2} \frac{1}{n_1} \delta, \sigma^2 I_{n_1}\right)$$
+$$Y_2|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_2} \alpha - \frac{1}{2} \frac{1}{n_2} \delta, \sigma^2 I_{n_2}\right)$$
+$$\delta|M_1 \sim \mathcal{N} (0, \tau^2)$$
+$$p(\alpha|M_1) \propto 1$$
 
 Note that the prior distribution for the lift $\delta$ is equal to the mixing distribution in the mSPRT. If you are not familiar with this vectorized notation, an alternative notation is
 - $y_{1i}|\alpha, \delta, M_1 \sim \mathcal{N} (\alpha + \frac{\delta}{2}, \sigma^2) \forall i = 1, \ldots, n_1$
