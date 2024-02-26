@@ -41,7 +41,12 @@ where $$n = n_1 + n_2$$, $$1_n$$ is a vector of 1’s, $$I_n$$ is an identity ma
 The first trick is to marginalize out the intercept parameter by computing the component of $$Y$$ that is orthogonal to the column space of $$1_n$$. Dropping the $$n$$'s from now on, let $$P_1 = \frac{1}{n}1(1'1)^{-1}1' = \frac{1}{n} 11'$$ be the projection operator onto the column space of $$1$$. This neatly isolates the component of $$\alpha$$ in the quadratic form i.e.
 
 $$
-\|Y - 1\alpha - X\delta\|^2_2 = (Y - 1\alpha - X\delta)'(Y - 1\alpha - X\delta) = (Y - 1\alpha - X\delta)'(P_1 + I - P_1)(Y - 1\alpha - X\delta) = \|P_1(Y - 1\alpha - X\delta)\|^2_2 + \|(I - P_1)(Y - 1\alpha - X\delta)\|^2_2 = n(\alpha - \bar{Y} - \bar{X}\delta)^2 + \|Y_c - X_c\delta\|^2_2,
+\begin{aligned}
+\|Y - 1\alpha - X\delta\|^2_2 &= (Y - 1\alpha - X\delta)'(Y - 1\alpha - X\delta) 
+&= (Y - 1\alpha - X\delta)'(P_1 + I - P_1)(Y - 1\alpha - X\delta) 
+&= \|P_1(Y - 1\alpha - X\delta)\|^2_2 + \|(I - P_1)(Y - 1\alpha - X\delta)\|^2_2 
+&= n(\alpha - \bar{Y} - \bar{X}\delta)^2 + \|Y_c - X_c\delta\|^2_2
+\end{aligned}
 $$
 
 where $$Y_c$$ and $$X_c$$ are the centered observations and design matrix
