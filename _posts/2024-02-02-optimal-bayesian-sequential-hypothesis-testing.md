@@ -1,3 +1,12 @@
+---
+layout: post
+title:  "Optimal Bayesian Sequential Hypothesis Testing"
+date:   2024-02-02
+categories: hypothesis-testing
+---
+
+{% newthought 'tl; dr We introduce the mSPRT' %} and give a derivation from a Bayesian point of view. 
+
 ### A Bayesian Model
 Consider the following Bayesian model for the data:
 - $Y_1|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_1} \alpha + \frac{1}{2} \frac{1}{n_1} \delta, \sigma^2 I_{n_1}\right)$
