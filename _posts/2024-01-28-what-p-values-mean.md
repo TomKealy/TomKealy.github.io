@@ -6,9 +6,6 @@ categories: statistics, hypothesis testing
 
 {% newthought 'tl;dr Most people get _p_-values wrong.' %} This is how to understand and apply them correctly.<!--more--> 
 
-
-tl;dr Most people get _p_-values wrong. This is how to understand and apply them correctly.<!--more--> 
-
 ## Introduction
 
 In the branch of statistics known as hypothesis testing,  a statistical hypothesis is a claim about the value of a parameter in a statistical model: for example  the mean difference in revenue from two random groups of customers visiting a website is exactly zero. In statistics we call the hypothesis you want to reject the null hypothesis. A p-value is a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct.
