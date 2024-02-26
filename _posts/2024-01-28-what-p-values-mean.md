@@ -4,6 +4,9 @@ title: “What p-values really mean“
 categories: statistics, hypothesis testing
 ---
 
+{% newthought 'tl;dr Most people get _p_-values wrong.' %} This is how to understand and apply them correctly.<!--more--> 
+
+
 tl;dr Most people get _p_-values wrong. This is how to understand and apply them correctly.<!--more--> 
 
 ## Introduction
