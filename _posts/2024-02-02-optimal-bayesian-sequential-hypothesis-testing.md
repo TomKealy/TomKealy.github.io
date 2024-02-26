@@ -42,9 +42,9 @@ The first trick is to marginalize out the intercept parameter by computing the c
 
 $$
 \begin{aligned}
-\|Y - 1\alpha - X\delta\|^2_2 &= (Y - 1\alpha - X\delta)'(Y - 1\alpha - X\delta) 
-&= (Y - 1\alpha - X\delta)'(P_1 + I - P_1)(Y - 1\alpha - X\delta) 
-&= \|P_1(Y - 1\alpha - X\delta)\|^2_2 + \|(I - P_1)(Y - 1\alpha - X\delta)\|^2_2 
+\|Y - 1\alpha - X\delta\|^2_2 &= (Y - 1\alpha - X\delta)'(Y - 1\alpha - X\delta) \\
+&= (Y - 1\alpha - X\delta)'(P_1 + I - P_1)(Y - 1\alpha - X\delta) \\
+&= \|P_1(Y - 1\alpha - X\delta)\|^2_2 + \|(I - P_1)(Y - 1\alpha - X\delta)\|^2_2 \\
 &= n(\alpha - \bar{Y} - \bar{X}\delta)^2 + \|Y_c - X_c\delta\|^2_2
 \end{aligned}
 $$
