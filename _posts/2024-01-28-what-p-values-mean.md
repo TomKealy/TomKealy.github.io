@@ -21,8 +21,9 @@ Applied researchers are certainly not to blame for misinterpreting p-values: p-v
 ## How to Interpret Experiment Results {% sidenote 2 'This example was supplied by: https://www.scribbr.com/statistics/p-value/'%}
 
 Let’s say you want to know whether there’s a difference in longevity between two groups of mice fed on different diets, diet A and diet B. You can statistically test the difference between these two diets using a two-tailed t test.
-* Null hypothesis (H0): there is no difference in longevity between the two groups.
-* Alternative hypothesis (HA or H1): there is a difference in longevity between the two groups.
+
+* __Null hypothesis (H0)__: there is no difference in longevity between the two groups.
+* __Alternative hypothesis (H1)__: there is a difference in longevity between the two groups.
 
 If the mice live equally long on either diet, then your test statistic will closely match the test statistic from the null hypothesis (that there is no difference between groups). The resulting p-value could be anything between 0 and 1. However, if there is an average difference in longevity between the two groups, then your test statistic will move further away from the values predicted by the null hypothesis, and the p-value will get smaller. The p-value will never reach zero, because there’s always a possibility that the null hypothesis could generate the data you have seen.
 
