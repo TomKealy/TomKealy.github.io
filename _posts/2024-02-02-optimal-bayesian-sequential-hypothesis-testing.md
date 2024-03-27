@@ -7,13 +7,13 @@ categories: hypothesis-testing
 
 {% newthought 'tl; dr We introduce the mSPRT' %} and give a derivation from a Bayesian point of view.<!--more--> 
 
-### Sequential Testing
+# Sequential Testing
 
-Normally when you go about hypothesis testing, after a random sample is observed one of two possible actions are taken: accept the null hypothesis $$H_0$$, or accepct the tive hypothesis $$H_1$$. In some cases the evidence maystrongly support one of the hvpotheses, whilst in other cases the evidence may be less convincing. Nevertheless, a decision must he made. All this assumes that all the data has been collected, and no more is available. It doesn't have to be this way. There is a class of hypothesis tests where you can safely collect more data when the evidence is ambiguous. Such a test typically continues until the evidence strongly favors one of the two hypotheses.
+Normally when you go about hypothesis testing, after a random sample is observed one of two possible actions are taken: accept the null hypothesis $$H_0$$, or accepct the tive hypothesis $$H_1$$. In some cases the evidence may strongly support one of the hypotheses, whilst in other cases the evidence may be less convincing. Nevertheless, a decision must he made. All this assumes that all the data has been collected, and no more is available. It doesn't have to be this way. There is a class of hypothesis tests where you can safely collect more data when the evidence is ambiguous. Such a test typically continues until the evidence strongly favors one of the two hypotheses.
 
-In case of simple hypotheses the strenath of the evidence for H. is Given by the ratio of the probability of the data under $$H_1$$, to the probability of thedata under $$H_1$$. We denote this likelihood ratio by $$\Lambda$$. The Neyman-Pearson lerama implies that for a given amount of information the likelihood ratio test is the most powerful test. Such a rule decides to accept $$H_1$$ if $$\Lambda$$ is big enough, and decides to accept $$H_0$$ otherwise. How big $$\Lambda$$ must get to lead to the decicion $$H_1$$, danends on. amond other things, its sampling distribution under $$H_0$$ and $$H_1$$. It is not unneral however for this enough to mean $$\Lambda \geq 1$$.
+In case of simple hypotheses the strength of the evidence for $$H$$ is given by the ratio of the probability of the data under $$H_0$$, to the probability of the data under $$H_1$$. We denote this likelihood ratio by $$\Lambda$$. The Neyman-Pearson lemma implies that for a given amount of information the likelihood ratio test is the most powerful test. Such a rule decides to accept $$H_1$$ if $$\Lambda$$ is big enough, and decides to accept $$H_0$$ otherwise. How big $$\Lambda$$ must get to lead to the decicion $$H_1$$, danends on, amond other things, its sampling distribution under $$H_0$$ and $$H_1$$. It is not unusual for "big enough" to mean $$\Lambda \geq 1$$. Such tests could easily decide $$H_0$$ or $$H_1$$ when the actual evidence is neutral.
 
-### SPRT
+## SPRT
 
 In 1943 Wald proposed the *sequential probability ratio test* (SPRT). Suppose that $$Y$$ is a random variable with unknown distribution $$f$$. We want to test the following hypotheses:
 
@@ -28,7 +28,34 @@ $$
 
 be the likelihood ratio at stage $$n$$. We choose two decision boundaries $$A$$ and $$B$$ such that $$0 < B < A < \infty $$,  we accept $$H_0$$ if $$\Lambda \leq B$$ and $$H_1$$ if $$\Lambda \geq A$$, and we continue if $$B \leq \Lambda \leq A$$. The constants $$A$$ and $$B$$ are determined by the desired false positive and false negative rates of the experimenter.
 
-### mSPRT
+### Example: IID case
+
+Assume that $$X_1 , X_2 \ldots$$ are independent and identically distributed with distributions $$P$$, and $$Q$$, under $$H_0$$ and $$H_1$$ respectively. Then $$L_n =\Lambda\left(X_n\right)$$. Let $$Z_i=\log{\left(\Lambda\left(X_n\right)\right)}$$. Since $$\log{L_n} = \sum_i^n Z_i$$ the SPRT can be viewed as z random walk (or more properly a family of random walks), with steps $$Z_i$$ which proceeds until it crosses $$\log{B}$$ or $$\log{A}$$.
+
+We now focus on the more general case where $$P$$ and $$Q$$, have either densities or probability mass functions of the form:
+
+$$ f\left(x; \theta\right) = h\left(x\right)\exp{C\left(\theta\right)x - D\left(\theta\right)} $$
+
+where $$\theta $$ is a real valued parameter. The *exponential families* are to work with and include many common distributions. Let $$P$$, be determined by $$f\left(x; \theta_0\right)$$, and let $$Q$$, be determined by $$f\left(x; \theta_1\right)$$. Then $$Z_i = \left[C\left(\theta_1\right) - C\left(\theta_0\right) \right]X_i - \left[D\left(\theta_1\right)-D\left(\theta_0\right)\right]$$. In termsof the random walk with steps $$Z_i$$ the SPRI continues until fixed boundaries are crossed.
+
+It is somtimes easier to perform the test using the sums of the $$X_i$$'s. Let $$S_n = \sum X_i$$. Assuming that $$ C\left(\theta_1\right) > C\left(\theta_0\right) $$ the test continues until
+
+$$ S_n \geq \frac{ \log{A} }{ C\left(\theta_1\right) - C\left(\theta_0\right) } + n\frac{ D\left(\theta_1\right)-D\left(\theta_0\right) }{ C\left(\theta_1\right) - C\left(\theta_0\right) } $$
+
+Or
+
+$$ S_n \leq \frac{ \log{A} }{ C\left(\theta_1\right) - C\left(\theta_0\right) } + n\frac{ D\left(\theta_1\right)-D\left(\theta_0\right) }{ C\left(\theta_1\right) - C\left(\theta_0\right) } $$
+
+The following tableshow the SPRT for some common distributions:
+
+{% marginnote 'tableID-3' 'Table: SPRTs for various common distributions' %}
+
+|Distribution | $$ f\left(x; \theta\right) $$  |  $$ C\left(\theta\right) $$  |   $$ C\left(\theta\right) $$   |
+|:----------------|----:|-----:|-------:|
+|Normal        |$$ \frac{1}{\sqrt{2\pi}}\exp{-\left(x-\theta\right)^2/2} $$ | $$\theta$$ |$$\frac{\theata^2}{2} $$ |
+|Bernoulli    |$$ \theta^x\left(1-\theta\right)^(1-x) $$   | $$ \log{\frac{\theta}{1-\theta}} $$     | $$ -\log{1-\theta} $$|
+
+## modified SPRT (mSPRT)
 
 ### A Bayesian Model
 Consider the following Bayesian model for the data:
