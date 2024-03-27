@@ -7,19 +7,49 @@ categories: hypothesis-testing
 
 {% newthought 'tl; dr We introduce the mSPRT' %} and give a derivation from a Bayesian point of view.<!--more--> 
 
+### Sequential Testing
+
+Normally when you go about hypothesis testing, after a random sample is observed one of two possible actions are taken: accept the null hypothesis $$H_0$$, or accepct the tive hypothesis $$H_1$$. In some cases the evidence maystrongly support one of the hvpotheses, whilst in other cases the evidence may be less convincing. Nevertheless, a decision must he made. All this assumes that all the data has been collected, and no more is available. It doesn't have to be this way. There is a class of hypothesis tests where you can safely collect more data when the evidence is ambiguous. Such a test typically continues until the evidence strongly favors one of the two hypotheses.
+
+In case of simple hypotheses the strenath of the evidence for H. is Given by the ratio of the probability of the data under $$H_1$$, to the probability of thedata under $$H_1$$. We denote this likelihood ratio by $$\Lambda$$. The Neyman-Pearson lerama implies that for a given amount of information the likelihood ratio test is the most powerful test. Such a rule decides to accept $$H_1$$ if $$\Lambda$$ is big enough, and decides to accept $$H_0$$ otherwise. How big $$\Lambda$$ must get to lead to the decicion $$H_1$$, danends on. amond other things, its sampling distribution under $$H_0$$ and $$H_1$$. It is not unneral however for this enough to mean $$\Lambda \geq 1$$.
+
+### SPRT
+
+In 1943 Wald proposed the *sequential probability ratio test* (SPRT). Suppose that $$Y$$ is a random variable with unknown distribution $$f$$. We want to test the following hypotheses:
+
+* $$H_0: f=f_0$$
+* $$H_1: f=f_1$$
+
+where $$f_0$$ and $$f_1$$ are specified. We observe values of $$Y$$ successively: $$y_1, y_2, \ldots$$ the random variables $$Y_i$$ corresponding to the $y_i$$ are i.i.d with common distribution $$f$$. Let
+
+$$
+\Lambda = \prod_{i=1}^n \frac{f_1\left(x_i\right)}{f_0\left(x_i\right)}
+$$
+
+be the likelihood ratio at stage $$n$$. We choose two decision boundaries $$A$$ and $$B$$ such that $$0 < B < A < \infty $$,  we accept $$H_0$$ if $$\Lambda \leq B$$ and $$H_1$$ if $$\Lambda \geq A$$, and we continue if $$B \leq \Lambda \leq A$$. The constants $$A$$ and $$B$$ are determined by the desired false positive and false negative rates of the experimenter.
+
+### mSPRT
 
 ### A Bayesian Model
 Consider the following Bayesian model for the data:
-$$Y_1|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_1} \alpha + \frac{1}{2} \frac{1}{n_1} \delta, \sigma^2 I_{n_1}\right)$$
-$$Y_2|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_2} \alpha - \frac{1}{2} \frac{1}{n_2} \delta, \sigma^2 I_{n_2}\right)$$
+$$Y_1|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_1} \alpha + \frac{1}{2n_1} \delta, \sigma^2 I_{n_1}\right)$$
+
+$$Y_2|\alpha, \delta, M_1 \sim \mathcal{N}\left(\frac{1}{n_2} \alpha - \frac{1}{2n_2} \delta, \sigma^2 I_{n_2}\right)$$
+
 $$\delta|M_1 \sim \mathcal{N} (0, \tau^2)$$
+
 $$p(\alpha|M_1) \propto 1$$
 
-Note that the prior distribution for the lift $\delta$ is equal to the mixing distribution in the mSPRT. If you are not familiar with this vectorized notation, an alternative notation is
-$$y_{1i}|\alpha, \delta, M_1 \sim \mathcal{N} (\alpha + \frac{\delta}{2}, \sigma^2) \forall i = 1, \ldots, n_1$$
-$$y_{2j}|\alpha, \delta, M_1 \sim \mathcal{N} (\alpha - \frac{\delta}{2}, \sigma^2) \forall j = 1, \ldots, n_2.$$
+Note that the prior distribution for the lift $$\delta$$ is equal to the mixing distribution in the mSPRT. If you are not familiar with this vectorized notation, an alternative notation is
 
-In this model for the "alternative" we have a grand mean $$\alpha$$ and a lift parameter $$\delta$$. Following a Bayesian approach, we assign $$\alpha$$ a uniform prior, and $$\delta$$ a Normal prior. Under this model, the interpretation of $$\delta$$ is still unchanged as $$E[y_1]-E[y_2]$$ i.e., the expected difference in means. Moreover, it also follows under this model that $$\bar{Y}_1 - \bar{Y}_2 \sim \mathcal{N} (\delta, \sigma^2(\frac{1}{n_1} + \frac{1}{n_2}))$$. Notice, however, that we have conditioned on this model being the alternative model $$M_1$$. The "null" model can be expressed as
+
+$$y_{1i}|\alpha, \delta, M_1 \sim \mathcal{N} (\alpha + \frac{\delta}{2}, \sigma^2) \text{ } \forall i = 1, \ldots, n_1$$
+$$y_{2j}|\alpha, \delta, M_1 \sim \mathcal{N} (\alpha - \frac{\delta}{2}, \sigma^2) \text{ } \forall j = 1, \ldots, n_2$$
+
+In this model for the "alternative" we have a grand mean $$\alpha$$ and a lift parameter $$\delta$$. 
+
+Following a Bayesian approach, we assign $$\alpha$$ a uniform prior, and $$\delta$$ a Normal prior. Under this model, the interpretation of $$\delta$$ is still unchanged as $$E[y_1]-E[y_2]$$ i.e., the expected difference in means. Moreover, it also follows under this model that $$\bar{Y}_1 - \bar{Y}_2 \sim \mathcal{N} (\delta, \sigma^2(\frac{1}{n_1} + \frac{1}{n_2}))$$. Notice, however, that we have conditioned on this model being the alternative model $$M_1$$. The "null" model can be expressed as
+
 $$Y_1|\alpha, M_0 \sim \mathcal{N} (\frac{1}{n_1} \alpha, \sigma^2 I_{n_1})$$
 $$Y_2|\alpha, M_0 \sim \mathcal{N} (\frac{1}{n_2} \alpha, \sigma^2 I_{n_2})$$
 $$p(\alpha|M_0) \propto 1$
