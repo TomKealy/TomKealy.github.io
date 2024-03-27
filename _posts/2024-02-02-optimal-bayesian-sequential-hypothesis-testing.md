@@ -58,7 +58,7 @@ The following tableshow the SPRT for some common distributions:
 |Normal        |$$ \frac{1}{\sqrt{2\pi}}e^\left(-\left(x-\theta\right)^2/2\right) $$ | $$\theta$$ |$$\frac{\theta^2}{2} $$ |
 |Bernoulli    |$$ \theta^x\left(1-\theta\right)^(1-x) $$   | $$ \log{\left(\frac{\theta}{1-\theta}\right)} $$     | $$ -\log{\left(1-\theta\right)} $$|
 |Exponential    |$$ \frac{1}{\theta}e^-x/\theta $$   | $$ \log{\theta}$$     | $$ \theta $$|
-|Poisson    |$$ \frac{e^-\theta \theta^x]{x!} $$   | $$ -\frac{1}{\theta}$$     | $$ \log{\theta} $$|
+|Poisson    |$$ \frac{e^-\theta \theta^x}{x!} $$   | $$ -\frac{1}{\theta}$$     | $$ \log{\theta} $$|
 
 ## modified SPRT (mSPRT)
 
