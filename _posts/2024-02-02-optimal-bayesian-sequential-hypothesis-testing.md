@@ -36,7 +36,10 @@ We now focus on the more general case where $$P$$ and $$Q$$, have either densiti
 
 $$ f\left(x; \theta\right) = h\left(x\right)\exp{C\left(\theta\right)x - D\left(\theta\right)} $$
 
-where $$\theta $$ is a real valued parameter. The *exponential families* are to work with and include many common distributions. Let $$P$$, be determined by $$f\left(x; \theta_0\right)$$, and let $$Q$$, be determined by $$f\left(x; \theta_1\right)$$. Then $$Z_i = \left[C\left(\theta_1\right) - C\left(\theta_0\right) \right]X_i - \left[D\left(\theta_1\right)-D\left(\theta_0\right)\right]$$. In termsof the random walk with steps $$Z_i$$ the SPRI continues until fixed boundaries are crossed.
+where $$\theta $$ is a real valued parameter. The *exponential families* are to work with and include many common distributions. Let $$P$$, be determined by $$f\left(x; \theta_0\right)$$, and let $$Q$$, be determined by $$f\left(x; \theta_1\right)$$. Then 
+$$Z_i = \left[C\left(\theta_1\right) - C\left(\theta_0\right) \right]X_i - \left[D\left(\theta_1\right)-D\left(\theta_0\right)\right]$$. 
+
+In terms of the random walk with steps $$Z_i$$ the SPRT continues until fixed boundaries are crossed.
 
 It is somtimes easier to perform the test using the sums of the $$X_i$$'s. Let $$S_n = \sum X_i$$. Assuming that $$ C\left(\theta_1\right) > C\left(\theta_0\right) $$ the test continues until
 
@@ -50,10 +53,12 @@ The following tableshow the SPRT for some common distributions:
 
 {% marginnote 'tableID-3' 'Table: SPRTs for various common distributions' %}
 
-|Distribution | $$ f\left(x; \theta\right) $$  |  $$ C\left(\theta\right) $$  |   $$ C\left(\theta\right) $$   |
+|Distribution | $$ f\left(x; \theta\right) $$  |  $$ C\left(\theta\right) $$  |   $$ D\left(\theta\right) $$   |
 |:----------------|----:|-----:|-------:|
-|Normal        |$$ \frac{1}{\sqrt{2\pi}}\exp{-\left(x-\theta\right)^2/2} $$ | $$\theta$$ |$$\frac{\theata^2}{2} $$ |
-|Bernoulli    |$$ \theta^x\left(1-\theta\right)^(1-x) $$   | $$ \log{\frac{\theta}{1-\theta}} $$     | $$ -\log{1-\theta} $$|
+|Normal        |$$ \frac{1}{\sqrt{2\pi}}e^\left(-\left(x-\theta\right)^2/2\right) $$ | $$\theta$$ |$$\frac{\theta^2}{2} $$ |
+|Bernoulli    |$$ \theta^x\left(1-\theta\right)^(1-x) $$   | $$ \log{\left(\frac{\theta}{1-\theta}\right)} $$     | $$ -\log{\left(1-\theta\right)} $$|
+|Exponential    |$$ \frac{1}{\theta}e^-x/\theta $$   | $$ \log{\theta}$$     | $$ \theta $$|
+|Poisson    |$$ \frac{e^-\theta \theta^x]{x!} $$   | $$ -\frac{1}{\theta}$$     | $$ \log{\theta} $$|
 
 ## modified SPRT (mSPRT)
 
