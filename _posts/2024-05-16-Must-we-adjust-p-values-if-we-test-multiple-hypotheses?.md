@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Must we adjust p-values if we test multiple hypotheses?"
-date:   2021-08-10
+date:   2024-05-16
 categories: GAMs
 ---
 {% newthought 'tl; dr Yes, yes you must' %}
