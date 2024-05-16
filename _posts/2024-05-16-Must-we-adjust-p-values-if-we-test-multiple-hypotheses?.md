@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "The guts of GAMs"
+title:  "Must we adjust p-values if we test multiple hypotheses?"
 date:   2021-08-10
 categories: GAMs
 ---
