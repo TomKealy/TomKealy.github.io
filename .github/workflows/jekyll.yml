@@ -2,16 +2,16 @@ name: Build and Deploy Jekyll Site
 
 on:
   push:
-    branches: [ master ]  # Changed from main to master
+    branches: [ master ]
   pull_request:
-    branches: [ master ]  # Changed from main to master
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Added explicit permissions
+      contents: write
     
     steps:
     - name: Checkout repository
@@ -21,11 +21,13 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.1'
-        bundler-cache: true
+        bundler-cache: false  # Changed to false to handle platform-specific setup
 
-    - name: Install Dependencies
+    - name: Configure Bundler
       run: |
-        bundle config path vendor/bundle
+        rm -f Gemfile.lock
+        bundle lock --add-platform x86_64-linux
+        bundle lock --add-platform ruby
         bundle install
 
     - name: Build Site
