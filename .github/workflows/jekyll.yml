@@ -20,21 +20,14 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.1'
-        bundler-cache: false  # Changed to false to handle platform-specific setup
+        bundler-cache: false
 
-    - name: Setup Bundler
+    - name: Setup Dependencies
       run: |
         rm -f Gemfile.lock
+        bundle config set --local path vendor/bundle
         bundle lock --add-platform x86_64-linux
         bundle lock --add-platform ruby
-        bundle install
-
-    - name: Install Dependencies
-      run: |
-        gem install bundler
-        bundle add jekyll -v "4.2.0"
-        bundle add jekyll-scholar
-        bundle add webrick
         bundle install
 
     - name: Build Site
