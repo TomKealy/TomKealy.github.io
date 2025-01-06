@@ -14,20 +14,22 @@ jobs:
       contents: write
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.1'
-        bundler-cache: false  # Changed to false to handle platform-specific setup
+        bundler-cache: true
 
-    - name: Configure Bundler
+    # Force install specific versions known to work together
+    - name: Install Dependencies
       run: |
-        rm -f Gemfile.lock
-        bundle lock --add-platform x86_64-linux
-        bundle lock --add-platform ruby
+        gem install bundler
+        bundle init
+        bundle add jekyll -v "4.2.0"
+        bundle add jekyll-scholar
+        bundle add webrick
         bundle install
 
     - name: Build Site
@@ -36,9 +38,8 @@ jobs:
         JEKYLL_ENV: production
 
     - name: Deploy to GitHub Pages
-      if: github.event_name != 'pull_request'
       uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/master'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./_site
-        enable_jekyll: false
