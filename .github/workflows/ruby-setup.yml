@@ -1,0 +1,51 @@
+name: Ruby Setup
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm-dev
+
+    - name: Install ruby-build
+      run: |
+        git clone https://github.com/rbenv/ruby-build.git
+        cd ruby-build
+        sudo ./install.sh
+
+    - name: Install Ruby
+      run: |
+        RUBY_VERSION="3.1.4"
+        RUBY_PATH="/opt/hostedtoolcache/Ruby/${RUBY_VERSION}/x64"
+        
+        # Create directory if it doesn't exist
+        sudo mkdir -p "$RUBY_PATH"
+        
+        # Install Ruby
+        sudo ruby-build "$RUBY_VERSION" "$RUBY_PATH"
+        
+        # Mark installation as complete
+        sudo touch "${RUBY_PATH}.complete"
+        
+        # Add Ruby to PATH
+        echo "${RUBY_PATH}/bin" >> $GITHUB_PATH
+        
+        # Verify installation
+        ruby --version
+
+    - name: Setup Bundler
+      run: |
+        gem install bundler
+        bundle install
