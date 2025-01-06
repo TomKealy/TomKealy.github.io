@@ -329,7 +329,3 @@ plt.title('Likelihood Over Time')
 plt.legend()
 plt.show()
 ```
-
-{% maincolumn "assets/img/Sequential_Hypothesis_Testing_pvals.png" "The progress of the mSPRT *p*-value as we add more samples." %}
-
-{% maincolumn "assets/img/Sequential_Hypothesis_Testing_likelihood.png" "The progress of the mSPRT likelihood as we add more samples." %}
