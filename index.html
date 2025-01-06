@@ -8,7 +8,7 @@ title: blog
     <meta charset='UTF-8'>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
 
-    <meta name='description' content='Gregory Gundersen is a PhD candidate at Princeton.'>
+    <meta name='description' content='Thomas Kealy is a Data Scientist in Berlin.'>
     <!-- A decent browser will parse this fine:
          https://webmasters.stackexchange.com/questions/92744. -->
     <meta name='keywords' content='
@@ -34,17 +34,12 @@ title: blog
     {% include nav.html %}
     <div id='blog' class='wrap'>
         <div id='intro'>
-            <div class='quote'>
-                <p>I learned very early the difference between knowing the name of something and knowing something.</p>
-                <a href='https://en.wikiquote.org/wiki/Richard_Feynman' target='_blank'>Richard Feynman</a>
-            </div>
         </div>
         <div id='posts' class='section'>
             {% for post in site.posts %}
                 <div class='post-row'>
                     <p class='post-title'>
                         <a href="{{ post.url }}">
-                            {% katexmm %}
                             {{ post.title }}
                             {% endkatexmm %}
                         </a>
