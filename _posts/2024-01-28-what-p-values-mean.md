@@ -2,6 +2,7 @@
 layout: post
 title: “What p-values really mean“
 categories: statistics, hypothesis testing
+bibliography: references.bib
 ---
 
 Most people get _p_-values wrong. This is how to understand and apply them correctly.
