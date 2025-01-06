@@ -2,14 +2,16 @@ name: Build and Deploy Jekyll Site
 
 on:
   push:
-    branches: [ main ]  # or your default branch name
+    branches: [ master ]  # Changed from main to master
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:    # Allows manual triggering
+    branches: [ master ]  # Changed from main to master
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Added explicit permissions
     
     steps:
     - name: Checkout repository
