@@ -56,8 +56,6 @@ $$ S_n \leq \frac{ \log{A} }{ C\left(\theta_1\right) - C\left(\theta_0\right) } 
 
 The following tableshow the SPRT for some common distributions:
 
-{% marginnote 'tableID-3' 'Table: SPRTs for various common distributions' %}
-
 |Distribution | $$ f\left(x; \theta\right) $$  |  $$ C\left(\theta\right) $$  |   $$ D\left(\theta\right) $$   |
 |:----------------|----:|-----:|-------:|
 |Normal        |$$ \frac{1}{\sqrt{2\pi}}e^\left(-\left(x-\theta\right)^2/2\right) $$ | $$\theta$$ |$$\frac{\theta^2}{2} $$ |
