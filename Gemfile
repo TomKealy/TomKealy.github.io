@@ -1,14 +1,11 @@
 source "https://rubygems.org"
 
-# Use github-pages gem for GitHub Pages compatibility
 gem "github-pages", group: :jekyll_plugins
 
-# Jekyll plugins
 group :jekyll_plugins do
   gem "jekyll-scholar"
   gem "jekyll-sitemap"
   gem "jekyll-feed"
-  gem "jekyll-katex"
   gem "jekyll-seo-tag"
 end
 

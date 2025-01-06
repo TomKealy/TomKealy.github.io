@@ -12,13 +12,4 @@ plugins:
   - jekyll-scholar
   - jekyll-sitemap
   - jekyll-feed
-  - jekyll-katex
-
-# KaTeX Configuration
-katex:
-  js_path: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
-  css_path: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-  auto_render_path: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  rendering_options:
-    throw_error: false
-    error_color: "#cc0000"
+  - jekyll-seo-tag
