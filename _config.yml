@@ -7,9 +7,16 @@ permalink: /blog/:year/:month/:day/:title/
 environment: prod
 url: "http://gregorygundersen.com"
 
-# Plugins
 plugins:
   - jekyll-scholar
   - jekyll-sitemap
   - jekyll-feed
   - jekyll-seo-tag
+
+scholar:
+  style: apa
+  locale: en
+  source: ./_bibliography
+  bibliography: references.bib
+  sort_by: year,month
+  order: descending
