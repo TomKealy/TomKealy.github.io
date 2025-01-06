@@ -4,8 +4,7 @@ title:  "Bayesian Sequential Hypothesis Testing"
 date:   2024-02-04
 categories: hypothesis-testing
 ---
-
-{% newthought 'tl; dr We show how mSPRT' %} can be thought of as a Bayesian Algorithm..<!--more--> 
+We show how mSPRT can be thought of as a Bayesian Algorithm.
 
 ### A Bayesian Model
 Consider the following Bayesian model for the data:

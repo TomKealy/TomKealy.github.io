@@ -5,8 +5,7 @@ date:   2021-10-10
 categories: optimisation
 ---
 
-tl; dr Gradient Descent is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.
-<!--more-->
+Gradient Descent is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.
 
 ## Introduction
 

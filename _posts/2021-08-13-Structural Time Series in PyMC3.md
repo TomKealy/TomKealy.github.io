@@ -4,7 +4,7 @@ title:  "Structural Time Series in PyMC!"
 date:   2021-08-13
 categories: time-series
 ---
-{% newthought 'tl; dr Bayesian Structural Time Series' %} let us model time series component by component. Here's how to do it in PyMC<!--more--> 
+Bayesian Structural Time Series let us model time series component by component. Here's how to do it in PyMC. 
 
 ```python
 %matplotlib inline

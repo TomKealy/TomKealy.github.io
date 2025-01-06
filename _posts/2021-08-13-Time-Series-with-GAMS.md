@@ -4,7 +4,7 @@ title:  "Time Series with GAMs"
 date:   2021-08-13
 categories: curve-fitting, GAMs
 ---
-{% newthought 'tl; dr Generalised Additive Models' %} are a flexible class of models which improve on polynomial regression. This post shows how to fit time series data with GAMs a bit like `prophet`.<!--more--> 
+Generalised Additive Models' %} are a flexible class of models which improve on polynomial regression. This post shows how to fit time series data with GAMs a bit like `prophet`.
 
 ## Introduction
 

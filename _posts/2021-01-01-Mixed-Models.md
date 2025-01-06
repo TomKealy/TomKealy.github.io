@@ -4,7 +4,7 @@ title:  "Mixed Models"
 date:   2021-01-01
 categories: optimisation
 ---
-{% newthought 'tl; dr Group Structure' %} is something we can exploit to improve our estimates. We introduce and explain mixed models and how to fit them.<!--more--> 
+ Group Structure is something we can exploit to improve our estimates. We introduce and explain mixed models and how to fit them.
 
 Often, we have data which has a group structure. For example, in the dataset we use in this post, radon measurements were taken in ~900 houses in 85 counties. It's unreasonable to expect that radon levels do not vary by state as well as house, and so we will integrate this into our analysis. 
 
@@ -16,7 +16,7 @@ where
 
 $$ \varepsilon \sim N\left(0, I\right) $$ 
 
-and \\(X\\) are known as fixed effects coefficients. To define a mixed model, we include a term \\(Z\eta\\), which corresponds to *random* effects. The model is now:
+and $$X$$ are known as fixed effects coefficients. To define a mixed model, we include a term $$Z^T\eta$$, which corresponds to *random* effects. The model is now:
 
 $$ y = X^T\beta + Z^T\eta + \varepsilon $$
 
@@ -28,7 +28,7 @@ and
 
 $$ \eta \sim N\left(0, \sigma^2I\right) $$
 
-We wish to infer \\(\beta, \eta, \sigma\\). Given the random effects have mean 0, the term \\(X^T\beta\\) captures the data's mean amd the term \\(Z^T\eta\\) captures variations in the data.
+We wish to infer $$\beta, \eta, \sigma$$. Given the random effects have mean 0, the term $$X^T\beta$$ captures the data's mean amd the term $$Z^T\eta$$ captures variations in the data.
 
 
 ```python

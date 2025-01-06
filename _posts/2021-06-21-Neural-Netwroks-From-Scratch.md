@@ -4,11 +4,11 @@ title:  "Neural Networks from scratch."
 date:   2021-06-21
 categories: optimisation, curve-fitting, neural-networks
 ---
-{% newthought 'tl; dr Neural Networks' %} are just mathematical expressions. In this post we create a small NN library, including autograd, to show how the internals work.<!--more--> 
+Neural Networks are just mathematical expressions. In this post we create a small NN library, including autograd, to show how the internals work.
 
 It's useful sometimes to write simple versions of complex things, so that you understand them. In this post we write a simple neural network from scratch.
 
-In a normal classification problem, we have some labels \(y\) and inputs \(x\) and we would like to learn a linear function 
+In a normal classification problem, we have some labels \(y\) and inputs \(x\) and we would like to learn a linear function :
 
 
 $$ y = W x $$ 

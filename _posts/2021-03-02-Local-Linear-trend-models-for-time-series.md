@@ -4,7 +4,7 @@ title:  "Local Linear Trend models for time series"
 date:   2021-03-02
 categories: time-series
 ---
-{% newthought 'tl; dr Local Linear Trend models' %} are one of the simplest time series models. Here we code them up in python.<!--more--> 
+Local Linear Trend models are one of the simplest time series models. Here we code them up in python.
 
 Local Linear Trend models are one of the simplest time series models, and can be expressed by the following equations:
 

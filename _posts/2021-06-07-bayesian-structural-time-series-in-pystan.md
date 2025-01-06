@@ -4,7 +4,7 @@ title:  "Bayesian Structural Time Series in pystan."
 date:   2021-06-07
 categories: optimisation
 ---
-{% newthought 'tl; dr Bayesian Structural Time Series' %} let us model time series component by component. Here's how to do it in Stan<!--more-->
+Bayesian Structural Time Series let us model time series component by component. Here's how to do it in Stan.
 
 Let \\(y_t\\) denote observation \\(t\\) in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$
 

@@ -4,8 +4,7 @@ title:  "Understanding the Guts of Generalized Additive Models (GAMs) with Hands
 date:   2021-08-10
 categories: GAMs
 ---
-{% newthought 'tl; dr Generalised Additive Models' %} look harder than they actually are. We fit a single dimension GAM from scratch, including generating splines.
-<!--more-->
+Generalised Additive Models look harder than they actually are. We fit a single dimension GAM from scratch, including generating splines.
 
 This post will explain  the internals of (generalised) additive models (GAMs): how to estimate the feature functions. We first explain *why* we want to fit additive models, and then we go on to explain how they are estimated in practice via splines (we will also explain what a spline is).  Finally we'll fit simple splines on wage data, then we'll go on to fit more complicated splines on some accelerometer data with a highly non-linear realtionship between in the input and the output.
 
@@ -19,7 +18,7 @@ $$
 E[Y|\mathbf{X} = \mathbf{x}] = \alpha + \sum_{j=1}^{p} f_j(x_j)
 $$
 
-This  includes the linear model as a special case, where $$ f_j(x_j) = \beta_j x_j $$, but it’s clearly more general because the $$ f_j $$'s can be arbitrary nonlinear functions. 
+This  includes the linear model as a special case, where $$ f_j(x_j) = \beta_j x_j $$, but it’s clearly more general because the $$ f_j $$'s can be arbitrary nonlinear functions.
 
 To make the model identifiable, we add a restriction. Without loss of generality, we assume:
 

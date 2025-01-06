@@ -4,8 +4,6 @@ title:  "Must we adjust p-values if we test multiple hypotheses?"
 date:   2024-05-16
 categories: GAMs
 ---
-{% newthought 'tl; dr Yes, yes you must' %}
-<!--more-->
 
 Jerzy Neyman and Egon Pearson developed their idea of hypothesis testing in 1933. This has since become the dominant paradigm of statistical inference. The goal of Neyman and Pearson's method were statistical tests which control errors. So scientist's could adopt claims without being wrong too often. A single number, alpha, controls the long run amount of wrong decisions. It is set before a scientist conducts any experiment. One corollary of this is that the scientific literature contains errors. Be careful about trusting scientific claims.
 

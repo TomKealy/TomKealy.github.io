@@ -5,7 +5,7 @@ date:   2024-10-09
 categories: hypothesis-testing, multiple-testing
 ---
 
-{% newthought 'tl; dr We show how to' handle more than one hypothesis at a time.%} <!--more--> 
+We show how to handle more than one hypothesis at a time. 
 
 ## Introduction
 

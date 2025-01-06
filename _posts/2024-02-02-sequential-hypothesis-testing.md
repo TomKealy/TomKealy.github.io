@@ -4,8 +4,7 @@ title:  "Sequential Hypothesis Testing"
 date:   2024-02-02
 categories: hypothesis-testing
 ---
-
-{% newthought 'tl; dr We introduce the mSPRT' %} and give a derivation from a Bayesian point of view.<!--more--> 
+We introduce the mSPRT and give a derivation from a Bayesian point of view.
 
 # Sequential Testing
 
