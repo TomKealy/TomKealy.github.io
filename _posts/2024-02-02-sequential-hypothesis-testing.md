@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Sequential Hypothesis Testing"
 date:   2024-02-02
 categories: hypothesis-testing

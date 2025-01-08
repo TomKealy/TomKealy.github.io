@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "More Complex (Linear) Regressions"
 date:   2021-03-05
 categories: optimisation

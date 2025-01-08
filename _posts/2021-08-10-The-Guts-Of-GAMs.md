@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Understanding the Guts of Generalized Additive Models (GAMs) with Hands-on Examples."
 date:   2021-08-10
 categories: GAMs

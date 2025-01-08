@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Time Series with GAMs"
 date:   2021-08-13
 categories: curve-fitting, GAMs

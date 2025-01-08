@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Bayesian Structural Time Series in pystan."
 date:   2021-06-07
 categories: optimisation

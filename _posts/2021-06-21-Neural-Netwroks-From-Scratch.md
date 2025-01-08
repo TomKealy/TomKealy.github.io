@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Neural Networks from scratch."
 date:   2021-06-21
 categories: optimisation, curve-fitting, neural-networks

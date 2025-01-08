@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "An introduction to Compressive Sensing."
 date:   2024-10-09
 categories: Compressive sensing.

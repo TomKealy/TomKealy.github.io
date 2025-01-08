@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: “What p-values really mean“
 categories: statistics, hypothesis testing
 bibliography: references.bib

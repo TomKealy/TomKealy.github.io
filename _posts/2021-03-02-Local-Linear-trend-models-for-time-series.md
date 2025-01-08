@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Local Linear Trend models for time series"
 date:   2021-03-02
 categories: time-series

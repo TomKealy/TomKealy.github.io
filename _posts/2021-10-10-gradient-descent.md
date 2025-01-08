@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "An introduction to Gradient Descent"
 date:   2021-10-10
 categories: optimisation

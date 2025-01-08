@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Mixed Models"
 date:   2021-01-01
 categories: optimisation

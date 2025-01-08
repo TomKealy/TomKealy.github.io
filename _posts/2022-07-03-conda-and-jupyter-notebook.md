@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Running Conda environments from Jupyter Notebook."
 date:   2022-07-03
 categories: optimisation

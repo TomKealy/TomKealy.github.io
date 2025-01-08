@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Bayesian Sequential Hypothesis Testing"
 date:   2024-02-04
 categories: hypothesis-testing
