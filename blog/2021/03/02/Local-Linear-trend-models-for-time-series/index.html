@@ -180,12 +180,11 @@ model {
 
 <p>Data Block:</p>
 
-<p>’'’python
-data {
-    int N;          // Number of observations
-    array[N] real X;    // Input data vector
-}
-‘’’</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="p">{</span>
+    <span class="nb">int</span> <span class="n">N</span><span class="p">;</span>          <span class="o">//</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">observations</span>
+    <span class="n">array</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">real</span> <span class="n">X</span><span class="p">;</span>    <span class="o">//</span> <span class="n">Input</span> <span class="n">data</span> <span class="n">vector</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <p>As input the the data the model expects is:</p>
 
@@ -194,15 +193,14 @@ data {
   <li>$X$ is a vector of length $N$ containing our actual observations (like passenger counts)</li>
 </ul>
 
-<p>’'’python
-parameters {
-    array[N] real u;          // State/level vector
-    array[N] real v;          // Velocity/trend vector
-    real&lt;lower=0&gt; s_u;    // State noise standard deviation
-    real&lt;lower=0&gt; s_v;    // Velocity noise standard deviation
-    real&lt;lower=0&gt; s_x;    // Observation noise standard deviation
-}
-‘’’</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">parameters</span> <span class="p">{</span>
+    <span class="n">array</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">real</span> <span class="n">u</span><span class="p">;</span>          <span class="o">//</span> <span class="n">State</span><span class="o">/</span><span class="n">level</span> <span class="n">vector</span>
+    <span class="n">array</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">real</span> <span class="n">v</span><span class="p">;</span>          <span class="o">//</span> <span class="n">Velocity</span><span class="o">/</span><span class="n">trend</span> <span class="n">vector</span>
+    <span class="n">real</span><span class="o">&lt;</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">s_u</span><span class="p">;</span>    <span class="o">//</span> <span class="n">State</span> <span class="n">noise</span> <span class="n">standard</span> <span class="n">deviation</span>
+    <span class="n">real</span><span class="o">&lt;</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">s_v</span><span class="p">;</span>    <span class="o">//</span> <span class="n">Velocity</span> <span class="n">noise</span> <span class="n">standard</span> <span class="n">deviation</span>
+    <span class="n">real</span><span class="o">&lt;</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">s_x</span><span class="p">;</span>    <span class="o">//</span> <span class="n">Observation</span> <span class="n">noise</span> <span class="n">standard</span> <span class="n">deviation</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <p>This section defines the parameters we want Stan to estimate:</p>
 
@@ -212,33 +210,29 @@ parameters {
   <li>The $s_$ parameters are standard deviations for different types of noise, constrained to be positive with &lt;lower=0&gt;</li>
 </ul>
 
-<p>’'’python
-model {
-    for (t in 2:N) {
-        v[t] ~ normal(v[t-1], s_v);
-        u[t] ~ normal(u[t-1] + v[t-1], s_u);
-    }
-    X ~ normal(u, s_x);
-}
-‘’’</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">t</span> <span class="ow">in</span> <span class="mi">2</span><span class="p">:</span><span class="n">N</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">s_v</span><span class="p">);</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">s_u</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">X</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">s_x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <p>This is where the actual model is defined through three key relationships:</p>
 
-<p>’'’python
-v[2:N] ~ normal(v[1:N-1], s_v)
-‘’’</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">N</span><span class="p">]</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">s_v</span><span class="p">)</span>
+</code></pre></div></div>
 
 <p>The velocity at each time point follows a random walk. Each velocity value is normally distributed around the previous velocity. $s_v$ controls how much the velocity can change between time points.</p>
 
-<p>’'’python
-u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
-‘’’</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">u</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">N</span><span class="p">]</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">s_u</span><span class="p">);</span>
+</code></pre></div></div>
 
 <p>The state at each time point depends on the previous state (u[1:N-1]) plus the previous velocity (v[1:N-1]). $s_u$ controls how much random variation is allowed in this relationship.</p>
 
-<p>’'’python
-X ~ normal(u, s_x);
-‘’’</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">s_x</span><span class="p">);</span>
+</code></pre></div></div>
 
 <p>Our observations $X$ are normally distributed around the true state $u$ with $s_x$ representing measurement noise or short-term fluctuations.</p>
 
@@ -280,21 +274,19 @@ X ~ normal(u, s_x);
 
 <p>We can measure our in sample fit with the following quantities:</p>
 
-<p>’'’python
-fitted_values = u_mean
-mse = np.mean((df[‘#Passengers’] - fitted_values)<strong>2)
-rmse = np.sqrt(mse)
-mae = np.mean(np.abs(df[‘#Passengers’] - fitted_values))
-mape = np.mean(np.abs((df[‘#Passengers’] - fitted_values) / df[‘#Passengers’])) * 100
-r2 = 1 - (np.sum((df[‘#Passengers’] - fitted_values)</strong>2) / 
-          np.sum((df[‘#Passengers’] - df[‘#Passengers’].mean())**2))</p>
-
-<p>print(f’MSE: {mse:.2f}’)
-print(f’RMSE: {rmse:.2f}’)
-print(f’MAE: {mae:.2f}’)
-print(f’MAPE: {mape:.2f}%’)
-print(f’R²: {r2:.4f}’)
-‘’’</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fitted_values</span> <span class="o">=</span> <span class="n">u_mean</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">((</span><span class="n">df</span><span class="p">[</span><span class="s">'#Passengers'</span><span class="p">]</span> <span class="o">-</span> <span class="n">fitted_values</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">rmse</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mse</span><span class="p">)</span>
+<span class="n">mae</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'#Passengers'</span><span class="p">]</span> <span class="o">-</span> <span class="n">fitted_values</span><span class="p">))</span>
+<span class="n">mape</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">((</span><span class="n">df</span><span class="p">[</span><span class="s">'#Passengers'</span><span class="p">]</span> <span class="o">-</span> <span class="n">fitted_values</span><span class="p">)</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s">'#Passengers'</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">((</span><span class="n">df</span><span class="p">[</span><span class="s">'#Passengers'</span><span class="p">]</span> <span class="o">-</span> <span class="n">fitted_values</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> 
+          <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">((</span><span class="n">df</span><span class="p">[</span><span class="s">'#Passengers'</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s">'#Passengers'</span><span class="p">].</span><span class="n">mean</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'MSE: </span><span class="si">{</span><span class="n">mse</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'RMSE: </span><span class="si">{</span><span class="n">rmse</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'MAE: </span><span class="si">{</span><span class="n">mae</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'MAPE: </span><span class="si">{</span><span class="n">mape</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">%'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'R²: </span><span class="si">{</span><span class="n">r2</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
 
 <p>I get:</p>
 
