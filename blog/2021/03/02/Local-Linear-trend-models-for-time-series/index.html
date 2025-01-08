@@ -180,20 +180,21 @@ model {
 
 <p>Data Block:</p>
 
-<p>’'’stan
+<p>’'’python
 data {
     int N;          // Number of observations
     array[N] real X;    // Input data vector
 }
-‘’’
-As input the the data the model expects is:</p>
+‘’’</p>
+
+<p>As input the the data the model expects is:</p>
 
 <ul>
   <li>$N$ is an integer representing the number of time points in our series</li>
   <li>$X$ is a vector of length $N$ containing our actual observations (like passenger counts)</li>
 </ul>
 
-<p>’'’stan
+<p>’'’python
 parameters {
     array[N] real u;          // State/level vector
     array[N] real v;          // Velocity/trend vector
@@ -211,7 +212,7 @@ parameters {
   <li>The $s_$ parameters are standard deviations for different types of noise, constrained to be positive with &lt;lower=0&gt;</li>
 </ul>
 
-<p>’'’stan
+<p>’'’python
 model {
     for (t in 2:N) {
         v[t] ~ normal(v[t-1], s_v);
@@ -223,19 +224,19 @@ model {
 
 <p>This is where the actual model is defined through three key relationships:</p>
 
-<p>’'’stan
+<p>’'’python
 v[2:N] ~ normal(v[1:N-1], s_v)
 ‘’’</p>
 
 <p>The velocity at each time point follows a random walk. Each velocity value is normally distributed around the previous velocity. $s_v$ controls how much the velocity can change between time points.</p>
 
-<p>’'’stan
+<p>’'’python
 u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
 ‘’’</p>
 
 <p>The state at each time point depends on the previous state (u[1:N-1]) plus the previous velocity (v[1:N-1]). $s_u$ controls how much random variation is allowed in this relationship.</p>
 
-<p>’'’stan
+<p>’'’python
 X ~ normal(u, s_x);
 ‘’’</p>
 
@@ -275,14 +276,13 @@ X ~ normal(u, s_x);
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 
+<p><img src="image/LocalLinearTimeSeries" alt="LLT model fit for the Air Passengers dataset." title="Initital Tit" /></p>
+
 <p>We can measure our in sample fit with the following quantities:</p>
 
-<p>’'’python</p>
-<h1 id="get-fitted-values">Get fitted values</h1>
-<p>fitted_values = u_mean</p>
-
-<h1 id="calculate-metrics">Calculate metrics</h1>
-<p>mse = np.mean((df[‘#Passengers’] - fitted_values)<strong>2)
+<p>’'’python
+fitted_values = u_mean
+mse = np.mean((df[‘#Passengers’] - fitted_values)<strong>2)
 rmse = np.sqrt(mse)
 mae = np.mean(np.abs(df[‘#Passengers’] - fitted_values))
 mape = np.mean(np.abs((df[‘#Passengers’] - fitted_values) / df[‘#Passengers’])) * 100
@@ -296,7 +296,7 @@ print(f’MAPE: {mape:.2f}%’)
 print(f’R²: {r2:.4f}’)
 ‘’’</p>
 
-<p>I get</p>
+<p>I get:</p>
 
 <p>MSE: 121.76
 RMSE: 11.03
