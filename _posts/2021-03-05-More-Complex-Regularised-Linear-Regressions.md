@@ -179,6 +179,6 @@ Regularization can help us solve ill-posed regression problems and handle noisy 
 
 For practical applications, consider:
 
-* Ridge Regression when you want to prevent overfitting but don't need sparse solutions
-* Using Lasso when you believe many features should have zero coefficients
-* Total Variation when you expect the coefficients to vary smoothly
+* Ridge Regression when you want to prevent overfitting but don't need sparse solutions.
+* Using Lasso when you believe many features should have zero coefficients.
+* Total Variation when you expect the coefficients to vary smoothly.
