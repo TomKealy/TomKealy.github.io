@@ -5,7 +5,7 @@ date:   2021-03-02
 categories: time-series
 ---
 
-The bedrock idea of modern statistics is exchangability. An exchangeable sequence of random variables is a sequence $X_11, X_2, X_3, \ldots$ whose joint probability distribution does not change when the positions in the sequence in which finitely many of them appear are altered. Informally, this means that you could permute the sequence and this would not change the inferences about it.
+The bedrock idea of modern statistics is exchangability. An exchangeable sequence of random variables is a sequence $X_1, X_2, X_3, \ldots$ whose joint probability distribution does not change when the positions in the sequence in which finitely many of them appear are altered. Informally, this means that you could permute the sequence and this would not change the inferences about it.
 
 Not all problems have this nice feature. The most common non-exchangeable problem is the inference of parameters in a time series. Time series analysis is a fundamental technique in data science that helps us understand and predict patterns in sequential data that evolves over time. Here, if you permute the sequence you lose all the information about what point came in which order-the essential feature of a time series.
 
