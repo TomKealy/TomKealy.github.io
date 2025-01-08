@@ -27,18 +27,21 @@ In this post, we'll walk through implementing LLT models in Python using Stan. W
 The LLT model can be expressed by the following equations:
 
 $$ v_t \sim N(v_{t-1}, \sigma_v^2) $$
+
 $$ x_t \sim N(x_{t-1} + v_{t-1}, \sigma_x^2) $$
+
 $$ y_t \sim N(x_t, \sigma_y^2) $$
+
 Where:
 
-$v_t$ represents the trend velocity (rate of change) at time t
-$x_t$ is the underlying state (level) of the system
-$y_t$ is the observed value
-$\sigma_v^2$ is the trend disturbance variance
-$\sigma_x^2$ is the level disturbance variance
-$\sigma_y^2$ is the observation error variance
+* $v_t$ represents the trend velocity (rate of change) at time t.
+* $x_t$ is the underlying state (level) of the system
+* $y_t$ is the observed value
+* $\sigma_v^2$ is the trend disturbance variance
+* $\sigma_x^2$ is the level disturbance variance
+* $\sigma_y^2$ is the observation error variance
 
-Local Linear Trend models are one of the simplest time series models. Here we code them up in python.
+Local Linear Trend models are one of the simplest time series models. Here we code them up in python using [stan](https://mc-stan.org/).
 
 We will model this in pystan, using the air passengers dataset.
 
