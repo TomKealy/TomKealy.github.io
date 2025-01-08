@@ -104,19 +104,19 @@ Let's break this down section by section:
 
 Data Block:
 
-'''python
+```python
 data {
     int N;          // Number of observations
     array[N] real X;    // Input data vector
 }
-'''
+```
 
 As input the the data the model expects is:
 
 * $N$ is an integer representing the number of time points in our series
 * $X$ is a vector of length $N$ containing our actual observations (like passenger counts)
 
-'''python
+```python
 parameters {
     array[N] real u;          // State/level vector
     array[N] real v;          // Velocity/trend vector
@@ -124,7 +124,7 @@ parameters {
     real<lower=0> s_v;    // Velocity noise standard deviation
     real<lower=0> s_x;    // Observation noise standard deviation
 }
-'''
+```
 
 This section defines the parameters we want Stan to estimate:
 
@@ -132,7 +132,7 @@ This section defines the parameters we want Stan to estimate:
 * $v$ represents the velocity (trend) at each time point
 * The $s_$ parameters are standard deviations for different types of noise, constrained to be positive with <lower=0>
 
-'''python
+```python
 model {
     for (t in 2:N) {
         v[t] ~ normal(v[t-1], s_v);
@@ -140,25 +140,25 @@ model {
     }
     X ~ normal(u, s_x);
 }
-'''
+```
 
 This is where the actual model is defined through three key relationships:
 
-'''python
+```python
 v[2:N] ~ normal(v[1:N-1], s_v)
-'''
+```
 
 The velocity at each time point follows a random walk. Each velocity value is normally distributed around the previous velocity. $s_v$ controls how much the velocity can change between time points.
 
-'''python
+```python
 u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
-'''
+```
 
 The state at each time point depends on the previous state (u[1:N-1]) plus the previous velocity (v[1:N-1]). $s_u$ controls how much random variation is allowed in this relationship.
 
-'''python
+```python
 X ~ normal(u, s_x);
-'''
+```
 
 Our observations $X$ are normally distributed around the true state $u$ with $s_x$ representing measurement noise or short-term fluctuations.
 
@@ -200,7 +200,7 @@ plt.show()
 
 We can measure our in sample fit with the following quantities:
 
-'''python
+```python
 fitted_values = u_mean
 mse = np.mean((df['#Passengers'] - fitted_values)**2)
 rmse = np.sqrt(mse)
@@ -208,13 +208,12 @@ mae = np.mean(np.abs(df['#Passengers'] - fitted_values))
 mape = np.mean(np.abs((df['#Passengers'] - fitted_values) / df['#Passengers'])) * 100
 r2 = 1 - (np.sum((df['#Passengers'] - fitted_values)**2) / 
           np.sum((df['#Passengers'] - df['#Passengers'].mean())**2))
-
 print(f'MSE: {mse:.2f}')
 print(f'RMSE: {rmse:.2f}')
 print(f'MAE: {mae:.2f}')
 print(f'MAPE: {mape:.2f}%')
 print(f'R²: {r2:.4f}')
-'''
+```
 
 I get:
 
