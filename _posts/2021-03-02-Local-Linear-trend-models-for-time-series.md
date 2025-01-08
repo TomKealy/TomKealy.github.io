@@ -104,18 +104,19 @@ Let's break this down section by section:
 
 Data Block:
 
-'''stan
+'''python
 data {
     int N;          // Number of observations
     array[N] real X;    // Input data vector
 }
 '''
+
 As input the the data the model expects is:
 
 * $N$ is an integer representing the number of time points in our series
 * $X$ is a vector of length $N$ containing our actual observations (like passenger counts)
 
-'''stan
+'''python
 parameters {
     array[N] real u;          // State/level vector
     array[N] real v;          // Velocity/trend vector
@@ -131,7 +132,7 @@ This section defines the parameters we want Stan to estimate:
 * $v$ represents the velocity (trend) at each time point
 * The $s_$ parameters are standard deviations for different types of noise, constrained to be positive with <lower=0>
 
-'''stan
+'''python
 model {
     for (t in 2:N) {
         v[t] ~ normal(v[t-1], s_v);
@@ -143,19 +144,19 @@ model {
 
 This is where the actual model is defined through three key relationships:
 
-'''stan
+'''python
 v[2:N] ~ normal(v[1:N-1], s_v)
 '''
 
 The velocity at each time point follows a random walk. Each velocity value is normally distributed around the previous velocity. $s_v$ controls how much the velocity can change between time points.
 
-'''stan
+'''python
 u[2:N] ~ normal(u[1:N-1] + v[1:N-1], s_u);
 '''
 
 The state at each time point depends on the previous state (u[1:N-1]) plus the previous velocity (v[1:N-1]). $s_u$ controls how much random variation is allowed in this relationship.
 
-'''stan
+'''python
 X ~ normal(u, s_x);
 '''
 
@@ -195,13 +196,12 @@ plt.grid(True)
 plt.show()
 ```
 
+![LLT model fit for the Air Passengers dataset.](image/LocalLinearTimeSeries "Initital Tit")
+
 We can measure our in sample fit with the following quantities:
 
 '''python
-# Get fitted values
 fitted_values = u_mean
-
-# Calculate metrics
 mse = np.mean((df['#Passengers'] - fitted_values)**2)
 rmse = np.sqrt(mse)
 mae = np.mean(np.abs(df['#Passengers'] - fitted_values))
@@ -216,7 +216,7 @@ print(f'MAPE: {mape:.2f}%')
 print(f'R²: {r2:.4f}')
 '''
 
-I get 
+I get:
 
 MSE: 121.76
 RMSE: 11.03
