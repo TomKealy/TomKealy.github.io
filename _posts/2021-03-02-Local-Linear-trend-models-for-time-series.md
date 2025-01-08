@@ -63,6 +63,8 @@ except FileNotFoundError:
 df.plot.scatter(x="Month", y="#Passengers", color="k")
 ```
 
+![Air Passengers dataset.](/LocalLinearTrend/AirPassengers.pmg "Air Passengers Data")
+
 This dataset tracks the monthly totals of a US airline passengers from 1949 to 1960. The time series displays a rising trend with multiplicative seasonality.
 
 In stan we can write out model as follows:
@@ -196,8 +198,6 @@ plt.grid(True)
 plt.show()
 ```
 
-![LLT model fit for the Air Passengers dataset.](/image/LocalLinearTimeSeries "Initital Tit")
-
 We can measure our in sample fit with the following quantities:
 
 ```python
@@ -278,7 +278,7 @@ generated quantities {
 """
 ```
 
-Here the Generated Quantities block predicts future states based on previous states (`normal_rng(u_pred[N+i-1], s_u)`), then generates observations from those states (`normal_rng(u_pred[N+i], s_x)`).
+Here the Generated Quantities block predicts future states based on previous states (```python normal_rng(u_pred[N+i-1], s_u)```), then generates observations from those states (```python normal_rng(u_pred[N+i], s_x)```).
 
 We can run the model with this code:
 
