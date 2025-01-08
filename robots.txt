@@ -1,1 +1,1 @@
-Sitemap: https://tomkealy.github.io//sitemap.xml
+Sitemap: http://gregorygundersen.com/sitemap.xml
