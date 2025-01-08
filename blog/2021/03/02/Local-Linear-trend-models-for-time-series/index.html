@@ -132,6 +132,8 @@ $\sigma_y^2$ is the observation error variance</p>
 <span class="n">df</span><span class="p">.</span><span class="n">plot</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"Month"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">"#Passengers"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"k"</span><span class="p">)</span>
 </code></pre></div></div>
 
+<p><img src="/LocalLinearTrend/AirPassengers.pmg" alt="Air Passengers dataset." title="Air Passengers Data" /></p>
+
 <p>This dataset tracks the monthly totals of a US airline passengers from 1949 to 1960. The time series displays a rising trend with multiplicative seasonality.</p>
 
 <p>In stan we can write out model as follows:</p>
@@ -270,8 +272,6 @@ model {
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p><img src="/image/LocalLinearTimeSeries" alt="LLT model fit for the Air Passengers dataset." title="Initital Tit" /></p>
-
 <p>We can measure our in sample fit with the following quantities:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fitted_values</span> <span class="o">=</span> <span class="n">u_mean</span>
@@ -352,7 +352,7 @@ generated quantities {
 """</span>
 </code></pre></div></div>
 
-<p>Here the Generated Quantities block predicts future states based on previous states (<code class="language-plaintext highlighter-rouge">normal_rng(u_pred[N+i-1], s_u)</code>), then generates observations from those states (<code class="language-plaintext highlighter-rouge">normal_rng(u_pred[N+i], s_x)</code>).</p>
+<p>Here the Generated Quantities block predicts future states based on previous states (<code class="language-plaintext highlighter-rouge">python normal_rng(u_pred[N+i-1], s_u)</code>), then generates observations from those states (<code class="language-plaintext highlighter-rouge">python normal_rng(u_pred[N+i], s_x)</code>).</p>
 
 <p>We can run the model with this code:</p>
 
