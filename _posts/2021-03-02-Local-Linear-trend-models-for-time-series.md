@@ -196,7 +196,7 @@ plt.grid(True)
 plt.show()
 ```
 
-![LLT model fit for the Air Passengers dataset.](image/LocalLinearTimeSeries "Initital Tit")
+![LLT model fit for the Air Passengers dataset.](/image/LocalLinearTimeSeries "Initital Tit")
 
 We can measure our in sample fit with the following quantities:
 
