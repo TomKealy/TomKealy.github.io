@@ -266,16 +266,15 @@ hr {
   margin-bottom: 0.75rem;
 }
 
-.post-content img {
+.article img {
   max-width: 100%;
   height: auto;
   display: block;
   margin: 1.5rem auto;
 }
 
-/* If you want a specific max width for larger screens */
 @media screen and (min-width: 700px) {
-  .post-content img {
-      max-width: 600px;  /* or whatever maximum width you prefer */
+  .article img {
+      max-width: 600px;
   }
 }
