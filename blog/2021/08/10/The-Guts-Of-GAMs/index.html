@@ -1,4 +1,85 @@
-<p>Generalised Additive Models look harder than they actually are. We fit a single dimension GAM from scratch, including generating splines.</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Understanding the Guts of Generalized Additive Models (GAMs) with Hands-on Examples.</title>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta name='description' content='Thomas Kealy is a Data Scientist in Berlin.'>
+    <meta name='keywords' content=''>
+    <meta name='author' content='Thomas Kealy'>
+    
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/trac.css' rel='stylesheet'/>
+    <link href='/css/markdown.css' rel='stylesheet'/>
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    
+    <!-- KaTeX JS -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+<!-- KaTeX Auto-render -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
+</head>
+<body>
+    <div class='content'>
+        <div class='nav'>
+    <ul class='wrap'>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/blog'>Blog</a></li>
+        <li><a href='/feed.xml'>RSS</a></li>
+    </ul>
+</div>
+        <div class='front-matter'>
+            <div class='wrap'>
+                <h1>Understanding the Guts of Generalized Additive Models (GAMs) with Hands-on Examples.</h1>
+                <h4></h4>
+                <div class='bylines'>
+                    <div class='byline'>
+                        <h3>Published</h3>
+                        <p>10 August 2021</p>
+                    </div>
+                </div>
+                <div class='clear'></div>
+            </div>
+        </div>
+        <div class='wrap article'>
+            <div class='post'>
+    <h1 class="post-title">Understanding the Guts of Generalized Additive Models (GAMs) with Hands-on Examples.</h1>
+    
+    <div class="post-metadata">
+        <span class="published-label">PUBLISHED</span>
+        <span class="post-date">10 August 2021</span>
+    </div>
+
+    <div class="post-content">
+        <p>Generalised Additive Models look harder than they actually are. We fit a single dimension GAM from scratch, including generating splines.</p>
 
 <p>This post will explain  the internals of (generalised) additive models (GAMs): how to estimate the feature functions. We first explain <em>why</em> we want to fit additive models, and then we go on to explain how they are estimated in practice via splines (we will also explain what a spline is).  Finally we’ll fit simple splines on wage data, then we’ll go on to fit more complicated splines on some accelerometer data with a highly non-linear realtionship between in the input and the output.</p>
 
@@ -428,3 +509,12 @@ We build the \(f_i\) using a type of function called a spline. Since our data is
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 </code></pre></div></div>
+
+    </div>
+</div>
+
+        </div>
+        
+    </div>
+</body>
+</html>

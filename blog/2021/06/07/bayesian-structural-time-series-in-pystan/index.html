@@ -1,4 +1,85 @@
-<p>Bayesian Structural Time Series let us model time series component by component. Here’s how to do it in Stan.</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bayesian Structural Time Series in pystan.</title>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta name='description' content='Thomas Kealy is a Data Scientist in Berlin.'>
+    <meta name='keywords' content=''>
+    <meta name='author' content='Thomas Kealy'>
+    
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/trac.css' rel='stylesheet'/>
+    <link href='/css/markdown.css' rel='stylesheet'/>
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    
+    <!-- KaTeX JS -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+<!-- KaTeX Auto-render -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
+</head>
+<body>
+    <div class='content'>
+        <div class='nav'>
+    <ul class='wrap'>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/blog'>Blog</a></li>
+        <li><a href='/feed.xml'>RSS</a></li>
+    </ul>
+</div>
+        <div class='front-matter'>
+            <div class='wrap'>
+                <h1>Bayesian Structural Time Series in pystan.</h1>
+                <h4></h4>
+                <div class='bylines'>
+                    <div class='byline'>
+                        <h3>Published</h3>
+                        <p>07 June 2021</p>
+                    </div>
+                </div>
+                <div class='clear'></div>
+            </div>
+        </div>
+        <div class='wrap article'>
+            <div class='post'>
+    <h1 class="post-title">Bayesian Structural Time Series in pystan.</h1>
+    
+    <div class="post-metadata">
+        <span class="published-label">PUBLISHED</span>
+        <span class="post-date">07 June 2021</span>
+    </div>
+
+    <div class="post-content">
+        <p>Bayesian Structural Time Series let us model time series component by component. Here’s how to do it in Stan.</p>
 
 <p>Let \(y_t\) denote observation \(t\) in a real-valued time series. A structural time series model can be described by a pair of equations relating yt to a vector of latent state variables $u_t$</p>
 
@@ -104,3 +185,12 @@ model {
 <p><img src="2021-06-07-bayesian-structural-time-series-in-pystan_files/2021-06-07-bayesian-structural-time-series-in-pystan_7_1.png" alt="png" /></p>
 
 <p>The fit looks ok, but it can definately be improved by adding a seasonal component.</p>
+
+    </div>
+</div>
+
+        </div>
+        
+    </div>
+</body>
+</html>
