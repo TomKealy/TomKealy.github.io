@@ -14,7 +14,7 @@ $$ y = X^T\beta + \varepsilon $$
 
 where
 
-$$ \varepsilon \sim N\left(0, I\right) $$ 
+$$ \varepsilon \sim N\left(0, I\right) $$
 
 and $$X$$ are known as fixed effects coefficients. To define a mixed model, we include a term $$Z^T\eta$$, which corresponds to *random* effects. The model is now:
 
