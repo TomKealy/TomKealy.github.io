@@ -63,7 +63,7 @@ except FileNotFoundError:
 df.plot.scatter(x="Month", y="#Passengers", color="k")
 ```
 
-![Air Passengers dataset.](/LocalLinearTrend/AirPassengers.pmg "Air Passengers Data")
+![Air Passengers dataset.](/assets/images//LocalLinearTrend/AirPassengers.png "Air Passengers Data")
 
 This dataset tracks the monthly totals of a US airline passengers from 1949 to 1960. The time series displays a rising trend with multiplicative seasonality.
 
