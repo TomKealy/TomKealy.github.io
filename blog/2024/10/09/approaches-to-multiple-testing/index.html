@@ -71,13 +71,7 @@ MathJax.Hub.Config({
             </div>
         </div>
         <div class='wrap article'>
-            <div class='post'>    
-    <div class="post-metadata">
-        <span class="post-date">09 October 2024</span>
-    </div>
-
-    <div class="post-content">
-        <p>We show how to handle more than one hypothesis at a time.</p>
+            <p>We show how to handle more than one hypothesis at a time.</p>
 
 <h2 id="introduction">Introduction</h2>
 
@@ -156,8 +150,6 @@ This error is when we leave money on the table. Statistical tests are designed t
 
 <p>A good example is to consider the following situation. You have 11 metrics you would like to compute p-values for in an experiment, with an overall alpha of 0.1. However, for one of them you wish to allocate an alpha of 0.5, and for the rest of them you want to allocate a p-value of 0.005 (0.05/10). This is a perfectly reasonable situation, as it keeps the overall alpha to 0.1 (the sum of all the individual alpha values). You could also extend this: your primary metric gets an alpha of 0.5, some set of secondary metrics gets an alpha of 0.3 (and the p-value thresholds are calculated via the Benjamini-Hochberg procedure) and even more tertiary metrics have an alpha of 0.2 (and the p-value thresholds are calculated via the Benjamini-Hochberg procedure). This tiering strategy is also appropriate. What wouldn’t be appropriate would be leaving the primary metric unadjusted, and still claiming the overall alpha is 0.1. In that case, the overall alpha would be inflated (possibly as high as 0.2).</p>
 
-    </div>
-</div>
         </div>
         
     </div>
