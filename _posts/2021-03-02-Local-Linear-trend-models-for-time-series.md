@@ -201,6 +201,8 @@ plt.grid(True)
 plt.show()
 ```
 
+![Air Passengers dataset.](/assets/images//LocalLinearTrend/PassengersVsPredicted.png "Air Passengers Predictions")
+
 We can measure our in sample fit with the following quantities:
 
 ```python
@@ -217,14 +219,13 @@ print(f'MAE: {mae:.2f}')
 print(f'MAPE: {mape:.2f}%')
 print(f'R²: {r2:.4f}')
 ```
-
 I get:
 
-MSE: 121.76
-RMSE: 11.03
-MAE: 8.12
-MAPE: 2.79%
-R²: 0.9915
+* MSE: 121.76
+* RMSE: 11.03
+* MAE: 8.12
+* MAPE: 2.79%
+* R²: 0.9915
 
 Which indicates a pretty good fit:
 
@@ -232,6 +233,29 @@ Which indicates a pretty good fit:
 * Only 2.79% average percentage error (MAPE)
 
 The low MAPE and high R² suggest the model captures both the trend and seasonal patterns. The RMSE of 11 passengers is quite small given the scale of passenger numbers in the dataset.
+
+We can also plot the distribution of the fitted parameters:
+
+```python
+params_to_plot = ['s_u', 's_v', 's_x']
+fig, axes = plt.subplots(len(params_to_plot), 1, figsize=(30, 10*len(params_to_plot)))
+
+for i, param in enumerate(params_to_plot):
+    # Get values for this parameter
+    param_values = parameters[param]
+    
+    # Plot histogram
+    axes[i].hist(param_values, bins=50)
+    axes[i].set_title(f'Distribution of {param}')
+    axes[i].set_xlabel('Value')
+    axes[i].set_ylabel('Count')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+![Air Passengers dataset.](/assets/images//LocalLinearTrend/fitted_parameters.png "Air Passengers Predictions")
 
 To predict future points, we have to include the extra points in the original stan code:
 
@@ -326,5 +350,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 ```
+
+![Air Passengers dataset.](/assets/images//LocalLinearTrend/Predictions.png "Air Passengers with Predictions")
 
 So, even though our model has a good in-sample fit, the out of sample predictions are very poor! We'll have to do something about that!
