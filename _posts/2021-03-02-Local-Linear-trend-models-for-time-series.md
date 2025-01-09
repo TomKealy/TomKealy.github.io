@@ -201,7 +201,7 @@ plt.grid(True)
 plt.show()
 ```
 
-![Air Passengers dataset.](/assets/images//LocalLinearTrend/PassengersVsPredicted.png "Air Passengers Predictions")
+![Air Passengers dataset.](/assets/images/LocalLinearTrend/PassengersVsPredicted.png "Air Passengers Predictions")
 
 We can measure our in sample fit with the following quantities:
 
@@ -255,7 +255,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-![Air Passengers dataset.](/assets/images//LocalLinearTrend/fitted_parameters.png "Air Passengers Predictions")
+![Fitted Parameters.](/assets/images/LocalLinearTrend/fitted_parameters.png "Fitted parameters.")
 
 To predict future points, we have to include the extra points in the original stan code:
 
@@ -351,6 +351,6 @@ plt.grid(True)
 plt.show()
 ```
 
-![Air Passengers dataset.](/assets/images//LocalLinearTrend/Predictions.png "Air Passengers with Predictions")
+![Air Passengers predictions.](/assets/images//LocalLinearTrend/Predictions.png "Air Passengers with Predictions")
 
 So, even though our model has a good in-sample fit, the out of sample predictions are very poor! We'll have to do something about that!
