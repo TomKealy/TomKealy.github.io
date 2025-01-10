@@ -1,8 +1,8 @@
 ---
 layout: default
 title:  "A short introduction to Martingales"
-subtitle: Calculations for 
-date:   2021-03-10
+subtitle: One way to think about dependent random variables.
+date:   2025-03-10
 categories: time-series
 ---
 
