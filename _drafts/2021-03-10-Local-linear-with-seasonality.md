@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Local Linear Trend models with seasonality"
 date:   2021-03-10
 categories: time-series
