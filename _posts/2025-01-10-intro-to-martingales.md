@@ -18,7 +18,7 @@ You should approach your problem from the point of view that "process $$X_t$$ is
 
 ## The maths, unfortunately
 
-We denote our [sample space](https://en.wikipedia.org/wiki/Probability_space) as $S$ (for example $S = {+1, -1}$). Let $F_n$ be a filtration of the event space (in our example $ F_0 = {{}, {+1}, {-1}, {+1, -1}}$). 
+We denote our [sample space](https://en.wikipedia.org/wiki/Probability_space) as $S$ (for example $S = {+1, -1}$). Let $F_n$ be a filtration of the event space. 
 
 Let $X_0, X_1, X_2, \dots$ be a sequence of random variables. We will imagine that we are acquiring information about $S$ in stages. The random variable $X_n$ is what we know at stage $n$. If $Z$ is any random variable, let
 
