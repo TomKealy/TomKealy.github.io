@@ -2,13 +2,15 @@ source "https://rubygems.org"
 
 gem "jekyll", "~> 4.2.0"
 gem "webrick"
-gem 'jekyll-katex'
+
 
 group :jekyll_plugins do
   gem "jekyll-scholar"
   gem "jekyll-sitemap"
   gem "jekyll-feed"
   gem "jekyll-seo-tag"
+  gem "jekyll_picture_tag"
+  gem "jekyll-katex"
 end
 
 platforms :mingw, :x64_mingw, :mswin, :jruby do

@@ -2,7 +2,7 @@
 layout: default
 title:  "A short introduction to Martingales"
 subtitle: One way to think about dependent random variables.
-date:   2025-03-10
+date:   2025-01-10
 categories: time-series
 ---
 
