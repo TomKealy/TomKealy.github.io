@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hypothesis Testing by Betting</title>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta name='description' content='Gregory Gundersen is a PhD candidate at Princeton.'>
+    <meta name='keywords' content=''>
+    <meta name='author' content='Gregory Gundersen'>
+    
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/trac.css' rel='stylesheet'/>
+    <link href='/css/markdown.css' rel='stylesheet'/>
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    
+    <script type='text/x-mathjax-config'>
+MathJax.Hub.Config({
+  jax: ['input/TeX', 'output/HTML-CSS'],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+    extensions: ['color.js']
+  },
+  messageStyle: 'none',
+  'HTML-CSS': { preferredFont: 'TeX', availableFonts: ['STIX','TeX'] }
+});
+</script>
+
+<script src='//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML' type='text/javascript'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+</head>
+<body>
+    <div class='content'>
+        <div class='nav'>
+    <ul class='wrap'>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/blog'>Blog</a></li>
+        <li><a href='/feed.xml'>RSS</a></li>
+    </ul>
+</div>
+        <div class='front-matter'>
+            <div class='wrap'>
+                <h1>Hypothesis Testing by Betting</h1>
+                <h4>A simpler alternative to $p$-values.</h4>
+                <div class='bylines'>
+                    <div class='byline'>
+                        <h3>Published</h3>
+                        <p>13 January 2025</p>
+                    </div>
+                </div>
+                <div class='clear'></div>
+            </div>
+        </div>
+        <div class='wrap article'>
+            <h1 id="introduction">Introduction</h1>
+
+<p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
+
+<p>A simpler alternative to $p$-values is to report the result of a bet against the null hypothesis. This is <strong>testing by betting.</strong> This method is closely related to the likelihood method, and leads to alternatives for statistical confidence and power.</p>
+
+<p>This post is a longer exposition of <em>Testing by Betting</em>, Gleen Schafer (2021) <a class="citation" href="#shafer2021testing">(Shafer, 2021)</a>. The point was to include more exposition and some code. Any resemblence to the original is therefore natural (and in some cases I’ve jsut changed the language);</p>
+
+<p>Testing by betting is straightforward. First we select a payoff (which can be either be zero or a positive number). Then we buy this payoff for its (hypothesized) expected value. If this bet multiplies the money it risks, we have evidence against the hypothesis. The factor–called the <strong>betting score</strong>–measures the strength of this evidence. Multiplying our money by 5 merits attention; multiplying it by 100 or by 1000 might be considered conclusive.</p>
+
+<p>Testing by betting is simpler than reporting a $p$-value, because a $p$-value represents the probability of obtaining test results at least as extreme as those observed, assuming the null hypothesis is true. The key phrase here is “at least as extreme”–you’re not just looking at the probability of getting exactly your observed result, but rather the probability of getting your result or any more extreme result. A $p$-value is thus the result of a <em>family</em> of tests:</p>
+
+<ul>
+  <li>For any observed test statistic, you need to consider all the possible outcomes that would be “more extreme”</li>
+  <li>You have to decide what counts as “more extreme” (one-tailed vs two-tailed tests)</li>
+  <li>You’re essentially conducting multiple implicit hypothesis tests - one for your actual result and one for each more extreme possible outcome.</li>
+</ul>
+
+<p>The betting score  is simpler because it just looks at one specific bet and its outcome–did you win or lose, and by how much? There’s no need to consider a family of hypothetical outcomes or define what counts as “more extreme.” To take an example:</p>
+
+<ol>
+  <li>With a $p$-value: If you observe a z-score of 2.5, you need to calculate the probability of observing a z-score ≥ 2.5 (or ≤ -2.5 for a two-tailed test)</li>
+  <li>With a betting score: You just calculate how much money your specific bet made or lost (e.g. 10x the initial bet).</li>
+</ol>
+
+<p>Betting scores also have a number of other advantages:</p>
+
+<ol>
+  <li>There is less uncertainty when you get a large betting score, compared with a small $p$-value. You will not forget that a long shot can succeed by sheer luck.</li>
+  <li>When we make a bet, we create an implied alternative hypothesis. The betting score is the likelihood ratio with respect to this alternative. What the betting score means is aligned with what a likelihood ratio means.</li>
+  <li>As well as implying an alternative hypothsis, the bet also implies a <strong>target.</strong> This is the value we desire to make the bet “worthwhile.” Implied targets are useful than power calculations, because an implied target along with an actual betting score tells a coherent story. To interpret a statistical test, you need to know the test’s actual statistical power. This, in turn, requires a fixed significance level. In traditional statistical inference, there’s a  awkward relationship between power calculations and $p$-values: Power calculations are done before the study; but after running the study, you report a $p$-value, which might be any value between 0 and 1. Betting scores are superior because they have a more coherent narrative -both your planning and your results are in the same units (betting scores for your money).</li>
+  <li>Testing by betting is a more agile approach to science, because you don’t have to plan your entire analysis in advance.</li>
+</ol>
+
+<h1 id="testing-by-betting">Testing by betting</h1>
+
+<p>We are interested in phenomenon which we model with a probability distribution, $P$, with an associated set of random variables. $X$. For example:</p>
+
+<ol>
+  <li>The ammount of traffic per hour at an intersection. We could model this as a <a href="https://en.wikipedia.org/wiki/Poisson_distribution">Poisson</a> distribution, and we want to know the mean parameter.</li>
+  <li>The height of pupils in a school. We could model this as a normal distribution, and we would like know the mean and standard deviation.</li>
+</ol>
+
+<p>We will later see the actual value of the parameter $X$, which we denote $x$. How can we give more nuanced content to our claims (e.g. that traffic intensity is best modelled by a Poisson distribution), and how could we challenge them?</p>
+
+<p>The way we choose to proceed is to interpret our claim as a collection of betting offers with Reality([^1]: You will have to be generous with notion). Reality offers to sell me any payoff $S\left(x\right)$ for its expected value $\mathcal{E}_P\left(x\right)$. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk.</p>
+
+<p>My betting score is:</p>
+
+\[\frac{S\left(x\right)}{\mathcal{E}_P\left(x\right)}\]
+
+<p>The score doesn’t change when I scale my bet, so I can take $\mathcal{E}_P\left(x\right) = 1$, and so the betting score is simply my stake.</p>
+
+<p>The standard way of testing a probability distribution $P$ is to select a significance level $α \in \left(0,1\right)$, usually small, and a set $E$ of possible values of $X$ such that $\mathcal{P}\left(X \in E\right) = \alpha$. The event $E$ is called the rejection region. The probability distribution $P$ is discredited (or rejected) if the actual value $x$ is in $E$.</p>
+
+<p>For example, we could test the mean $X$ of a series of measurements $M_1, M_2, \ldots, M_k$ to see if the distribution $P$ has mean zero or not. We believe that $X$ comes from a standard normal distribution, and so we test (with a $z$-test for instance) that $X$ is in the region $X \in \left(-1.96, 1.96\right)$ (i.e. $X$ is within 2 standard deviations of the standard normal distribution). If we see a $x$ (the actual mean) that is bigger than 1.96 (i.e. $\mid x\mid &gt; 1.96$) then we conclude that the $X$ does not have mean 0.</p>
+
+<p>Textbooks seldom make the idea explicit, a standard test is often thought of as a bet: I pay $1 for the payoff $S_E$ defined by</p>
+
+\[\begin{eqnarray} 
+S_E     \nonumber \\
+&amp;=&amp; \frac{1}{\alpha} \text{ if} x \in E \nonumber \\
+&amp; 0 \text{ otherwise}   \nonumber
+\end{eqnarray}\]
+
+<p>If $E$ happens, I have multiplied the $1 I risked by $\frac{1}/\alpha}$. This makes standard testing a special case of testing by betting, the special case where the bet is all-or-nothing. In return for $1, I get either $$\frac{1}/\alpha}$ or $0.</p>
+
+<p>So a betting score $S\left(x\right)$ appraises the evidence against $P$. The larger $S\left(x\right)$, the stronger the evidence.</p>
+
+<h2 id="betting-scores-are-likelihood-ratios">Betting scores are likelihood ratios</h2>
+
+<p>Betting against a hypothesis is equivalent to proposing an alternative hypothesis $Q$ and comparing likelihoods. We show this this by first showing a betting score is a likelihood ratio, and then by showing that likelihood ratios are betting scores.</p>
+
+<p>Earlier we defined our betting score as:</p>
+
+\[\frac{S\left(x\right)}{\mathcal{E}_P\left(x\right)}\]
+
+<p>Where our payoff in the bet is denoted by $S\left(x\right)$ and my stake is simplly the expected value $\mathcal{E}_P\left(x\right)$. The betting score is what you win divided by what you paid. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk (i.e. I pay the expected value of this payoff $S$ under probability distribution $P$).</p>
+
+<p>We also noted that the score doesn’t change when I scale my bet (doubling both your payoff and stake gives the same score), so I can take $\mathcal{E}_P\left(y\right) = 1$. The assumption $\mathbb{E}_P(S) = 1$. Another way of saying this is that $\sum_x S(x)P(x) = 1$. Because $S(x)$ and $P(x)$ are:</p>
+
+<ol>
+  <li>nonnegative for all $x$ (and we are assuming that $P &gt; 0$)</li>
+  <li>$\sum_x S(x)P(x) = 1$</li>
+</ol>
+
+<p>$SP$ is a probability distribution. We <em>define</em></p>
+
+\[Q := SP\]
+
+<p>and call $Q$ the alternative <em>implied</em> by the bet $S$. If $P$ is wrong and $Q$ is actually the true distribution, then your bet would be expected to make money. So $Q$ represents what you “think might actually be true” when you make your bet against $P$.</p>
+
+<p>Because we assumed $P(x) &gt; 0$ for all $x$, we can rearrange, and express our payoff as the ratio of these two probability distributions:</p>
+
+\[S(x) = \frac{Q(x)}{P(x)}\]
+
+<p>i.e. the betting score is a simply a likelihood ratio.</p>
+
+<p>A likelihood ratio is a betting score.</p>
+
+<p>If you have two probability distributions $Q$ and $P$ then the likelihood ration $S = Q/P$ satisfies the requirements for a bet:</p>
+
+<ol>
+  <li>$Q/P$ is nonnegative since probabilities are nonnegative.</li>
+  <li>$\sum_x \frac{Q(x)}{P(x)}P(x) = \sum_y Q(x) = 1$. I.e. The expected value of the bet under $P$ is 1.</li>
+</ol>
+
+<p>expected value of this bet under $Q$ is nonnegative: $\mathbb{E}_Q(S) \geq 1$ ($\mathbb{E}_Q(S)$ is how much you expect to win if $Q$ is actually true).</p>
+
+<p>In fact $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. Since $S = Q/P$, we can write $\mathbb{E}_Q(S) = \sum_x S(x)Q(x)$. We substitute $S = Q/P$:</p>
+
+\[\mathbb{E}_Q(S) &amp;=&amp; \sum_x \frac{Q(x)}{P(x)}Q(x) \\
+&amp;= \sum_y \frac{Q(x)^2}{P(x)}\]
+
+<p>Let’s consider $\mathbb{E}_P(S^2)$:</p>
+
+\[\mathbb{E}_P(S^2) = \sum_y S(x)^2P(x)\]
+
+<p>Again substitute $S = Q/P$:</p>
+
+\[\mathbb{E}_P(S^2) = \sum_x (\frac{Q(x)}{P(x)})^2P(x) \\
+&amp;= \sum_y \frac{Q(y)^2}{P(y)^2}P(y) \\
+&amp;= \sum_y \frac{Q(y)^2}{P(y)}\\\]
+
+<p>We can see that this is the same as what we got for $\mathbb{E}_Q(S)$, thus $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. When we square $S = Q/P$ and multiply by $P$ in $\mathbb{E}_P(S^2)$, we end up with the same expression as when we multiply $S = Q/P$ by $Q$ in $\mathbb{E}_Q(S)$.</p>
+
+<p>A consequence of this insight is that because we know that $\mathbb{E}_P(S) = 1$ (this was one of our initial assumptions about the betting score), $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$ implies:</p>
+
+\[\mathbb{E}_Q(S) - 1
+&amp;=&amp; \mathbb{E}_P(S^2) - 1$ (substituting \mathbb{E}_Q(S) = \mathbb{E}_P(S^2)) \\
+&amp;= \mathbb{E}_P(S^2) - (\mathbb{E}_P(S))^2$ (substituting 1 = \mathbb{E}_P(S) (just square both sides)) \\
+&amp;= \text{Var}_P(S)\]
+
+<p>Here $\mathbb{E}_Q(S) - 1$ represents what I win if I am right, and not “Reality” ($P$). i.e the more variable your betting score is under the null hypothesis $P$, the more you stand to gain if your alternative $Q$ is actually true. If you make a more extreme bet (higher variance), you have more to gain if you’re right.</p>
+
+<h2 id="how-much-should-i-bet">How much should I bet?</h2>
+
+<p>We began with your claiming that $P$ describes the phenomenon $X$ and my making a bet $S$ satisfying $S \geq 0$ and, for simplicity, $\mathbb{E}_P(S) = 1$. Suppose, however, that I do have an alternative $Q$ in mind. I have a hunch that $Q$ is a valid description of $X$. In this case, should I use $\fra{Q}/{P}$ as my bet?</p>
+
+<p>There are two schools of thought: opportunistic and repeated testing, and testing in a single ‘go.’ The first justification is related to <a href="https://en.wikipedia.org/wiki/Kelly_criterion">Kelly Betting</a>, and the second is related to the <a href="https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma">Neyman-Pearson Lemma</a>.</p>
+
+<h3 id="kelly-betting">Kelly Betting</h3>
+<p>The thought that I should is supported by Gibbs’s inequality([^2]: The standard form of Gibbs’s inequality (also known as the information inequality) states that:
+$-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent) 
+says that</p>
+
+\[\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P} \\]
+
+<p>for <strong>any</strong> probability distribution $R$ for $Y$. Because any bet $S$ is of the form $R/P$ for some such $R$, Gibb’s inequality tells us that $\mathbb{E}_Q(\ln S)$ is maximized over $S$ by setting $S := Q/P$. This tells that if we have a hunch that $Q$ is more correct than $P$ (or any other probability distribution $R$) then we should be $\frac{Q}{P}.</p>
+
+<p>The quanitiy $\mathbb{E}_Q(\ln(Q/P))$ is known as the Kullback-Leibler divergence between $Q$ and $P$. It is the mean number of bits of information you gain when $Q$ is the true encoding distribution and not $P.</p>
+
+<p>Why should I choose $S$ to maximize $\mathbb{E}_Q(\ln S)$? Why not maximize $\mathbb{E}_Q(S)$? Or perhaps $Q(S \geq 20)$ or $Q(S \geq 1/\alpha)$ for some other significance level $\alpha$?</p>
+
+<p>Maximizing $\mathbb{E}(\ln S)$ makes sense in a scientific context where we combine successive betting scores by multiplication. i.e. when we are testing opportunistically. When $S$ is the product of many successive factors, maximizing $\mathbb{E}(\ln S)$ maximizes $S$’s rate of growth. Logarithms are <em>additive</em> in repeated bets.</p>
+
+<h3 id="neyman-pearson">Neyman-Pearson</h3>
+<p>Conversely choosing $S$ to maximize $Q(S \geq 1/\alpha)$ is appropriate when the hypothesis being tested will not be tested again.</p>
+
+<p>For a given significance level $\alpha$, we choose a rejection region $E$ such that $Q(x)/P(x)$ is at least as large for all $x \in E$ as for any $x \notin E$, where $Q$ is an alternative hypothesis.</p>
+
+<p>Let us call the bet $S_E$ with this choice of $E$ the <em>level-$\alpha$ bet</em> against $P$ with respect to $Q$. The <em>Neyman-Pearson lemma</em> says that this choice of $E$ maximizes</p>
+
+\[Q(\text{test rejects }P) = Q(X \in E) = Q(S_E(X) \geq 1/\alpha)\]
+
+<p>which we call the <em>power</em> of the test with respect to $Q$. In fact, $S_E$ with this choice of $E$ maximizes</p>
+
+\[Q(S(Y) \geq 1/\alpha)\]
+
+<p>over all bets $S$, not merely over all-or-nothing bets. <a class="citation" href="#shafer2021testing">(Shafer, 2021)</a> offers a proof of this statement.</p>
+
+<h2 id="implied-targets">Implied targets</h2>
+
+<p>When I get my betting score for a particular bet $S$ against $P$, how do I know if the score is good or not?</p>
+
+<p>Choosing a payoff $S$ defines an alternative probability distribution, $Q : = SP$, and with $S$ being the bet against $P$ that maximizes $\mathbb{E}<em>Q(\ln S)$. We might hope for a betting score whose _logarithm</em> is in the ballpark of $\mathbb{E}_Q(\ln S)$. I.e a betting score like:</p>
+
+\[S_{*} : = \exp{\mathbb{E}_Q(\ln S)}$\]
+
+<p>We call $S_{∗}$ the <strong>implied target</strong> of the bet $S$. The implied target of the all-or-nothing bet is always $\frac{1}{\alpha}$.</p>
+
+<p>The notion of an implied target is analogous to the notion of statistical power with respect to a particular alternative. But it has the advantage that we cannot avoid discussing it by refusing to specify a particular alternative. The implied alternative $Q$ and the implied target $S_{∗}$ are determined as soon as the distribution $P$ and the bet $S$ are specified. The implied target can be computed without even mentioning $Q$, because:</p>
+
+\[\mathbb{E}_Q(\ln S) = \sum_x Q(x)\ln S(x) = \sum_y P(x)S(x)\ln S(x) = \mathbb{E}_P(S\ln S)\]
+
+<p>(def expectation, then def of $Q$, collect like terms). i.e. this is expected log betting score under _either $Q$ (as $\mathbb{E}_Q(\ln S)$) or $P$ (as $\mathbb{E}_P(S\ln S)$).</p>
+
+<h1 id="examples">Examples</h1>
+
+<p>Here’s the example in markdown:</p>
+
+<p><strong>Example 1.</strong></p>
+
+<p>Suppose $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 1 and standard deviation 10, and we observe $x = 30$.</p>
+
+<ol>
+  <li>
+    <p>Statistician A simply calculates a p-value: $P(X \geq 30) \approx 0.00135$. She concludes that $P$ is strongly discredited.</p>
+  </li>
+  <li>
+    <p>Statistician B uses the Neyman-Pearson test with significance level $\alpha = 0.05$, which rejects $P$ when $x &gt; 16.5$. Its power is only about 6%([^3: To find the power, we need to calculate: 
+$Q(X &gt; 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
+We can standardize this:
+Under $Q$: $X \sim N(1, 100)$
+$$
+P(X &gt; 16.5) &amp;=&amp; P(\frac{X-1}{10} &gt; \frac{16.5-1}{10})
+&amp;= P(Z &gt; 1.55)$ where $Z$ is standard normal
+&amp;= 1 - \Phi(1.55)
+&amp;\approx 0.06 or 6\%]).</p>
+  </li>
+</ol>
+
+<p>Seeing $x = 30$, it does reject $P$. Had she formulated her test as a bet, she would have multiplied the money she risked by 20.</p>
+
+<ol>
+  <li>Statistician C uses the bet $S$ given by:</li>
+</ol>
+
+\[S(y) := \frac{q(x)}{p(x)} = \frac{\sqrt{10^2\pi}\exp(-(x-1)^2/200)}{\sqrt{10^2\pi}\exp(-x^2/200)} = \exp(\frac{2x-1}{200})\]
+
+<p>So</p>
+
+\[\mathbb{E}_Q(\ln(S)) = \frac{1}{200} = \frac{1}{200}\]
+
+<p>I.e. the implied target is $\exp(1/200) \approx 1.005$. She does a little better than this very low target; she multiplies the money she risked by $\exp(59/200) \approx 1.34$.</p>
+
+<p>The power and the implied target both told us in advance that the study was a waste of time. The betting score of 1.34 confirms that little was accomplished, while the low $p$-value and the Neyman-Pearson rejection of $P$ give a misleading verdict in favour of $Q$.</p>
+
+<h1 id="hypotheis-testing-and-code">Hypotheis Testing and Code</h1>
+
+        </div>
+        
+    </div>
+</body>
+</html>
