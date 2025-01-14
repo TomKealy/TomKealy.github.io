@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T15:54:06+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T15:56:43+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
 
@@ -49,7 +49,7 @@
 
 \[\frac{S\left(x\right)}{\mathcal{E}_P\left(x\right)}\]
 
-<p>The score doesn’t change when I scale my bet, so I can take $\mathcal{E}_P\left(x\right) = 1$, and so the betting score is simply my stake.</p>
+<p>The score doesn’t change when I scale my bet, so I can take $\mathcal{E}_P\left(x\right) = 1$, and so the betting score is simply my payoff.</p>
 
 <p>The standard way of testing a probability distribution $P$ is to select a significance level $α \in \left(0,1\right)$, usually small, and a set $E$ of possible values of $X$ such that $\mathcal{P}\left(X \in E\right) = \alpha$. The event $E$ is called the rejection region. The probability distribution $P$ is discredited (or rejected) if the actual value $x$ is in $E$.</p>
 
@@ -57,11 +57,12 @@
 
 <p>Textbooks seldom make the idea explicit, a standard test is often thought of as a bet: I pay $1 for the payoff $S_E$ defined by</p>
 
-\[\begin{eqnarray} 
-S_E     \nonumber \\
-&amp;=&amp; \frac{1}{\alpha} \text{ if} x \in E \nonumber \\
-&amp; 0 \text{ otherwise}   \nonumber
-\end{eqnarray}\]
+\[\begin{aligned}
+S_E &amp;= \begin{cases}
+\frac{1}{\alpha} &amp; \text{if } x \in E \\
+0 &amp; \text{otherwise}
+\end{cases}
+\end{aligned}\]
 
 <p>If $E$ happens, I have multiplied the $1 I risked by $\frac{1}/\alpha}$. This makes standard testing a special case of testing by betting, the special case where the bet is all-or-nothing. In return for $1, I get either $$\frac{1}/\alpha}$ or $0.</p>
 
@@ -110,8 +111,8 @@ S_E     \nonumber \\
 <p>In fact $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. Since $S = Q/P$, we can write $\mathbb{E}_Q(S) = \sum_x S(x)Q(x)$. We substitute $S = Q/P$:</p>
 
 \[\begin{align*}
-\mathbb{E}_Q(S) &amp;=&amp; \sum_x \frac{Q(x)}{P(x)}Q(x) \\
-&amp;= \sum_y \frac{Q(x)^2}{P(x)}
+\mathbb{E}_Q(S) &amp;= \sum_x \frac{Q(x)}{P(x)}Q(x) \\
+&amp;= \sum_x \frac{Q(x)^2}{P(x)}
 \end{align*}\]
 
 <p>Let’s consider $\mathbb{E}_P(S^2)$:</p>
@@ -121,9 +122,9 @@ S_E     \nonumber \\
 <p>Again substitute $S = Q/P$:</p>
 
 \[\begin{align*}
-\mathbb{E}_P(S^2) = \sum_x (\frac{Q(x)}{P(x)})^2P(x) \\
-&amp;= \sum_y \frac{Q(y)^2}{P(y)^2}P(y) \\
-&amp;= \sum_y \frac{Q(y)^2}{P(y)}\\
+\mathbb{E}_P(S^2) &amp;= \sum_x \left(\frac{Q(x)}{P(x)}\right)^2P(x) \\
+&amp;= \sum_x \frac{Q(x)^2}{P(x)^2}P(x) \\
+&amp;= \sum_x \frac{Q(x)^2}{P(x)}
 \end{align*}\]
 
 <p>We can see that this is the same as what we got for $\mathbb{E}_Q(S)$, thus $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. When we square $S = Q/P$ and multiply by $P$ in $\mathbb{E}_P(S^2)$, we end up with the same expression as when we multiply $S = Q/P$ by $Q$ in $\mathbb{E}_Q(S)$.</p>
