@@ -237,14 +237,9 @@ The power and the implied target both told us in advance that the study was a wa
 
 [^1]: You will have to be generous with notions here.
 
-[^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent.
+[^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$.
 
-[^3]: To find the power, we need to calculate:
-   $Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
-   
-   We can standardize this:
-   Under $Q$: $X \sim N(1, 100)$
-   
+[^3]: To find the power, we need to calculate $Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$.
    $$
    \begin{align*}
    P(X > 16.5) &= P(\frac{X-1}{10} > \frac{16.5-1}{10}) \\
