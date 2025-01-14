@@ -247,9 +247,6 @@ Where $\mathcal{K}$ is our final capital.
 The ```BettingTest``` class below implements this Protocol.
 
 ```python
-import numpy as np
-from scipy import stats
-
 class BettingTest:
     def __init__(self, null_mean=0, null_std=1):
         """
@@ -284,7 +281,11 @@ class BettingTest:
         implied_target = np.exp(np.mean(log_scores))
         
         return betting_score, implied_target
+```
 
+We can use the code like this:
+
+```python
 if __name__ == "__main__":
     np.random.seed(42)
     
@@ -528,12 +529,4 @@ if __name__ == "__main__":
 
 [^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$.
 
-[^3]: To find the power, we need to calculate $Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$.
-   $$
-   \begin{align*}
-   P(X > 16.5) &= P(\frac{X-1}{10} > \frac{16.5-1}{10}) \\
-   &= P(Z > 1.55) \text{ where } Z \text{ is standard normal} \\
-   &= 1 - \Phi(1.55) \\
-   &\approx 0.06 \text{ or } 6\%
-   \end{align*}
-   $$
+[^3]: To find the power, we need to calculate $Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$. $ P(X > 16.5) = P(\frac{X-1}{10} > \frac{16.5-1}{10}) = P(Z > 1.55) \text{ where } Z \text{ is standard normal} \\= 1 - \Phi(1.55) \approx 0.06 \text{ or } 6\%$
