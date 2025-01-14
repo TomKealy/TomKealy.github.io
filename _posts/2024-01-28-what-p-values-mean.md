@@ -1,11 +1,10 @@
 ---
 layout: default
-title: “What p-values really mean“
+title: What p-values really mean
+subtitle: Most people get _p_-values wrong. This is how to understand and apply them correctly.
 categories: statistics, hypothesis testing
 bibliography: references.bib
 ---
-
-Most people get _p_-values wrong. This is how to understand and apply them correctly.
 
 ## Introduction
 
@@ -15,7 +14,7 @@ A statistical hypothesis test is an algorithm used to calculate a test statistic
 
 The above discussion is mostly concerned with how well the data fits the model, and not whether the hypotheses in question are true. Statistics alone cannot answer such questions. Because the data you collect can be consistent with many similar hypotheses, statistics can only tell you which hypothesis could best have generated the data. Not whether the hypotheses were true. Data analysis alone cannot tell you whether the government program was a success, whether the drug should be prescribed to patients, or whether the website really is better with this new design. Statistics can tell you how many people were saved from poverty, how effective the drug is, or whether more people buy your products after a website redesign.
 
-This might be why p-values are the most misunderstood, misinterpreted, and occasionally miscalculated of statistical quantities. No matter how hard statisticians try, what the p-value really means hasn’t broken through to the wider scientific consciousness. In fact, p-values are so difficult to interpret that when the Journal of the American Medical Association surveyed its members in 2007 about how to interpret p-values, none of the available options were correct {% cite windish2007medicine %}..
+This might be why p-values are the most misunderstood, misinterpreted, and occasionally miscalculated of statistical quantities. No matter how hard statisticians try, what the p-value really means hasn’t broken through to the wider scientific consciousness. In fact, p-values are so difficult to interpret that when the Journal of the American Medical Association surveyed its members in 2007 about how to interpret p-values, none of the available options were correct {% cite windish2007medicine %}.
 
 Applied researchers are certainly not to blame for misinterpreting p-values: p-values are, after all,  the problem child of statistics—a quantity straightforward to calculate but philosophically and practically difficult to interpret. That being said, we still conduct experiments so we still have to interpret their outcomes—that means we have to interpret p-values.
 
