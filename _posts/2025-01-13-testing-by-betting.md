@@ -51,7 +51,7 @@ $$
 \frac{S\left(x\right)}{\mathcal{E}_P\left(x\right)}
 $$
 
-The score doesn't change when I scale my bet, so I can take $\mathcal{E}_P\left(x\right) = 1$, and so the betting score is simply my stake.
+The score doesn't change when I scale my bet, so I can take $\mathcal{E}_P\left(x\right) = 1$, and so the betting score is simply my payoff.
 
 The standard way of testing a probability distribution $P$ is to select a significance level $α \in \left(0,1\right)$, usually small, and a set $E$ of possible values of $X$ such that $\mathcal{P}\left(X \in E\right) = \alpha$. The event $E$ is called the rejection region. The probability distribution $P$ is discredited (or rejected) if the actual value $x$ is in $E$.
 
@@ -59,11 +59,14 @@ For example, we could test the mean $X$ of a series of measurements $M_1, M_2, \
 
 Textbooks seldom make the idea explicit, a standard test is often thought of as a bet: I pay $1 for the payoff $S_E$ defined by
 
-$$\begin{eqnarray} 
-S_E     \nonumber \\
-&=& \frac{1}{\alpha} \text{ if} x \in E \nonumber \\
-& 0 \text{ otherwise}   \nonumber
-\end{eqnarray}$$
+$$
+\begin{aligned}
+S_E &= \begin{cases}
+\frac{1}{\alpha} & \text{if } x \in E \\
+0 & \text{otherwise}
+\end{cases}
+\end{aligned}
+$$
 
 If $E$ happens, I have multiplied the $1 I risked by $\frac{1}/\alpha}$. This makes standard testing a special case of testing by betting, the special case where the bet is all-or-nothing. In return for $1, I get either $\$\frac{1}/\alpha}$ or $0.
 
@@ -115,8 +118,8 @@ In fact $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. Since $S = Q/P$, we can write $\m
 
 $$
 \begin{align*}
-\mathbb{E}_Q(S) &=& \sum_x \frac{Q(x)}{P(x)}Q(x) \\
-&= \sum_y \frac{Q(x)^2}{P(x)}
+\mathbb{E}_Q(S) &= \sum_x \frac{Q(x)}{P(x)}Q(x) \\
+&= \sum_x \frac{Q(x)^2}{P(x)}
 \end{align*}
 $$
 
@@ -130,9 +133,9 @@ Again substitute $S = Q/P$:
 
 $$
 \begin{align*}
-\mathbb{E}_P(S^2) = \sum_x (\frac{Q(x)}{P(x)})^2P(x) \\
-&= \sum_y \frac{Q(y)^2}{P(y)^2}P(y) \\
-&= \sum_y \frac{Q(y)^2}{P(y)}\\
+\mathbb{E}_P(S^2) &= \sum_x \left(\frac{Q(x)}{P(x)}\right)^2P(x) \\
+&= \sum_x \frac{Q(x)^2}{P(x)^2}P(x) \\
+&= \sum_x \frac{Q(x)^2}{P(x)}
 \end{align*}
 $$
 
