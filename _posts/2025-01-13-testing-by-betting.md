@@ -60,15 +60,13 @@ For example, we could test the mean $X$ of a series of measurements $M_1, M_2, \
 Textbooks seldom make the idea explicit, however a standard test is often thought of as a bet: I pay \$1 for the payoff $S_E$ defined by
 
 $$
-\begin{aligned}
-S_E &= \begin{cases}
+S_E = \begin{cases}
 \frac{1}{\alpha} & \text{if } x \in E \\
 0 & \text{otherwise}
 \end{cases}
-\end{aligned}
 $$
 
-If $E$ happens, I have multiplied the \$1 I risked by $\frac{1}/{\alpha}$. This makes standard testing a special case of testing by betting, the special case where the bet is all-or-nothing. In return for \$1, I get either $\frac{1}/\alpha}$ or \$0.
+If $E$ happens, I have multiplied the \$1 I risked by $\frac{1}{\alpha}$. This makes standard testing a special case of testing by betting, the special case where the bet is all-or-nothing. In return for \$1, I get either $\frac{1}{\alpha}$ or \$0.
 
 So a betting score $S\left(x\right)$ appraises the evidence against $P$. The larger $S\left(x\right)$, the stronger the evidence.
 
