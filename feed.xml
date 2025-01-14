@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T12:39:57+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T12:50:42+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
 
@@ -43,7 +43,7 @@
 
 <p>We will later see the actual value of the parameter $X$, which we denote $x$. How can we give more nuanced content to our claims (e.g. that traffic intensity is best modelled by a Poisson distribution), and how could we challenge them?</p>
 
-<p>The way we choose to proceed is to interpret our claim as a collection of betting offers with Reality([^1]: You will have to be generous with notion). Reality offers to sell me any payoff $S\left(x\right)$ for its expected value $\mathcal{E}_P\left(x\right)$. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk.</p>
+<p>The way we choose to proceed is to interpret our claim as a collection of betting offers with Reality<sup id="fnref:1"><a href="#fn:1" class="footnote" rel="footnote" role="doc-noteref">1</a></sup>. Reality offers to sell me any payoff $S\left(x\right)$ for its expected value $\mathcal{E}_P\left(x\right)$. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk.</p>
 
 <p>My betting score is:</p>
 
@@ -140,9 +140,7 @@ S_E     \nonumber \\
 <p>There are two schools of thought: opportunistic and repeated testing, and testing in a single ‘go.’ The first justification is related to <a href="https://en.wikipedia.org/wiki/Kelly_criterion">Kelly Betting</a>, and the second is related to the <a href="https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma">Neyman-Pearson Lemma</a>.</p>
 
 <h3 id="kelly-betting">Kelly Betting</h3>
-<p>The thought that I should is supported by Gibbs’s inequality([^2]: The standard form of Gibbs’s inequality (also known as the information inequality) states that:
-$-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent) 
-says that</p>
+<p>The thought that I should is supported by Gibbs’s inequality which says that<sup id="fnref:2"><a href="#fn:2" class="footnote" rel="footnote" role="doc-noteref">2</a></sup>:</p>
 
 \[\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P} \\]
 
@@ -198,15 +196,7 @@ says that</p>
     <p>Statistician A simply calculates a p-value: $P(X \geq 30) \approx 0.00135$. She concludes that $P$ is strongly discredited.</p>
   </li>
   <li>
-    <p>Statistician B uses the Neyman-Pearson test with significance level $\alpha = 0.05$, which rejects $P$ when $x &gt; 16.5$. Its power is only about 6%([^3: To find the power, we need to calculate: 
-$Q(X &gt; 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
-We can standardize this:
-Under $Q$: $X \sim N(1, 100)$
-$$
-P(X &gt; 16.5) &amp;=&amp; P(\frac{X-1}{10} &gt; \frac{16.5-1}{10})
-&amp;= P(Z &gt; 1.55)$ where $Z$ is standard normal
-&amp;= 1 - \Phi(1.55)
-&amp;\approx 0.06 or 6\%]).</p>
+    <p>Statistician B uses the Neyman-Pearson test with significance level $\alpha = 0.05$, which rejects $P$ when $x &gt; 16.5$. Its power is only about 6%[^3].</p>
   </li>
 </ol>
 
@@ -226,7 +216,28 @@ P(X &gt; 16.5) &amp;=&amp; P(\frac{X-1}{10} &gt; \frac{16.5-1}{10})
 
 <p>The power and the implied target both told us in advance that the study was a waste of time. The betting score of 1.34 confirms that little was accomplished, while the low $p$-value and the Neyman-Pearson rejection of $P$ give a misleading verdict in favour of $Q$.</p>
 
-<h1 id="hypotheis-testing-and-code">Hypotheis Testing and Code</h1>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">A short introduction to Martingales</title><link href="http://gregorygundersen.com/blog/2025/01/10/intro-to-martingales/" rel="alternate" type="text/html" title="A short introduction to Martingales" /><published>2025-01-10T00:00:00+00:00</published><updated>2025-01-10T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/10/intro-to-martingales</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/10/intro-to-martingales/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<h1 id="hypotheis-testing-and-code">Hypotheis Testing and Code</h1>
+
+<p>$-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent
+[^3]: To find the power, we need to calculate: 
+$Q(X &gt; 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
+We can standardize this:
+Under $Q$: $X \sim N(1, 100)$
+$$
+P(X &gt; 16.5) &amp;=&amp; P(\frac{X-1}{10} &gt; \frac{16.5-1}{10})
+&amp;= P(Z &gt; 1.55)$ where $Z$ is standard normal
+&amp;= 1 - \Phi(1.55)
+&amp;\approx 0.06 or 6\%]</p>
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1">
+      <p>You will have to be generous with notions here. <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>The standard form of Gibbs’s inequality (also known as the information inequality) states that: <a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">A short introduction to Martingales</title><link href="http://gregorygundersen.com/blog/2025/01/10/intro-to-martingales/" rel="alternate" type="text/html" title="A short introduction to Martingales" /><published>2025-01-10T00:00:00+00:00</published><updated>2025-01-10T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/10/intro-to-martingales</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/10/intro-to-martingales/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>Martingales are elegant and powerful tools to study sequences of dependent random variables. It is originated from gambling, where a gambler can adjust the bet according to the previous results.</p>
 
