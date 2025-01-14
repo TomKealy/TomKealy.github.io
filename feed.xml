@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T16:58:07+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T16:58:28+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
 
@@ -189,8 +189,6 @@
 <p>(def expectation, then def of $Q$, collect like terms). i.e. this is expected log betting score under <em>either</em> $Q$ (as $\mathbb{E}<em>Q(\ln S)$) _or</em> $P$ (as $\mathbb{E}_P(S\ln S)$).</p>
 
 <h1 id="examples">Examples</h1>
-
-<p>Here’s the example in markdown:</p>
 
 <p><strong>Example 1.</strong></p>
 
