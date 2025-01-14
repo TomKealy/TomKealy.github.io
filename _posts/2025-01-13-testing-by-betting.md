@@ -146,8 +146,8 @@ A consequence of this insight is that because we know that $\mathbb{E}_P(S) = 1$
 $$
 \begin{align*}
 \mathbb{E}_Q(S) - 1
-&=& \mathbb{E}_P(S^2) - 1$ (substituting \mathbb{E}_Q(S) = \mathbb{E}_P(S^2)) \\
-&= \mathbb{E}_P(S^2) - (\mathbb{E}_P(S))^2$ (substituting 1 = \mathbb{E}_P(S) (just square both sides)) \\
+&= \mathbb{E}_P(S^2) - 1 \quad \text{(substituting }\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)\text{)} \\
+&= \mathbb{E}_P(S^2) - (\mathbb{E}_P(S))^2 \quad \text{(substituting }1 = \mathbb{E}_P(S)\text{)} \\
 &= \text{Var}_P(S)
 \end{align*}
 $$
