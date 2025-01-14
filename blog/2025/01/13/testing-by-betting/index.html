@@ -297,27 +297,22 @@ S_E     \nonumber \\
 
 <h1 id="hypotheis-testing-and-code">Hypotheis Testing and Code</h1>
 
-<p>$Q(X &gt; 16.5)$ where under $Q$, $X \sim N(1, 10^2)$</p>
-
-<p>We can standardize this:
-   Under $Q$: $X \sim N(1, 100)$</p>
-
-\[\begin{align*}
+<p>\(\begin{align*}
    P(X &gt; 16.5) &amp;= P(\frac{X-1}{10} &gt; \frac{16.5-1}{10}) \\
    &amp;= P(Z &gt; 1.55) \text{ where } Z \text{ is standard normal} \\
    &amp;= 1 - \Phi(1.55) \\
    &amp;\approx 0.06 \text{ or } 6\%
-   \end{align*}\]
+   \end{align*}\)</p>
 <div class="footnotes" role="doc-endnotes">
   <ol>
     <li id="fn:1">
       <p>You will have to be generous with notions here. <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
     </li>
     <li id="fn:2">
-      <p>The standard form of Gibbs’s inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent. <a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+      <p>The standard form of Gibbs’s inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. <a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
     </li>
     <li id="fn:3">
-      <p>To find the power, we need to calculate: <a href="#fnref:3" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+      <p>To find the power, we need to calculate $Q(X &gt; 16.5)$ where under $Q$, $X \sim N(1, 10^2)$. <a href="#fnref:3" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
     </li>
   </ol>
 </div>
