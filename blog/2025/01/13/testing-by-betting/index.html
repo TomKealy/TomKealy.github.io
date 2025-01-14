@@ -294,7 +294,17 @@ MathJax.Hub.Config({
 
 <h1 id="hypotheis-testing-and-code">Hypotheis Testing and Code</h1>
 
-<p>Here is Protocol 1</p>
+<p>We now present three implementations of the ideas in <a class="citation" href="#shafer2021testing">(Shafer, 2021)</a>. Firstly we implement a version of Protocol 1:</p>
+
+<blockquote>
+  <p>Protocol 1. Testing a probability distribution
+   Sceptic announces $S: X → \left[0, \infty\right)$ such that $\mathbb{E}_P(S) = 1$. Reality announces $X \in \mathcal{X}$.
+   \mathcal{K}: = $S(x)$.</p>
+</blockquote>
+
+<p>Where $\mathcal{K}$ is our final capital.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">BettingTest</code> class below implements this Protocol.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
@@ -333,34 +343,22 @@ MathJax.Hub.Config({
         <span class="n">implied_target</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_scores</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">betting_score</span><span class="p">,</span> <span class="n">implied_target</span>
-    
-    <span class="k">def</span> <span class="nf">traditional_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
-        <span class="s">"""
-        Perform traditional hypothesis test returning p-value.
-        
-        Parameters:
-        - data: Observed data
-        - alpha: Significance level
-        
-        Returns:
-        - p_value: Two-sided p-value
-        - significant: Whether null hypothesis is rejected
-        """</span>
-        <span class="n">t_stat</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">ttest_1samp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">null_mean</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">p_value</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">&lt;</span> <span class="n">alpha</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
     <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
     
     <span class="n">true_mean</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">null_mean</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">null_std</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">true_mean</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
     
-    <span class="n">bt</span> <span class="o">=</span> <span class="n">BettingTest</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">bt</span> <span class="o">=</span> <span class="n">BettingTest</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="o">=</span><span class="n">null_mean</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="n">null_std</span><span class="p">)</span>
     <span class="n">betting_scores</span><span class="p">,</span> <span class="n">implied_target</span> <span class="o">=</span> <span class="n">bt</span><span class="p">.</span><span class="n">compute_betting_score</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
     <span class="n">final_betting_score</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">betting_scores</span><span class="p">)))</span>
-    <span class="n">p_value</span><span class="p">,</span> <span class="n">is_significant</span> <span class="o">=</span> <span class="n">bt</span><span class="p">.</span><span class="n">traditional_test</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    
+    <span class="n">t_stat</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">ttest_1samp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_mean</span><span class="p">)</span>
+    <span class="n">is_significant</span> <span class="o">=</span> <span class="n">p_value</span> <span class="o">&lt;</span> <span class="n">alpha</span>
+
     <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Results:"</span><span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Sample mean: </span><span class="si">{</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Traditional Test:"</span><span class="p">)</span>
