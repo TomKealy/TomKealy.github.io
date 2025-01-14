@@ -114,8 +114,10 @@ expected value of this bet under $Q$ is nonnegative: $\mathbb{E}_Q(S) \geq 1$ ($
 In fact $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. Since $S = Q/P$, we can write $\mathbb{E}_Q(S) = \sum_x S(x)Q(x)$. We substitute $S = Q/P$:
 
 $$
+\begin{align*}
 \mathbb{E}_Q(S) &=& \sum_x \frac{Q(x)}{P(x)}Q(x) \\
 &= \sum_y \frac{Q(x)^2}{P(x)}
+\end{align*}
 $$
 
 Let's consider $\mathbb{E}_P(S^2)$:
@@ -127,9 +129,11 @@ $$
 Again substitute $S = Q/P$:
 
 $$
+\begin{align*}
 \mathbb{E}_P(S^2) = \sum_x (\frac{Q(x)}{P(x)})^2P(x) \\
 &= \sum_y \frac{Q(y)^2}{P(y)^2}P(y) \\
 &= \sum_y \frac{Q(y)^2}{P(y)}\\
+\end{align*}
 $$
 
 We can see that this is the same as what we got for $\mathbb{E}_Q(S)$, thus $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. When we square $S = Q/P$ and multiply by $P$ in $\mathbb{E}_P(S^2)$, we end up with the same expression as when we multiply $S = Q/P$ by $Q$ in $\mathbb{E}_Q(S)$.
@@ -137,10 +141,12 @@ We can see that this is the same as what we got for $\mathbb{E}_Q(S)$, thus $\ma
 A consequence of this insight is that because we know that $\mathbb{E}_P(S) = 1$ (this was one of our initial assumptions about the betting score), $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$ implies:
 
 $$
+\begin{align*}
 \mathbb{E}_Q(S) - 1
 &=& \mathbb{E}_P(S^2) - 1$ (substituting \mathbb{E}_Q(S) = \mathbb{E}_P(S^2)) \\
 &= \mathbb{E}_P(S^2) - (\mathbb{E}_P(S))^2$ (substituting 1 = \mathbb{E}_P(S) (just square both sides)) \\
 &= \text{Var}_P(S)
+\end{align*}
 $$
 
 Here $\mathbb{E}_Q(S) - 1$ represents what I win if I am right, and not "Reality" ($P$). i.e the more variable your betting score is under the null hypothesis $P$, the more you stand to gain if your alternative $Q$ is actually true. If you make a more extreme bet (higher variance), you have more to gain if you're right.
@@ -230,14 +236,20 @@ The power and the implied target both told us in advance that the study was a wa
 # Hypotheis Testing and Code
 
 [^1]: You will have to be generous with notions here.
-[^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that:
-$-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent
-[^3]: To find the power, we need to calculate: 
-$Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
-We can standardize this:
-Under $Q$: $X \sim N(1, 100)$
-$$
-P(X > 16.5) &=& P(\frac{X-1}{10} > \frac{16.5-1}{10})
-&= P(Z > 1.55)$ where $Z$ is standard normal
-&= 1 - \Phi(1.55)
-&\approx 0.06 or 6\%]
+
+[^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent.
+
+[^3]: To find the power, we need to calculate:
+   $Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
+   
+   We can standardize this:
+   Under $Q$: $X \sim N(1, 100)$
+   
+   $$
+   \begin{align*}
+   P(X > 16.5) &= P(\frac{X-1}{10} > \frac{16.5-1}{10}) \\
+   &= P(Z > 1.55) \text{ where } Z \text{ is standard normal} \\
+   &= 1 - \Phi(1.55) \\
+   &\approx 0.06 \text{ or } 6\%
+   \end{align*}
+   $$
