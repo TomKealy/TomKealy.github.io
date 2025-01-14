@@ -208,8 +208,6 @@ $$\mathbb{E}_Q(\ln S) = \sum_x Q(x)\ln S(x) = \sum_y P(x)S(x)\ln S(x) = \mathbb{
 
 # Examples
 
-Here's the example in markdown:
-
 **Example 1.** 
 
 Suppose $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 1 and standard deviation 10, and we observe $x = 30$.
