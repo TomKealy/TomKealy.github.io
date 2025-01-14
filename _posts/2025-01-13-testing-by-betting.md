@@ -57,7 +57,7 @@ The standard way of testing a probability distribution $P$ is to select a signif
 
 For example, we could test the mean $X$ of a series of measurements $M_1, M_2, \ldots, M_k$ to see if the distribution $P$ has mean zero or not. We believe that $X$ comes from a standard normal distribution, and so we test (with a $z$-test for instance) that $X$ is in the region $X \in \left(-1.96, 1.96\right)$ (i.e. $X$ is within 2 standard deviations of the standard normal distribution). If we see a $x$ (the actual mean) that is bigger than 1.96 (i.e. $\mid x\mid > 1.96$) then we conclude that the $X$ does not have mean 0.
 
-Textbooks seldom make the idea explicit, a standard test is often thought of as a bet: I pay \$1 for the payoff $S_E$ defined by
+Textbooks seldom make the idea explicit, however a standard test is often thought of as a bet: I pay USS 1 for the payoff $S_E$ defined by
 
 $$
 \begin{aligned}
@@ -68,7 +68,7 @@ S_E &= \begin{cases}
 \end{aligned}
 $$
 
-If $E$ happens, I have multiplied the \$1 I risked by $\frac{1}/\alpha}$. This makes standard testing a special case of testing by betting, the special case where the bet is all-or-nothing. In return for \$1, I get either $\$\frac{1}/\alpha}$ or $0.
+If $E$ happens, I have multiplied the USD1 I risked by $\frac{1}/\alpha}$. This makes standard testing a special case of testing by betting, the special case where the bet is all-or-nothing. In return for USD 1, I get either $\$\frac{1}/\alpha}$ or $0.
 
 So a betting score $S\left(x\right)$ appraises the evidence against $P$. The larger $S\left(x\right)$, the stronger the evidence.
 
