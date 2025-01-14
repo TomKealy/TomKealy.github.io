@@ -239,8 +239,9 @@ The power and the implied target both told us in advance that the study was a wa
 We now present three implementations of the ideas in {% cite shafer2021testing %}. Firstly we implement a version of Protocol 1, which formalises the above method of testing a probability distribution $P$ for a phenomenon X that takes values in a set $\mathcal{X}$. 
 
 >Protocol 1. Testing a probability distribution
->    Sceptic announces $S: X → \left[0, \infty\right)$ such that $\mathbb{E}_P(S) = 1$. Reality announces $X \in \mathcal{X}$.
->    \mathcal{K}: = $S(x)$.
+>    Sceptic announces $S: X → \left[0, \infty\right)$ such that $\mathbb{E}_P(S) = 1$. 
+> Reality announces $X \in \mathcal{X}$.
+> \mathcal{K}: = $S(x)$.
 
 Where $\mathcal{K}$ is our final capital.
 
