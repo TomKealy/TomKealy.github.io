@@ -236,6 +236,298 @@ The power and the implied target both told us in advance that the study was a wa
 
 # Hypotheis Testing and Code
 
+Here is Protocol 1
+
+```python
+import numpy as np
+from scipy import stats
+
+class BettingTest:
+    def __init__(self, null_mean=0, null_std=1):
+        """
+        Initialize a betting-based hypothesis test.
+        
+        Parameters:
+        - null_mean: Mean under the null hypothesis
+        - null_std: Standard deviation under the null hypothesis
+        """
+        self.null_mean = null_mean
+        self.null_std = null_std
+        
+    def compute_betting_score(self, data, alternative_mean):
+        """
+        Compute the betting score (likelihood ratio) comparing the null hypothesis
+        to an alternative hypothesis.
+        
+        Parameters:
+        - data: Observed data
+        - alternative_mean: Mean under the alternative hypothesis
+        
+        Returns:
+        - betting_score: The factor by which we multiply our money
+        - implied_target: The expected betting score under the alternative
+        """
+        null_density = stats.norm.pdf(data, self.null_mean, self.null_std)
+        alt_density = stats.norm.pdf(data, alternative_mean, self.null_std)
+        
+        betting_score = alt_density / null_density
+        
+        log_scores = np.log(betting_score)
+        implied_target = np.exp(np.mean(log_scores))
+        
+        return betting_score, implied_target
+    
+    def traditional_test(self, data, alpha=0.05):
+        """
+        Perform traditional hypothesis test returning p-value.
+        
+        Parameters:
+        - data: Observed data
+        - alpha: Significance level
+        
+        Returns:
+        - p_value: Two-sided p-value
+        - significant: Whether null hypothesis is rejected
+        """
+        t_stat, p_value = stats.ttest_1samp(data, self.null_mean)
+        return p_value, p_value < alpha
+
+if __name__ == "__main__":
+    np.random.seed(42)
+    
+    true_mean = 0.5
+    n_samples = 100
+    data = np.random.normal(true_mean, 1, n_samples)
+    
+    bt = BettingTest(null_mean=0, null_std=1)
+    betting_scores, implied_target = bt.compute_betting_score(data, alternative_mean=0.5)
+    final_betting_score = np.exp(np.mean(np.log(betting_scores)))
+    p_value, is_significant = bt.traditional_test(data)
+    
+    print("\nResults:")
+    print(f"Sample mean: {np.mean(data):.3f}")
+    print(f"\nTraditional Test:")
+    print(f"P-value: {p_value:.3f}")
+    print(f"Significant at 0.05 level: {is_significant}")
+    print(f"\nBetting Test:")
+    print(f"Final betting score: {final_betting_score:.3f}")
+    print(f"Implied target: {implied_target:.3f}")
+
+    score_interp = "strong" if final_betting_score > 20 else \
+                   "moderate" if final_betting_score > 5 else "weak"
+    print(f"\nBetting score indicates {score_interp} evidence against null hypothesis")
+    print(f"(We multiplied our money by a factor of {final_betting_score:.1f})")
+```
+
+Here is protocol 2:
+
+```python
+import numpy as np
+from scipy import stats
+
+class Protocol2Test:
+    def __init__(self):
+        """Initialize with K0 = 1 as specified in Protocol 2"""
+        self.K = 1.0  # Current capital
+        self.history = []  # Track history of outcomes
+        
+    def announce_bet(self, y_history):
+        """
+        Sceptic announces betting function Sn.
+        
+        In Protocol 2, this should satisfy EP(Sn(Yn)|y1,...,yn-1) = Kn-1
+        We'll create a simple betting function based on the likelihood ratio
+        between two normal distributions.
+        """
+        current_capital = self.K
+        
+        def S(y):
+            null_density = stats.norm.pdf(y, loc=0, scale=1)
+            if len(y_history) > 0:
+                alt_mean = np.mean(y_history)
+            else:
+                alt_mean = 0.1
+                
+            alt_density = stats.norm.pdf(y, loc=alt_mean, scale=1)
+            return current_capital * (alt_density / null_density)
+        
+        return S
+    
+    def update(self, yn):
+        """
+        Reality announces yn and capital is updated.
+        
+        Parameters:
+        - yn: The realized value
+        """
+        S = self.announce_bet(self.history)
+        self.K = S(yn)
+        self.history.append(yn)
+        return self.K
+    
+    def verify_martingale_property(self, n_samples=1000):
+        """
+        Verify that EP(Sn(Yn)|y1,...,yn-1) = Kn-1
+        by Monte Carlo simulation.
+        """
+        S = self.announce_bet(self.history)
+        samples = np.random.normal(0, 1, n_samples)
+        expected_value = np.mean([S(y) for y in samples])
+        
+        print(f"Martingale property check:")
+        print(f"Current capital (Kn-1): {self.K:.3f}")
+        print(f"Expected value of Sn: {expected_value:.3f}")
+
+if __name__ == "__main__":
+    np.random.seed(42)
+    data = np.random.normal(0.5, 1, 10)  # Data with non-zero mean
+    test = Protocol2Test()
+    print("Testing sequence:")
+    
+    for i, yn in enumerate(data):
+        if i < 3:
+            print(f"\nStep {i+1}:")
+            test.verify_martingale_property()
+        capital = test.update(yn)
+        print(f"yn = {yn:.3f}, Capital = {capital:.3f}")
+```
+
+Here is a betting strategy based on differences between two stocastic processes:
+
+```python
+import numpy as np
+from scipy import stats
+from typing import Tuple, List, Optional
+
+class SequentialBettingTest:
+    def __init__(self, initial_capital: float = 1.0):
+        """
+        Initialize a sequential betting test for comparing two processes.
+        
+        Parameters:
+        - initial_capital: Starting betting capital (default=1.0)
+        """
+        self.capital = initial_capital
+        self.betting_scores = []
+        self.cumulative_scores = []
+        
+    def compute_step_bet(self, 
+                        x1_history: np.ndarray, 
+                        x2_history: np.ndarray,
+                        current_difference: float,
+                        null_hypothesis_difference: float = 0.0,
+                        volatility: float = 1.0) -> float:
+        """
+        Compute the optimal bet for the next step based on the history.
+        Uses Kelly criterion for optimal bet sizing.
+        
+        Parameters:
+        - x1_history: History of first process
+        - x2_history: History of second process
+        - current_difference: Current observation of difference
+        - null_hypothesis_difference: Expected difference under null hypothesis
+        - volatility: Expected volatility of the difference
+        
+        Returns:
+        - bet_size: Amount to bet (as fraction of current capital)
+        """
+        historical_diffs = np.diff(x1_history - x2_history)
+        if len(historical_diffs) > 0:
+            hist_mean = np.mean(historical_diffs)
+            hist_std = np.std(historical_diffs) if len(historical_diffs) > 1 else volatility
+        else:
+            hist_mean = 0
+            hist_std = volatility
+            
+        advantage = (hist_mean - null_hypothesis_difference) / (hist_std ** 2)
+        kelly_fraction = advantage / 2  # Classic Kelly for Gaussian
+        return np.clip(kelly_fraction, -0.5, 0.5)
+    
+    def update(self, 
+               x1: float, 
+               x2: float, 
+               null_hypothesis_difference: float = 0.0,
+               x1_history: Optional[np.ndarray] = None,
+               x2_history: Optional[np.ndarray] = None) -> Tuple[float, float]:
+        """
+        Update betting score based on new observations.
+        
+        Parameters:
+        - x1: New observation from first process
+        - x2: New observation from second process
+        - null_hypothesis_difference: Expected difference under null hypothesis
+        - x1_history: Optional history of first process
+        - x2_history: Optional history of second process
+        
+        Returns:
+        - current_capital: Updated capital after bet
+        - betting_score: Score for this step
+        """
+        difference = x1 - x2
+        
+        if x1_history is None:
+            x1_history = np.array([])
+        if x2_history is None:
+            x2_history = np.array([])
+            
+        bet_size = self.compute_step_bet(
+            x1_history, x2_history, difference,
+            null_hypothesis_difference
+        )
+        
+        score = 1 + bet_size * (difference - null_hypothesis_difference)
+        self.capital *= score
+        
+        self.betting_scores.append(score)
+        self.cumulative_scores.append(self.capital)
+        
+        return self.capital, score
+    
+    def get_results(self) -> dict:
+        """
+        Get summary of betting test results.
+        
+        Returns:
+        - Dictionary containing test results and statistics
+        """
+        return {
+            'final_capital': self.capital,
+            'betting_scores': self.betting_scores,
+            'cumulative_scores': self.cumulative_scores,
+            'average_score': np.mean(self.betting_scores),
+            'total_steps': len(self.betting_scores)
+        }
+
+if __name__ == "__main__":
+    np.random.seed(42)
+    
+    n_steps = 100
+    process1 = np.random.normal(0.1, 1, n_steps) 
+    process2 = np.random.normal(0.0, 1, n_steps)
+    
+    sbt = SequentialBettingTest()
+    
+    for t in range(n_steps):
+        hist1 = process1[:t] if t > 0 else np.array([])
+        hist2 = process2[:t] if t > 0 else np.array([])
+    
+        capital, score = sbt.update(
+            process1[t], 
+            process2[t],
+            null_hypothesis_difference=0.0,
+            x1_history=hist1,
+            x2_history=hist2
+        )
+    results = sbt.get_results()
+    
+    print("\nSequential Betting Test Results:")
+    print(f"Number of steps: {results['total_steps']}")
+    print(f"Final capital: {results['final_capital']:.2f}")
+    print(f"Average betting score: {results['average_score']:.2f}")
+    t_stat, p_value = stats.ttest_ind(process1, process2)
+    print(f"\nTraditional t-test p-value: {p_value:.4f}")
+```
+
 [^1]: You will have to be generous with notions here.
 
 [^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$.
