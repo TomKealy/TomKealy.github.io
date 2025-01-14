@@ -236,7 +236,15 @@ The power and the implied target both told us in advance that the study was a wa
 
 # Hypotheis Testing and Code
 
-Here is Protocol 1
+We now present three implementations of the ideas in {% cite shafer2021testing %}. Firstly we implement a version of Protocol 1:
+
+>Protocol 1. Testing a probability distribution
+>    Sceptic announces $S: X → \left[0, \infty\right)$ such that $\mathbb{E}_P(S) = 1$. Reality announces $X \in \mathcal{X}$.
+>    \mathcal{K}: = $S(x)$.
+
+Where $\mathcal{K}$ is our final capital.
+
+The ```BettingTest``` class below implements this Protocol.
 
 ```python
 import numpy as np
@@ -276,34 +284,22 @@ class BettingTest:
         implied_target = np.exp(np.mean(log_scores))
         
         return betting_score, implied_target
-    
-    def traditional_test(self, data, alpha=0.05):
-        """
-        Perform traditional hypothesis test returning p-value.
-        
-        Parameters:
-        - data: Observed data
-        - alpha: Significance level
-        
-        Returns:
-        - p_value: Two-sided p-value
-        - significant: Whether null hypothesis is rejected
-        """
-        t_stat, p_value = stats.ttest_1samp(data, self.null_mean)
-        return p_value, p_value < alpha
 
 if __name__ == "__main__":
     np.random.seed(42)
     
     true_mean = 0.5
+    null_mean = 0
+    null_std = 1
     n_samples = 100
     data = np.random.normal(true_mean, 1, n_samples)
     
-    bt = BettingTest(null_mean=0, null_std=1)
+    bt = BettingTest(null_mean=0=null_mean, null_std=null_std)
     betting_scores, implied_target = bt.compute_betting_score(data, alternative_mean=0.5)
     final_betting_score = np.exp(np.mean(np.log(betting_scores)))
-    p_value, is_significant = bt.traditional_test(data)
-    
+    t_stat, p_value = stats.ttest_1samp(data, null_mean)
+    is_significant = p_value < alpha
+
     print("\nResults:")
     print(f"Sample mean: {np.mean(data):.3f}")
     print(f"\nTraditional Test:")
