@@ -43,7 +43,7 @@ We are interested in phenomenon which we model with a probability distribution, 
 
 We will later see the actual value of the parameter $X$, which we denote $x$. How can we give more nuanced content to our claims (e.g. that traffic intensity is best modelled by a Poisson distribution), and how could we challenge them?
 
-The way we choose to proceed is to interpret our claim as a collection of betting offers with Reality([^1]: You will have to be generous with notion). Reality offers to sell me any payoff $S\left(x\right)$ for its expected value $\mathcal{E}_P\left(x\right)$. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk.
+The way we choose to proceed is to interpret our claim as a collection of betting offers with Reality[^1]. Reality offers to sell me any payoff $S\left(x\right)$ for its expected value $\mathcal{E}_P\left(x\right)$. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk.
 
 My betting score is:
 
@@ -152,9 +152,7 @@ We began with your claiming that $P$ describes the phenomenon $X$ and my making 
 There are two schools of thought: opportunistic and repeated testing, and testing in a single 'go.' The first justification is related to [Kelly Betting](https://en.wikipedia.org/wiki/Kelly_criterion), and the second is related to the [Neyman-Pearson Lemma](https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma).
 
 ### Kelly Betting
-The thought that I should is supported by Gibbs's inequality([^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that:
-$-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent) 
-says that
+The thought that I should is supported by Gibbs's inequality which says that[^2]:
 
 $$\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P} \$$
 
@@ -209,15 +207,7 @@ Suppose $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ s
 
 1. Statistician A simply calculates a p-value: $P(X \geq 30) \approx 0.00135$. She concludes that $P$ is strongly discredited.
 
-2. Statistician B uses the Neyman-Pearson test with significance level $\alpha = 0.05$, which rejects $P$ when $x > 16.5$. Its power is only about 6%([^3: To find the power, we need to calculate: 
-$Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
-We can standardize this:
-Under $Q$: $X \sim N(1, 100)$
-$$
-P(X > 16.5) &=& P(\frac{X-1}{10} > \frac{16.5-1}{10})
-&= P(Z > 1.55)$ where $Z$ is standard normal
-&= 1 - \Phi(1.55)
-&\approx 0.06 or 6\%]).
+2. Statistician B uses the Neyman-Pearson test with significance level $\alpha = 0.05$, which rejects $P$ when $x > 16.5$. Its power is only about 6%[^3].
 
 Seeing $x = 30$, it does reject $P$. Had she formulated her test as a bet, she would have multiplied the money she risked by 20.
 
@@ -238,3 +228,16 @@ I.e. the implied target is $\exp(1/200) \approx 1.005$. She does a little better
 The power and the implied target both told us in advance that the study was a waste of time. The betting score of 1.34 confirms that little was accomplished, while the low $p$-value and the Neyman-Pearson rejection of $P$ give a misleading verdict in favour of $Q$.
 
 # Hypotheis Testing and Code
+
+[^1]: You will have to be generous with notions here.
+[^2]: The standard form of Gibbs's inequality (also known as the information inequality) states that:
+$-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. The version here ($\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}$) is equivalent
+[^3]: To find the power, we need to calculate: 
+$Q(X > 16.5)$ where under $Q$, $X \sim N(1, 10^2)$
+We can standardize this:
+Under $Q$: $X \sim N(1, 100)$
+$$
+P(X > 16.5) &=& P(\frac{X-1}{10} > \frac{16.5-1}{10})
+&= P(Z > 1.55)$ where $Z$ is standard normal
+&= 1 - \Phi(1.55)
+&\approx 0.06 or 6\%]

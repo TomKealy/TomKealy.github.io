@@ -1,7 +1,7 @@
 ---
 layout: default
 title: What p-values really mean
-subtitle: Most people get _p_-values wrong. This is how to understand and apply them correctly.
+subtitle: Most people get $p$-values wrong. This is how to understand and apply them correctly.
 categories: statistics, hypothesis testing
 bibliography: references.bib
 ---
