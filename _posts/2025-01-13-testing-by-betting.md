@@ -154,18 +154,20 @@ Here $\mathbb{E}_Q(S) - 1$ represents what I win if I am right, and not "Reality
 
 ## How much should I bet?
 
-We began with your claiming that $P$ describes the phenomenon $X$ and my making a bet $S$ satisfying $S \geq 0$ and, for simplicity, $\mathbb{E}_P(S) = 1$. Suppose, however, that I do have an alternative $Q$ in mind. I have a hunch that $Q$ is a valid description of $X$. In this case, should I use $\fra{Q}/{P}$ as my bet?
+We began with your claiming that $P$ describes the phenomenon $X$ and my making a bet $S$ satisfying $S \geq 0$ and, for simplicity, $\mathbb{E}_P(S) = 1$. Suppose, however, that I do have an alternative $Q$ in mind. I have a hunch that $Q$ is a valid description of $X$. In this case, should I use $\frac{Q}/{P}$ as my bet?
 
 There are two schools of thought: opportunistic and repeated testing, and testing in a single 'go.' The first justification is related to [Kelly Betting](https://en.wikipedia.org/wiki/Kelly_criterion), and the second is related to the [Neyman-Pearson Lemma](https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma).
 
 ### Kelly Betting
 The thought that I should is supported by Gibbs's inequality which says that[^2]:
 
-$$\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P} \$$
+$$
+\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}
+$$
 
-for **any** probability distribution $R$ for $Y$. Because any bet $S$ is of the form $R/P$ for some such $R$, Gibb's inequality tells us that $\mathbb{E}_Q(\ln S)$ is maximized over $S$ by setting $S := Q/P$. This tells that if we have a hunch that $Q$ is more correct than $P$ (or any other probability distribution $R$) then we should be $\frac{Q}{P}.
+for **any** probability distribution $R$ for $Y$. Because any bet $S$ is of the form $R/P$ for some such $R$, Gibb's inequality tells us that $\mathbb{E}_Q(\ln S)$ is maximized over $S$ by setting $S := Q/P$. This tells that if we have a hunch that $Q$ is more correct than $P$ (or any other probability distribution $R$) then we should be $\frac{Q}{P}$.
 
-The quanitiy $\mathbb{E}_Q(\ln(Q/P))$ is known as the Kullback-Leibler divergence between $Q$ and $P$. It is the mean number of bits of information you gain when $Q$ is the true encoding distribution and not $P.
+The quanitiy $\mathbb{E}_Q(\ln(Q/P))$ is known as the Kullback-Leibler divergence between $Q$ and $P$. It is the mean number of bits of information you gain when $Q$ is the true encoding distribution and not $P$.
 
 Why should I choose $S$ to maximize $\mathbb{E}_Q(\ln S)$? Why not maximize $\mathbb{E}_Q(S)$? Or perhaps $Q(S \geq 20)$ or $Q(S \geq 1/\alpha)$ for some other significance level $\alpha$?
 
@@ -193,7 +195,7 @@ When I get my betting score for a particular bet $S$ against $P$, how do I know 
 Choosing a payoff $S$ defines an alternative probability distribution, $Q : = SP$, and with $S$ being the bet against $P$ that maximizes $\mathbb{E}_Q(\ln S)$. We might hope for a betting score whose _logarithm_ is in the ballpark of $\mathbb{E}_Q(\ln S)$. I.e a betting score like:
 
 $$
-S_{*} : = \exp{\mathbb{E}_Q(\ln S)}$
+S_{*} : = \exp{\mathbb{E}_Q(\ln S)}
 $$
 
 We call $S_{∗}$ the **implied target** of the bet $S$. The implied target of the all-or-nothing bet is always $\frac{1}{\alpha}$.
@@ -202,7 +204,7 @@ The notion of an implied target is analogous to the notion of statistical power 
 
 $$\mathbb{E}_Q(\ln S) = \sum_x Q(x)\ln S(x) = \sum_y P(x)S(x)\ln S(x) = \mathbb{E}_P(S\ln S)$$
 
-(def expectation, then def of $Q$, collect like terms). i.e. this is expected log betting score under _either $Q$ (as $\mathbb{E}_Q(\ln S)$) or $P$ (as $\mathbb{E}_P(S\ln S)$).
+(def expectation, then def of $Q$, collect like terms). i.e. this is expected log betting score under _either_ $Q$ (as $\mathbb{E}_Q(\ln S)$) _or_ $P$ (as $\mathbb{E}_P(S\ln S)$).
 
 # Examples
 
