@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T16:46:41+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T16:58:07+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
 
@@ -140,18 +140,18 @@
 
 <h2 id="how-much-should-i-bet">How much should I bet?</h2>
 
-<p>We began with your claiming that $P$ describes the phenomenon $X$ and my making a bet $S$ satisfying $S \geq 0$ and, for simplicity, $\mathbb{E}_P(S) = 1$. Suppose, however, that I do have an alternative $Q$ in mind. I have a hunch that $Q$ is a valid description of $X$. In this case, should I use $\fra{Q}/{P}$ as my bet?</p>
+<p>We began with your claiming that $P$ describes the phenomenon $X$ and my making a bet $S$ satisfying $S \geq 0$ and, for simplicity, $\mathbb{E}_P(S) = 1$. Suppose, however, that I do have an alternative $Q$ in mind. I have a hunch that $Q$ is a valid description of $X$. In this case, should I use $\frac{Q}/{P}$ as my bet?</p>
 
 <p>There are two schools of thought: opportunistic and repeated testing, and testing in a single ‘go.’ The first justification is related to <a href="https://en.wikipedia.org/wiki/Kelly_criterion">Kelly Betting</a>, and the second is related to the <a href="https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma">Neyman-Pearson Lemma</a>.</p>
 
 <h3 id="kelly-betting">Kelly Betting</h3>
 <p>The thought that I should is supported by Gibbs’s inequality which says that<sup id="fnref:2"><a href="#fn:2" class="footnote" rel="footnote" role="doc-noteref">2</a></sup>:</p>
 
-\[\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P} \\]
+\[\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}\]
 
-<p>for <strong>any</strong> probability distribution $R$ for $Y$. Because any bet $S$ is of the form $R/P$ for some such $R$, Gibb’s inequality tells us that $\mathbb{E}_Q(\ln S)$ is maximized over $S$ by setting $S := Q/P$. This tells that if we have a hunch that $Q$ is more correct than $P$ (or any other probability distribution $R$) then we should be $\frac{Q}{P}.</p>
+<p>for <strong>any</strong> probability distribution $R$ for $Y$. Because any bet $S$ is of the form $R/P$ for some such $R$, Gibb’s inequality tells us that $\mathbb{E}_Q(\ln S)$ is maximized over $S$ by setting $S := Q/P$. This tells that if we have a hunch that $Q$ is more correct than $P$ (or any other probability distribution $R$) then we should be $\frac{Q}{P}$.</p>
 
-<p>The quanitiy $\mathbb{E}_Q(\ln(Q/P))$ is known as the Kullback-Leibler divergence between $Q$ and $P$. It is the mean number of bits of information you gain when $Q$ is the true encoding distribution and not $P.</p>
+<p>The quanitiy $\mathbb{E}_Q(\ln(Q/P))$ is known as the Kullback-Leibler divergence between $Q$ and $P$. It is the mean number of bits of information you gain when $Q$ is the true encoding distribution and not $P$.</p>
 
 <p>Why should I choose $S$ to maximize $\mathbb{E}_Q(\ln S)$? Why not maximize $\mathbb{E}_Q(S)$? Or perhaps $Q(S \geq 20)$ or $Q(S \geq 1/\alpha)$ for some other significance level $\alpha$?</p>
 
@@ -178,7 +178,7 @@
 
 <p>Choosing a payoff $S$ defines an alternative probability distribution, $Q : = SP$, and with $S$ being the bet against $P$ that maximizes $\mathbb{E}<em>Q(\ln S)$. We might hope for a betting score whose _logarithm</em> is in the ballpark of $\mathbb{E}_Q(\ln S)$. I.e a betting score like:</p>
 
-\[S_{*} : = \exp{\mathbb{E}_Q(\ln S)}$\]
+\[S_{*} : = \exp{\mathbb{E}_Q(\ln S)}\]
 
 <p>We call $S_{∗}$ the <strong>implied target</strong> of the bet $S$. The implied target of the all-or-nothing bet is always $\frac{1}{\alpha}$.</p>
 
@@ -186,7 +186,7 @@
 
 \[\mathbb{E}_Q(\ln S) = \sum_x Q(x)\ln S(x) = \sum_y P(x)S(x)\ln S(x) = \mathbb{E}_P(S\ln S)\]
 
-<p>(def expectation, then def of $Q$, collect like terms). i.e. this is expected log betting score under _either $Q$ (as $\mathbb{E}_Q(\ln S)$) or $P$ (as $\mathbb{E}_P(S\ln S)$).</p>
+<p>(def expectation, then def of $Q$, collect like terms). i.e. this is expected log betting score under <em>either</em> $Q$ (as $\mathbb{E}<em>Q(\ln S)$) _or</em> $P$ (as $\mathbb{E}_P(S\ln S)$).</p>
 
 <h1 id="examples">Examples</h1>
 
