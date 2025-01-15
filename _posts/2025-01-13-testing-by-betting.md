@@ -248,39 +248,75 @@ Where $\mathcal{K}$ is our final capital.
 The ```BettingTest``` class below implements this Protocol.
 
 ```python
+from dataclasses import dataclass
+import numpy as np
+from scipy import stats
+from typing import Union, Tuple, List
+
+@dataclass
+class TestParameters:
+    """Container for test parameters"""
+
+    null_mean: float
+    null_std: float
+    alternative_mean: float
+    alternative_std: float = None  # If None, uses null_std
+
+    def __post_init__(self):
+        """Set alternative_std to null_std if not provided"""
+        if self.alternative_std is None:
+            self.alternative_std = self.null_std
+
 class BettingTest:
-    def __init__(self, null_mean=0, null_std=1):
+    def __init__(self, params: TestParameters):
         """
         Initialize a betting-based hypothesis test.
-        
+
+        Parameters:
+        - params: TestParameters object containing distribution parameters
+        """
+        self.params = params
+
+    @classmethod
+    def from_null(cls, null_mean: float = 0, null_std: float = 1) -> "BettingTest":
+        """
+        Alternative constructor using just null hypothesis parameters.
+
         Parameters:
         - null_mean: Mean under the null hypothesis
         - null_std: Standard deviation under the null hypothesis
         """
-        self.null_mean = null_mean
-        self.null_std = null_std
-        
-    def compute_betting_score(self, data, alternative_mean):
+        params = TestParameters(
+            null_mean=null_mean,
+            null_std=null_std,
+            alternative_mean=null_mean,  # Will be updated in compute_betting_score
+        )
+        return cls(params)
+
+    def compute_betting_score(
+        self, data: Union[float, List[float], np.ndarray]
+    ) -> Tuple[np.ndarray, float]:
         """
         Compute the betting score (likelihood ratio) comparing the null hypothesis
         to an alternative hypothesis.
-        
+
         Parameters:
         - data: Observed data
         - alternative_mean: Mean under the alternative hypothesis
-        
+
         Returns:
         - betting_score: The factor by which we multiply our money
         - implied_target: The expected betting score under the alternative
         """
-        null_density = stats.norm.pdf(data, self.null_mean, self.null_std)
-        alt_density = stats.norm.pdf(data, alternative_mean, self.null_std)
-        
+        null_density = stats.norm.pdf(data, self.params.null_mean, self.params.null_std)
+        alt_density = stats.norm.pdf(
+            data, self.params.alternative_mean, self.params.null_std
+        )
+
         betting_score = alt_density / null_density
-        
+
         log_scores = np.log(betting_score)
         implied_target = np.exp(np.mean(log_scores))
-        
         return betting_score, implied_target
 ```
 
@@ -289,17 +325,19 @@ We can use the code like this:
 ```python
 if __name__ == "__main__":
     np.random.seed(42)
-    
+
+    alpha = 0.05
     true_mean = 0.5
     null_mean = 0
     null_std = 1
     n_samples = 100
     data = np.random.normal(true_mean, 1, n_samples)
-    
-    bt = BettingTest(null_mean=0=null_mean, null_std=null_std)
-    betting_scores, implied_target = bt.compute_betting_score(data, alternative_mean=0.5)
+
+    params = TestParameters(null_mean=0, null_std=1, alternative_mean=0.5)
+    bt = BettingTest(params)
+    betting_scores, implied_target = bt.compute_betting_score(data)
     final_betting_score = np.exp(np.mean(np.log(betting_scores)))
-    t_stat, p_value = stats.ttest_1samp(data, null_mean)
+    t_stat, p_value = stats.ttest_1samp(data, params.null_mean)
     is_significant = p_value < alpha
 
     print("\nResults:")
@@ -311,220 +349,162 @@ if __name__ == "__main__":
     print(f"Final betting score: {final_betting_score:.3f}")
     print(f"Implied target: {implied_target:.3f}")
 
-    score_interp = "strong" if final_betting_score > 20 else \
-                   "moderate" if final_betting_score > 5 else "weak"
+    score_interp = (
+        "strong"
+        if final_betting_score > 20
+        else "moderate" if final_betting_score > 5 else "weak"
+    )
     print(f"\nBetting score indicates {score_interp} evidence against null hypothesis")
     print(f"(We multiplied our money by a factor of {final_betting_score:.1f})")
 ```
+This prints out:
 
-Here is protocol 2:
+> Results:
+> Sample mean: 0.396
+> =================================================================
+> Traditional Test:
+> P-value: 0.000
+> Significant at 0.05 level: True
+> =================================================================
+> Betting Test:
+> Final betting score: 1.076
+> Implied target: 1.076
+> Betting score indicates weak evidence against null hypothesis
+> (We multiplied our money by a factor of 1.1)
 
-```python
-import numpy as np
-from scipy import stats
-
-class Protocol2Test:
-    def __init__(self):
-        """Initialize with K0 = 1 as specified in Protocol 2"""
-        self.K = 1.0  # Current capital
-        self.history = []  # Track history of outcomes
-        
-    def announce_bet(self, y_history):
-        """
-        Sceptic announces betting function Sn.
-        
-        In Protocol 2, this should satisfy EP(Sn(Yn)|y1,...,yn-1) = Kn-1
-        We'll create a simple betting function based on the likelihood ratio
-        between two normal distributions.
-        """
-        current_capital = self.K
-        
-        def S(y):
-            null_density = stats.norm.pdf(y, loc=0, scale=1)
-            if len(y_history) > 0:
-                alt_mean = np.mean(y_history)
-            else:
-                alt_mean = 0.1
-                
-            alt_density = stats.norm.pdf(y, loc=alt_mean, scale=1)
-            return current_capital * (alt_density / null_density)
-        
-        return S
-    
-    def update(self, yn):
-        """
-        Reality announces yn and capital is updated.
-        
-        Parameters:
-        - yn: The realized value
-        """
-        S = self.announce_bet(self.history)
-        self.K = S(yn)
-        self.history.append(yn)
-        return self.K
-    
-    def verify_martingale_property(self, n_samples=1000):
-        """
-        Verify that EP(Sn(Yn)|y1,...,yn-1) = Kn-1
-        by Monte Carlo simulation.
-        """
-        S = self.announce_bet(self.history)
-        samples = np.random.normal(0, 1, n_samples)
-        expected_value = np.mean([S(y) for y in samples])
-        
-        print(f"Martingale property check:")
-        print(f"Current capital (Kn-1): {self.K:.3f}")
-        print(f"Expected value of Sn: {expected_value:.3f}")
-
-if __name__ == "__main__":
-    np.random.seed(42)
-    data = np.random.normal(0.5, 1, 10)  # Data with non-zero mean
-    test = Protocol2Test()
-    print("Testing sequence:")
-    
-    for i, yn in enumerate(data):
-        if i < 3:
-            print(f"\nStep {i+1}:")
-            test.verify_martingale_property()
-        capital = test.update(yn)
-        print(f"yn = {yn:.3f}, Capital = {capital:.3f}")
-```
-
-Here is a betting strategy based on differences between two stocastic processes:
+Finally, we will use this example to work through a couple of examples from the paper. The following function will actually run the examples:
 
 ```python
-import numpy as np
-from scipy import stats
-from typing import Tuple, List, Optional
+def run_example(y: float, params: TestParameters, example_num: int):
+    """
+    Run complete example showing all three statistical approaches.
 
-class SequentialBettingTest:
-    def __init__(self, initial_capital: float = 1.0):
-        """
-        Initialize a sequential betting test for comparing two processes.
-        
-        Parameters:
-        - initial_capital: Starting betting capital (default=1.0)
-        """
-        self.capital = initial_capital
-        self.betting_scores = []
-        self.cumulative_scores = []
-        
-    def compute_step_bet(self, 
-                        x1_history: np.ndarray, 
-                        x2_history: np.ndarray,
-                        current_difference: float,
-                        null_hypothesis_difference: float = 0.0,
-                        volatility: float = 1.0) -> float:
-        """
-        Compute the optimal bet for the next step based on the history.
-        Uses Kelly criterion for optimal bet sizing.
-        
-        Parameters:
-        - x1_history: History of first process
-        - x2_history: History of second process
-        - current_difference: Current observation of difference
-        - null_hypothesis_difference: Expected difference under null hypothesis
-        - volatility: Expected volatility of the difference
-        
-        Returns:
-        - bet_size: Amount to bet (as fraction of current capital)
-        """
-        historical_diffs = np.diff(x1_history - x2_history)
-        if len(historical_diffs) > 0:
-            hist_mean = np.mean(historical_diffs)
-            hist_std = np.std(historical_diffs) if len(historical_diffs) > 1 else volatility
-        else:
-            hist_mean = 0
-            hist_std = volatility
-            
-        advantage = (hist_mean - null_hypothesis_difference) / (hist_std ** 2)
-        kelly_fraction = advantage / 2  # Classic Kelly for Gaussian
-        return np.clip(kelly_fraction, -0.5, 0.5)
-    
-    def update(self, 
-               x1: float, 
-               x2: float, 
-               null_hypothesis_difference: float = 0.0,
-               x1_history: Optional[np.ndarray] = None,
-               x2_history: Optional[np.ndarray] = None) -> Tuple[float, float]:
-        """
-        Update betting score based on new observations.
-        
-        Parameters:
-        - x1: New observation from first process
-        - x2: New observation from second process
-        - null_hypothesis_difference: Expected difference under null hypothesis
-        - x1_history: Optional history of first process
-        - x2_history: Optional history of second process
-        
-        Returns:
-        - current_capital: Updated capital after bet
-        - betting_score: Score for this step
-        """
-        difference = x1 - x2
-        
-        if x1_history is None:
-            x1_history = np.array([])
-        if x2_history is None:
-            x2_history = np.array([])
-            
-        bet_size = self.compute_step_bet(
-            x1_history, x2_history, difference,
-            null_hypothesis_difference
-        )
-        
-        score = 1 + bet_size * (difference - null_hypothesis_difference)
-        self.capital *= score
-        
-        self.betting_scores.append(score)
-        self.cumulative_scores.append(self.capital)
-        
-        return self.capital, score
-    
-    def get_results(self) -> dict:
-        """
-        Get summary of betting test results.
-        
-        Returns:
-        - Dictionary containing test results and statistics
-        """
-        return {
-            'final_capital': self.capital,
-            'betting_scores': self.betting_scores,
-            'cumulative_scores': self.cumulative_scores,
-            'average_score': np.mean(self.betting_scores),
-            'total_steps': len(self.betting_scores)
-        }
+    Parameters:
+    - y: Observed value
+    - params: TestParameters object containing distribution parameters
+    - example_num: Example number for display
+    """
+    print(f"\nExample {example_num}")
+    print("=" * 50)
 
-if __name__ == "__main__":
-    np.random.seed(42)
-    
-    n_steps = 100
-    process1 = np.random.normal(0.1, 1, n_steps) 
-    process2 = np.random.normal(0.0, 1, n_steps)
-    
-    sbt = SequentialBettingTest()
-    
-    for t in range(n_steps):
-        hist1 = process1[:t] if t > 0 else np.array([])
-        hist2 = process2[:t] if t > 0 else np.array([])
-    
-        capital, score = sbt.update(
-            process1[t], 
-            process2[t],
-            null_hypothesis_difference=0.0,
-            x1_history=hist1,
-            x2_history=hist2
-        )
-    results = sbt.get_results()
-    
-    print("\nSequential Betting Test Results:")
-    print(f"Number of steps: {results['total_steps']}")
-    print(f"Final capital: {results['final_capital']:.2f}")
-    print(f"Average betting score: {results['average_score']:.2f}")
-    t_stat, p_value = stats.ttest_ind(process1, process2)
-    print(f"\nTraditional t-test p-value: {p_value:.4f}")
+    # Statistician A: p-value
+    p_value = 1 - stats.norm.cdf(y, params.null_mean, params.null_std)
+    print("\nStatistician A (p-value):")
+    print(f"p-value = {p_value:.4f}")
+
+    # Statistician B: Neyman-Pearson test
+    power, critical_value = compute_power(params)
+    np_rejects = y > critical_value
+    print("\nStatistician B (Neyman-Pearson):")
+    print(f"Power = {power:.4%}")
+    print(f"Critical value = {critical_value:.3f}")
+    print(f"Rejects null: {np_rejects}")
+    if np_rejects:
+        print("Multiplies money by 20")
+    else:
+        print("Loses all money")
+
+    # Statistician C: Betting score
+    bt = BettingTest(params)
+    betting_score, implied_target = bt.compute_betting_score(y)
+    print("\nStatistician C (Betting):")
+    print(f"Betting score = {betting_score:.3f}")
+    print(f"Implied target = {implied_target:.3f}")
+
+    # Interpretation
+    if betting_score > implied_target:
+        conclusion = "favors Q over P"
+    else:
+        conclusion = "favors P over Q"
+    print(f"Evidence {conclusion}")
 ```
+
+and this is a helper function to calculate the power of a Neyman-Pearson test:
+
+```python
+def compute_power(params: TestParameters, alpha: float = 0.05):
+    """
+    Compute power of Neyman-Pearson test.
+
+    Parameters:
+    - params: TestParameters object containing distribution parameters
+    - alpha: Significance level (default=0.05)
+
+    Returns:
+    - power: Power of the test
+    - critical_value: Critical value for rejection region
+    """
+    critical_value = stats.norm.ppf(1 - alpha) * params.null_std + params.null_mean
+    power = 1 - stats.norm.cdf(
+        critical_value, params.alternative_mean, params.alternative_std
+    )
+    return power, critical_value
+```
+
+**Example 2:**
+
+> $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 37 and standard deviation 10, and we observe $x = 16.5$.
+
+We run it like this:
+
+```python
+params2 = TestParameters(null_mean=0, null_std=10, alternative_mean=37)
+run_example(y=16.5, params=params2, example_num=2)
+```
+
+And get the following output:
+
+> Statistician A (p-value):
+> p-value = 0.0495
+> =================================================================
+> Statistician B (Neyman-Pearson):
+> Power = 98.0068%
+> Critical value = 16.449
+> Rejects null: True
+> Multiplies money by 20
+> =================================================================
+> Statistician C (Betting):
+> Betting score = 0.477
+> Implied target = 0.477
+> Evidence favors P over Q
+
+1. Statistician A again calculates a $p$-value: $P(X \geq 16.5) \approx 0.0495$. She concludes that $P$ is discredited.
+2. Statistician B uses the Neyman–Pearson test that rejects when $x > 16.445$. This test has significance level $\alpha = 0.05$, and its power under $Q$ is almost $98%$. It rejects; Statistician B multiplies the money she risked by $20$.
+3. Statistician C uses the bet $S$ given by $S(x) := q(x)/p(x)$. Calculating as in the previous example, we see that $S$'s implied target is $939$ and yet the betting score is only $S(16.5) = 0.477$. Rather than multiply her money, Statistician C has lost more than half of it. She concludes that the evidence from her bet very mildly favours $P$ relative to $Q$.
+
+Assuming that $Q$ is indeed a plausible alternative, the high power and high implied target suggest that the study is meritorious. But the low $p$-value and the Neyman–Pearson rejection of $P$ are misleading. The betting score points in the other direction, albeit not enough to merit attention.
+**Example3:**
+
+Now the case of a non-significant outcome: $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 20 and standard deviation 10, and we observe $x = 5$.
+
+We run it like this:
+
+```python
+params3 = TestParameters(null_mean=0, null_std=10, alternative_mean=20)
+run_example(y=5, params=params3, example_num=3)
+```
+
+And get the following output:
+
+> Statistician A (p-value):
+> p-value = 0.3085
+> =================================================================
+> Statistician B (Neyman-Pearson):
+> Power = 63.8760%
+> Critical value = 16.449
+> Rejects null: False
+> Loses all money
+> =================================================================
+> Statistician C (Betting):
+> Betting score = 0.368
+> Implied target = 0.368
+> Evidence favours P over Q
+
+1. Statistician A calculates the $p$-value $P(X \geq 5) \approx 0.3085$. As this is not very small, she concludes that the study provides no evidence about $P$.
+2. Statistician B uses the Neyman–Pearson test that rejects when $x > 16.445$. This test has significance level $\alpha = 0.05$, and its power under $Q$ is about $64%$. It does not reject; Statistician B loses all the money she risked.
+3. Statistician C uses the bet $S$ given by $S(x) := q(x)/p(x)$. This time $S$'s implied target is approximately $7.39$ and yet the actual betting score is only $S(5) \approx 0.368$. Statistician C again loses more than half her money. She again concludes that the evidence from her bet favours $P$ relative to $Q$ but not enough to merit attention.
+
+In this case, the power and the implied target both suggested that the study was marginal. The Neyman–Pearson conclusion was 'no evidence'. The bet $S$ provides the same conclusion; the score $S(x)$ favours $P$ relative to $Q$ but too weakly to merit attention.
 
 [^1]: You will have to be generous with notions here.
 
