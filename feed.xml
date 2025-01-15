@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-14T17:43:53+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-15T14:01:56+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
 
@@ -225,47 +225,84 @@
 
 <blockquote>
   <p>Protocol 1. Testing a probability distribution
-   Sceptic announces $S: X → \left[0, \infty\right)$ such that $\mathbb{E}_P(S) = 1$. Reality announces $X \in \mathcal{X}$.
-   \mathcal{K}: = $S(x)$.</p>
+   Sceptic announces $S: X → \left[0, \infty\right)$ such that $\mathbb{E}_P(S) = 1$. 
+Reality announces $X \in \mathcal{X}$.
+\mathcal{K}: = $S(x)$.</p>
 </blockquote>
 
 <p>Where $\mathcal{K}$ is our final capital.</p>
 
 <p>The <code class="language-plaintext highlighter-rouge">BettingTest</code> class below implements this Protocol.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BettingTest</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="o">@</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">TestParameters</span><span class="p">:</span>
+    <span class="s">"""Container for test parameters"""</span>
+
+    <span class="n">null_mean</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">null_std</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">alternative_mean</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">alternative_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># If None, uses null_std
+</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Set alternative_std to null_std if not provided"""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">alternative_std</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">alternative_std</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">null_std</span>
+
+<span class="k">class</span> <span class="nc">BettingTest</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">TestParameters</span><span class="p">):</span>
         <span class="s">"""
         Initialize a betting-based hypothesis test.
-        
+
+        Parameters:
+        - params: TestParameters object containing distribution parameters
+        """</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_null</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">null_mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s">"BettingTest"</span><span class="p">:</span>
+        <span class="s">"""
+        Alternative constructor using just null hypothesis parameters.
+
         Parameters:
         - null_mean: Mean under the null hypothesis
         - null_std: Standard deviation under the null hypothesis
         """</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">null_mean</span> <span class="o">=</span> <span class="n">null_mean</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">null_std</span> <span class="o">=</span> <span class="n">null_std</span>
-        
-    <span class="k">def</span> <span class="nf">compute_betting_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span>
+            <span class="n">null_mean</span><span class="o">=</span><span class="n">null_mean</span><span class="p">,</span>
+            <span class="n">null_std</span><span class="o">=</span><span class="n">null_std</span><span class="p">,</span>
+            <span class="n">alternative_mean</span><span class="o">=</span><span class="n">null_mean</span><span class="p">,</span>  <span class="c1"># Will be updated in compute_betting_score
+</span>        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_betting_score</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
         <span class="s">"""
         Compute the betting score (likelihood ratio) comparing the null hypothesis
         to an alternative hypothesis.
-        
+
         Parameters:
         - data: Observed data
         - alternative_mean: Mean under the alternative hypothesis
-        
+
         Returns:
         - betting_score: The factor by which we multiply our money
         - implied_target: The expected betting score under the alternative
         """</span>
-        <span class="n">null_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">null_mean</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">null_std</span><span class="p">)</span>
-        <span class="n">alt_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">null_std</span><span class="p">)</span>
-        
+        <span class="n">null_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">null_mean</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">null_std</span><span class="p">)</span>
+        <span class="n">alt_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">alternative_mean</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">null_std</span>
+        <span class="p">)</span>
+
         <span class="n">betting_score</span> <span class="o">=</span> <span class="n">alt_density</span> <span class="o">/</span> <span class="n">null_density</span>
-        
+
         <span class="n">log_scores</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">betting_score</span><span class="p">)</span>
         <span class="n">implied_target</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_scores</span><span class="p">))</span>
-        
         <span class="k">return</span> <span class="n">betting_score</span><span class="p">,</span> <span class="n">implied_target</span>
 </code></pre></div></div>
 
@@ -273,17 +310,19 @@
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
     <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-    
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>
     <span class="n">true_mean</span> <span class="o">=</span> <span class="mf">0.5</span>
     <span class="n">null_mean</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">null_std</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">true_mean</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
-    
-    <span class="n">bt</span> <span class="o">=</span> <span class="n">BettingTest</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="o">=</span><span class="n">null_mean</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="n">null_std</span><span class="p">)</span>
-    <span class="n">betting_scores</span><span class="p">,</span> <span class="n">implied_target</span> <span class="o">=</span> <span class="n">bt</span><span class="p">.</span><span class="n">compute_betting_score</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">bt</span> <span class="o">=</span> <span class="n">BettingTest</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">betting_scores</span><span class="p">,</span> <span class="n">implied_target</span> <span class="o">=</span> <span class="n">bt</span><span class="p">.</span><span class="n">compute_betting_score</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">final_betting_score</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">betting_scores</span><span class="p">)))</span>
-    <span class="n">t_stat</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">ttest_1samp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_mean</span><span class="p">)</span>
+    <span class="n">t_stat</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">ttest_1samp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">null_mean</span><span class="p">)</span>
     <span class="n">is_significant</span> <span class="o">=</span> <span class="n">p_value</span> <span class="o">&lt;</span> <span class="n">alpha</span>
 
     <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Results:"</span><span class="p">)</span>
@@ -295,218 +334,170 @@
     <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Final betting score: </span><span class="si">{</span><span class="n">final_betting_score</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Implied target: </span><span class="si">{</span><span class="n">implied_target</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
 
-    <span class="n">score_interp</span> <span class="o">=</span> <span class="s">"strong"</span> <span class="k">if</span> <span class="n">final_betting_score</span> <span class="o">&gt;</span> <span class="mi">20</span> <span class="k">else</span> \
-                   <span class="s">"moderate"</span> <span class="k">if</span> <span class="n">final_betting_score</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="k">else</span> <span class="s">"weak"</span>
+    <span class="n">score_interp</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s">"strong"</span>
+        <span class="k">if</span> <span class="n">final_betting_score</span> <span class="o">&gt;</span> <span class="mi">20</span>
+        <span class="k">else</span> <span class="s">"moderate"</span> <span class="k">if</span> <span class="n">final_betting_score</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="k">else</span> <span class="s">"weak"</span>
+    <span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Betting score indicates </span><span class="si">{</span><span class="n">score_interp</span><span class="si">}</span><span class="s"> evidence against null hypothesis"</span><span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"(We multiplied our money by a factor of </span><span class="si">{</span><span class="n">final_betting_score</span><span class="si">:</span><span class="p">.</span><span class="mi">1</span><span class="n">f</span><span class="si">}</span><span class="s">)"</span><span class="p">)</span>
 </code></pre></div></div>
+<p>This prints out:</p>
 
-<p>Here is protocol 2:</p>
+<blockquote>
+  <p>Results:
+Sample mean: 0.396
+=================================================================
+Traditional Test:
+P-value: 0.000
+Significant at 0.05 level: True
+=================================================================
+Betting Test:
+Final betting score: 1.076
+Implied target: 1.076
+Betting score indicates weak evidence against null hypothesis
+(We multiplied our money by a factor of 1.1)</p>
+</blockquote>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<p>Finally, we will use this example to work through a couple of examples from the paper. The following function will actually run the examples:</p>
 
-<span class="k">class</span> <span class="nc">Protocol2Test</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s">"""Initialize with K0 = 1 as specified in Protocol 2"""</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">K</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Current capital
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Track history of outcomes
-</span>        
-    <span class="k">def</span> <span class="nf">announce_bet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_history</span><span class="p">):</span>
-        <span class="s">"""
-        Sceptic announces betting function Sn.
-        
-        In Protocol 2, this should satisfy EP(Sn(Yn)|y1,...,yn-1) = Kn-1
-        We'll create a simple betting function based on the likelihood ratio
-        between two normal distributions.
-        """</span>
-        <span class="n">current_capital</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">K</span>
-        
-        <span class="k">def</span> <span class="nf">S</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-            <span class="n">null_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_history</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">alt_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_history</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">alt_mean</span> <span class="o">=</span> <span class="mf">0.1</span>
-                
-            <span class="n">alt_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">alt_mean</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">current_capital</span> <span class="o">*</span> <span class="p">(</span><span class="n">alt_density</span> <span class="o">/</span> <span class="n">null_density</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="n">S</span>
-    
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yn</span><span class="p">):</span>
-        <span class="s">"""
-        Reality announces yn and capital is updated.
-        
-        Parameters:
-        - yn: The realized value
-        """</span>
-        <span class="n">S</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">announce_bet</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">history</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">S</span><span class="p">(</span><span class="n">yn</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">history</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">yn</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">K</span>
-    
-    <span class="k">def</span> <span class="nf">verify_martingale_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-        <span class="s">"""
-        Verify that EP(Sn(Yn)|y1,...,yn-1) = Kn-1
-        by Monte Carlo simulation.
-        """</span>
-        <span class="n">S</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">announce_bet</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">history</span><span class="p">)</span>
-        <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
-        <span class="n">expected_value</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">([</span><span class="n">S</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">])</span>
-        
-        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Martingale property check:"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Current capital (Kn-1): </span><span class="si">{</span><span class="bp">self</span><span class="p">.</span><span class="n">K</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Expected value of Sn: </span><span class="si">{</span><span class="n">expected_value</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_example</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">TestParameters</span><span class="p">,</span> <span class="n">example_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="s">"""
+    Run complete example showing all three statistical approaches.
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># Data with non-zero mean
-</span>    <span class="n">test</span> <span class="o">=</span> <span class="n">Protocol2Test</span><span class="p">()</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Testing sequence:"</span><span class="p">)</span>
-    
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Step </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s">:"</span><span class="p">)</span>
-            <span class="n">test</span><span class="p">.</span><span class="n">verify_martingale_property</span><span class="p">()</span>
-        <span class="n">capital</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">yn</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"yn = </span><span class="si">{</span><span class="n">yn</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">, Capital = </span><span class="si">{</span><span class="n">capital</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    Parameters:
+    - y: Observed value
+    - params: TestParameters object containing distribution parameters
+    - example_num: Example number for display
+    """</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Example </span><span class="si">{</span><span class="n">example_num</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"="</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="c1"># Statistician A: p-value
+</span>    <span class="n">p_value</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">null_mean</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">null_std</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Statistician A (p-value):"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"p-value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+    <span class="c1"># Statistician B: Neyman-Pearson test
+</span>    <span class="n">power</span><span class="p">,</span> <span class="n">critical_value</span> <span class="o">=</span> <span class="n">compute_power</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">np_rejects</span> <span class="o">=</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">critical_value</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Statistician B (Neyman-Pearson):"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Power = </span><span class="si">{</span><span class="n">power</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="o">%</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Critical value = </span><span class="si">{</span><span class="n">critical_value</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Rejects null: </span><span class="si">{</span><span class="n">np_rejects</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np_rejects</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Multiplies money by 20"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Loses all money"</span><span class="p">)</span>
+
+    <span class="c1"># Statistician C: Betting score
+</span>    <span class="n">bt</span> <span class="o">=</span> <span class="n">BettingTest</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">betting_score</span><span class="p">,</span> <span class="n">implied_target</span> <span class="o">=</span> <span class="n">bt</span><span class="p">.</span><span class="n">compute_betting_score</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Statistician C (Betting):"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Betting score = </span><span class="si">{</span><span class="n">betting_score</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Implied target = </span><span class="si">{</span><span class="n">implied_target</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+    <span class="c1"># Interpretation
+</span>    <span class="k">if</span> <span class="n">betting_score</span> <span class="o">&gt;</span> <span class="n">implied_target</span><span class="p">:</span>
+        <span class="n">conclusion</span> <span class="o">=</span> <span class="s">"favors Q over P"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">conclusion</span> <span class="o">=</span> <span class="s">"favors P over Q"</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Evidence </span><span class="si">{</span><span class="n">conclusion</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>Here is a betting strategy based on differences between two stocastic processes:</p>
+<p>and this is a helper function to calculate the power of a Neyman-Pearson test:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">compute_power</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">TestParameters</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">):</span>
+    <span class="s">"""
+    Compute power of Neyman-Pearson test.
 
-<span class="k">class</span> <span class="nc">SequentialBettingTest</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_capital</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
-        <span class="s">"""
-        Initialize a sequential betting test for comparing two processes.
-        
-        Parameters:
-        - initial_capital: Starting betting capital (default=1.0)
-        """</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">capital</span> <span class="o">=</span> <span class="n">initial_capital</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">betting_scores</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">cumulative_scores</span> <span class="o">=</span> <span class="p">[]</span>
-        
-    <span class="k">def</span> <span class="nf">compute_step_bet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-                        <span class="n">x1_history</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                        <span class="n">x2_history</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span>
-                        <span class="n">current_difference</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                        <span class="n">null_hypothesis_difference</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-                        <span class="n">volatility</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="s">"""
-        Compute the optimal bet for the next step based on the history.
-        Uses Kelly criterion for optimal bet sizing.
-        
-        Parameters:
-        - x1_history: History of first process
-        - x2_history: History of second process
-        - current_difference: Current observation of difference
-        - null_hypothesis_difference: Expected difference under null hypothesis
-        - volatility: Expected volatility of the difference
-        
-        Returns:
-        - bet_size: Amount to bet (as fraction of current capital)
-        """</span>
-        <span class="n">historical_diffs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x1_history</span> <span class="o">-</span> <span class="n">x2_history</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">historical_diffs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">hist_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">historical_diffs</span><span class="p">)</span>
-            <span class="n">hist_std</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">historical_diffs</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">historical_diffs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">volatility</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">hist_mean</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">hist_std</span> <span class="o">=</span> <span class="n">volatility</span>
-            
-        <span class="n">advantage</span> <span class="o">=</span> <span class="p">(</span><span class="n">hist_mean</span> <span class="o">-</span> <span class="n">null_hypothesis_difference</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">hist_std</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">kelly_fraction</span> <span class="o">=</span> <span class="n">advantage</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># Classic Kelly for Gaussian
-</span>        <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelly_fraction</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-               <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
-               <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
-               <span class="n">null_hypothesis_difference</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-               <span class="n">x1_history</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-               <span class="n">x2_history</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-        <span class="s">"""
-        Update betting score based on new observations.
-        
-        Parameters:
-        - x1: New observation from first process
-        - x2: New observation from second process
-        - null_hypothesis_difference: Expected difference under null hypothesis
-        - x1_history: Optional history of first process
-        - x2_history: Optional history of second process
-        
-        Returns:
-        - current_capital: Updated capital after bet
-        - betting_score: Score for this step
-        """</span>
-        <span class="n">difference</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span>
-        
-        <span class="k">if</span> <span class="n">x1_history</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">x1_history</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([])</span>
-        <span class="k">if</span> <span class="n">x2_history</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">x2_history</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([])</span>
-            
-        <span class="n">bet_size</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">compute_step_bet</span><span class="p">(</span>
-            <span class="n">x1_history</span><span class="p">,</span> <span class="n">x2_history</span><span class="p">,</span> <span class="n">difference</span><span class="p">,</span>
-            <span class="n">null_hypothesis_difference</span>
-        <span class="p">)</span>
-        
-        <span class="n">score</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">bet_size</span> <span class="o">*</span> <span class="p">(</span><span class="n">difference</span> <span class="o">-</span> <span class="n">null_hypothesis_difference</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">capital</span> <span class="o">*=</span> <span class="n">score</span>
-        
-        <span class="bp">self</span><span class="p">.</span><span class="n">betting_scores</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">cumulative_scores</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">capital</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">capital</span><span class="p">,</span> <span class="n">score</span>
-    
-    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="s">"""
-        Get summary of betting test results.
-        
-        Returns:
-        - Dictionary containing test results and statistics
-        """</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s">'final_capital'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">capital</span><span class="p">,</span>
-            <span class="s">'betting_scores'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">betting_scores</span><span class="p">,</span>
-            <span class="s">'cumulative_scores'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">cumulative_scores</span><span class="p">,</span>
-            <span class="s">'average_score'</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">betting_scores</span><span class="p">),</span>
-            <span class="s">'total_steps'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">betting_scores</span><span class="p">)</span>
-        <span class="p">}</span>
+    Parameters:
+    - params: TestParameters object containing distribution parameters
+    - alpha: Significance level (default=0.05)
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-    
-    <span class="n">n_steps</span> <span class="o">=</span> <span class="mi">100</span>
-    <span class="n">process1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">)</span> 
-    <span class="n">process2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">)</span>
-    
-    <span class="n">sbt</span> <span class="o">=</span> <span class="n">SequentialBettingTest</span><span class="p">()</span>
-    
-    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
-        <span class="n">hist1</span> <span class="o">=</span> <span class="n">process1</span><span class="p">[:</span><span class="n">t</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([])</span>
-        <span class="n">hist2</span> <span class="o">=</span> <span class="n">process2</span><span class="p">[:</span><span class="n">t</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([])</span>
-    
-        <span class="n">capital</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">sbt</span><span class="p">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="n">process1</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> 
-            <span class="n">process2</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
-            <span class="n">null_hypothesis_difference</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-            <span class="n">x1_history</span><span class="o">=</span><span class="n">hist1</span><span class="p">,</span>
-            <span class="n">x2_history</span><span class="o">=</span><span class="n">hist2</span>
-        <span class="p">)</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">sbt</span><span class="p">.</span><span class="n">get_results</span><span class="p">()</span>
-    
-    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Sequential Betting Test Results:"</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Number of steps: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="s">'total_steps'</span><span class="p">]</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Final capital: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="s">'final_capital'</span><span class="p">]</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Average betting score: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="s">'average_score'</span><span class="p">]</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">t_stat</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">process1</span><span class="p">,</span> <span class="n">process2</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Traditional t-test p-value: </span><span class="si">{</span><span class="n">p_value</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    Returns:
+    - power: Power of the test
+    - critical_value: Critical value for rejection region
+    """</span>
+    <span class="n">critical_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">params</span><span class="p">.</span><span class="n">null_std</span> <span class="o">+</span> <span class="n">params</span><span class="p">.</span><span class="n">null_mean</span>
+    <span class="n">power</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">cdf</span><span class="p">(</span>
+        <span class="n">critical_value</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">alternative_mean</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">alternative_std</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">power</span><span class="p">,</span> <span class="n">critical_value</span>
 </code></pre></div></div>
+
+<p><strong>Example 2:</strong></p>
+
+<blockquote>
+  <p>$P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 37 and standard deviation 10, and we observe $x = 16.5$.</p>
+</blockquote>
+
+<p>We run it like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params2</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mi">37</span><span class="p">)</span>
+<span class="n">run_example</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mf">16.5</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params2</span><span class="p">,</span> <span class="n">example_num</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And get the following output:</p>
+
+<blockquote>
+  <p>Statistician A (p-value):
+p-value = 0.0495
+=================================================================
+Statistician B (Neyman-Pearson):
+Power = 98.0068%
+Critical value = 16.449
+Rejects null: True
+Multiplies money by 20
+=================================================================
+Statistician C (Betting):
+Betting score = 0.477
+Implied target = 0.477
+Evidence favors P over Q</p>
+</blockquote>
+
+<ol>
+  <li>Statistician A again calculates a $p$-value: $P(X \geq 16.5) \approx 0.0495$. She concludes that $P$ is discredited.</li>
+  <li>Statistician B uses the Neyman–Pearson test that rejects when $x &gt; 16.445$. This test has significance level $\alpha = 0.05$, and its power under $Q$ is almost $98%$. It rejects; Statistician B multiplies the money she risked by $20$.</li>
+  <li>Statistician C uses the bet $S$ given by $S(x) := q(x)/p(x)$. Calculating as in the previous example, we see that $S$’s implied target is $939$ and yet the betting score is only $S(16.5) = 0.477$. Rather than multiply her money, Statistician C has lost more than half of it. She concludes that the evidence from her bet very mildly favours $P$ relative to $Q$.</li>
+</ol>
+
+<p>Assuming that $Q$ is indeed a plausible alternative, the high power and high implied target suggest that the study is meritorious. But the low $p$-value and the Neyman–Pearson rejection of $P$ are misleading. The betting score points in the other direction, albeit not enough to merit attention.
+<strong>Example3:</strong></p>
+
+<p>Now the case of a non-significant outcome: $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 20 and standard deviation 10, and we observe $x = 5$.</p>
+
+<p>We run it like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params3</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">run_example</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params3</span><span class="p">,</span> <span class="n">example_num</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And get the following output:</p>
+
+<blockquote>
+  <p>Statistician A (p-value):
+p-value = 0.3085
+=================================================================
+Statistician B (Neyman-Pearson):
+Power = 63.8760%
+Critical value = 16.449
+Rejects null: False
+Loses all money
+=================================================================
+Statistician C (Betting):
+Betting score = 0.368
+Implied target = 0.368
+Evidence favours P over Q</p>
+</blockquote>
+
+<ol>
+  <li>Statistician A calculates the $p$-value $P(X \geq 5) \approx 0.3085$. As this is not very small, she concludes that the study provides no evidence about $P$.</li>
+  <li>Statistician B uses the Neyman–Pearson test that rejects when $x &gt; 16.445$. This test has significance level $\alpha = 0.05$, and its power under $Q$ is about $64%$. It does not reject; Statistician B loses all the money she risked.</li>
+  <li>Statistician C uses the bet $S$ given by $S(x) := q(x)/p(x)$. This time $S$’s implied target is approximately $7.39$ and yet the actual betting score is only $S(5) \approx 0.368$. Statistician C again loses more than half her money. She again concludes that the evidence from her bet favours $P$ relative to $Q$ but not enough to merit attention.</li>
+</ol>
+
+<p>In this case, the power and the implied target both suggested that the study was marginal. The Neyman–Pearson conclusion was ‘no evidence’. The bet $S$ provides the same conclusion; the score $S(x)$ favours $P$ relative to $Q$ but too weakly to merit attention.</p>
 
 <div class="footnotes" role="doc-endnotes">
   <ol>
