@@ -5,7 +5,7 @@ date:   2025-01-15
 categories: hypothesis-testing
 ---
 
-{:toc}
+{% include toc.html %}
 
 # Introduction
 
