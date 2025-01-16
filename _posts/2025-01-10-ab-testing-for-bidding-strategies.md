@@ -40,14 +40,14 @@ Google and Facebook collect data about each ad which is served to you. So, the d
 
 We are interested in testing which of two hypoteses are true:
 
-1. The null hypothesis $H_0: P \in \mathcal{P}_{\text{null}}$
-2. The alternative $H_1: P \in \mathcal{P}_{\text{alt}}$. 
+1. The null hypothesis $H_0: P \in \mathcal{P}_{\text{null}}$.
+2. The alternative $H_1: P \in \mathcal{P}_{\text{alt}}$.
 
 We have observations of some procces denoted by $Z_1, Z_2, \ldots$ lying in some space $\mathcal{Z}$, and drawn i.i.d. according to $P$.
 
 Testing by betting reframes hypothesis testing into a gambilng problem, instead of creating a function to produce test statistics. Totest the null $H_0$, a bettor may place repeated bets on the outcomes $\{Z_t : t \geq 1\}$ starting with an initial wealth $K_0 = 1$. A single round of betting (say at time $t$) involves the following two steps:
 
-1. First, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$, under the restriction that it ensures a fair bet if the null is true. Formally, this is imposed by requiring $S_t$ to satisfy $\mathbb{E}_P[S_t(Z_t)|\mathcal{F}_{t-1}] = 1$ (or more generally, $\mathbb{E}_P[S_t(Z_t)|\mathcal{F}_{t-1}] \leq 1$) for all $P \in \mathcal{P}_{\text{null}}$, where $\mathcal{F}_{t-1} = \sigma(Z_1,\ldots,Z_{t-1})$.
+1. The bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff fuction is restricted to ensure a fair bet if the null is true. Formally, this is imposed by requiring $S_t$ to satisfy $\mathbb{E}_P[S_t(Z_t)|\mathcal{F}_{t-1}] = 1$.
 
 2. Then, the outcome $Z_t$ is revealed, and the bettor's wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor's wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.
 
