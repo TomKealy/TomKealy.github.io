@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-16T10:51:39+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-16T10:56:54+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
 
@@ -36,7 +36,7 @@
 <p>We are interested in testing which of two hypoteses are true:</p>
 
 <ol>
-  <li>The null hypothesis $H_0: P \in \mathcal{P}_{\text{null}}$</li>
+  <li>The null hypothesis $H_0: P \in \mathcal{P}_{\text{null}}$.</li>
   <li>The alternative $H_1: P \in \mathcal{P}_{\text{alt}}$.</li>
 </ol>
 
@@ -49,9 +49,8 @@
     <table>
       <tbody>
         <tr>
-          <td>First, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$, under the restriction that it ensures a fair bet if the null is true. Formally, this is imposed by requiring $S_t$ to satisfy $\mathbb{E}_P[S_t(Z_t)</td>
-          <td>\mathcal{F}_{t-1}] = 1$ (or more generally, $\mathbb{E}_P[S_t(Z_t)</td>
-          <td>\mathcal{F}<em>{t-1}] \leq 1$) for all $P \in \mathcal{P}</em>{\text{null}}$, where $\mathcal{F}<em>{t-1} = \sigma(Z_1,\ldots,Z</em>{t-1})$.</td>
+          <td>The bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff fuction is restricted to ensure a fair bet if the null is true. Formally, this is imposed by requiring $S_t$ to satisfy $\mathbb{E}_P[S_t(Z_t)</td>
+          <td>\mathcal{F}_{t-1}] = 1$.</td>
         </tr>
       </tbody>
     </table>
