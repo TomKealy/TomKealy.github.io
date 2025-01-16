@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-16T10:02:13+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-16T10:24:24+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
 
@@ -20,7 +20,7 @@
 
 <ol>
   <li>What is the appropriate randomisation unit in this case? We can’t be certain that the dollar ammounts or the number of conversions are at all comparible between experiment variations.</li>
-  <li>Given the uncertainty over the randomisation unit, is the simple total profit (revenue - spend) an appropriate metric to determine the outcome of the experiment? What is an appropriate method for statistical inference in this case (I have read this post as a starter).</li>
+  <li>Given the uncertainty over the randomisation unit, is the simple total profit (revenue - spend) an appropriate metric to determine the outcome of the experiment? What is an appropriate method for statistical inference in this case.</li>
   <li>Sample size &amp; duration: How do I determine the appropriate sample size or experiment duration to detect a 10% uplift in ROI with statistical significance? Is it even correct to think of randomisation units being days?</li>
   <li>Variance estimation: Given that spend is not directly controlled but influenced by target CPA, what metrics or techniques should I use to accurately estimate the variance in ROI across both groups?</li>
   <li>Bias mitigation: How can I account for differences in spend or conversion patterns that might create bias, especially if one strategy adapts faster than the other?</li>
@@ -33,7 +33,9 @@
 
 <h1 id="sequential-testing-by-betting-a-martingale-approach">Sequential Testing by Betting: A Martingale Approach</h1>
 
-<p>Consider a hypothesis testing problem with a null hypothesis $H_0: P \in \mathcal{P}<em>{\text{null}}$ and alternative $H_1: P \in \mathcal{P}</em>{\text{alt}}$, and observations denoted by $Z_1, Z_2, \ldots$ lying in some space $\mathcal{Z}$, and drawn i.i.d. according to $P$. To test the null $H_0$, a bettor may place repeated bets on the outcomes ${Z_t : t \geq 1}$ starting with an initial wealth $K_0 = 1$. A single round of betting (say at time $t$) involves the following two steps:</p>
+<p>We are interested in testing which of two hypoteses are true: a null hypothesis $H_0: P \in \mathcal{P}<em>{\text{null}}$ and alternative $H_1: P \in \mathcal{P}</em>{\text{alt}}$. We have observations denoted by $Z_1, Z_2, \ldots$ lying in some space $\mathcal{Z}$, and drawn i.i.d. according to $P$.</p>
+
+<p>Testing by betting reframes hypothesis testing into a gambilng problem, instead of creating a function to produce test statistics. Totest the null $H_0$, a bettor may place repeated bets on the outcomes ${Z_t : t \geq 1}$ starting with an initial wealth $K_0 = 1$. A single round of betting (say at time $t$) involves the following two steps:</p>
 
 <ol>
   <li>
@@ -50,19 +52,43 @@
   <li>Then, the outcome $Z_t$ is revealed, and the bettor’s wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor’s wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.</li>
 </ol>
 
-<p>The two key technical pieces that underpin the framework are test martingales [Shafer et al., 2011] and Ville’s inequality [Ville, 1939]. To elaborate, the restriction on the conditional expectation of the payoff functions implies that under the null, ${K_t : t \geq 0}$ is a test martingale, which is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.</p>
+<p>The restriction on the conditional expectation of the payoff functions implies that under the null, ${K_t : t \geq 0}$ is a test martingale, which is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.</p>
 
-<p>On the other hand, when $H_1$ is true, the bettor’s choice of payoff functions, ${S_t : t \geq 1}$ should ensure that the wealth process (or equivalently, the amount of evidence against the null) grows at a fast rate, ideally exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville’s maximal inequality ensures that this test controls the type-I error at level $\alpha$.</p>
+<p>On the other hand, when $H_1$ is true, the bettor’s choice of payoff functions, ${S_t : t \geq 1}$ should ensure that the wealth process grows exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville’s maximal inequality[^1] ensures that this test controls the type-I error at level $\alpha$.</p>
 
 <table>
   <tbody>
     <tr>
-      <td>The discussion in the previous paragraph highlights some key design choices that must be made to use these ideas for two-sample testing: in which function class should $S_t$ lie; how to ensure $\mathbb{E}[S_t</td>
-      <td>\mathcal{F}<em>{t-1}] = 1$ uniformly over $\mathcal{P}</em>{\text{null}}$; and how to ensure fast growth of $K_t$ under the alternative? When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known, an obvious choice of $S_t$ is the likelihood ratio $dQ/dP$. Indeed, with this choice of payoff functions, we have $\mathbb{E}_P[S_t</td>
-      <td>\mathcal{F}_{t-1}] = 1$, meaning it is a fair bet under the null. Furthermore, it is easy to check that under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$. However, when dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric (as is the case with the two-sample testing problem considered in this paper), there is no obvious choice for the payoff functions.</td>
+      <td>When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known, the payoff fucntion $S_t$ is just the likelihood ratio $dQ/dP$. With this choice of payoff functions, we have $\mathbb{E}_P[S_t</td>
+      <td>\mathcal{F}_{t-1}] = 1$, meaning it is a fair bet under the null. Under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.</td>
     </tr>
   </tbody>
 </table>
+
+<p>When dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric there is no obvious choice for the payoff functions. So there are a couple of design choices we need to make before we can use the testing by betting framework:</p>
+
+<ol>
+  <li>In which function class should $S_t$ lie?</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>How to ensure $\mathbb{E}[S_t</td>
+          <td>\mathcal{F}<em>{t-1}] = 1$ uniformly over $\mathcal{P}</em>{\text{null}}$;</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>How to ensure fast growth of $K_t$ under the alternative?</li>
+</ol>
+
+<p>Before we continue with the exposition, we first define a sequential test:</p>
+
+<blockquote>
+  <p><strong>Definition 1</strong> (sequential-test). A level-$\alpha$ sequential test can be represented by a random stopping time $\tau$ taking values in ${1, 2, \ldots} \cup {\infty}$, and satisfying the condition $\mathbb{P}(\tau &lt; \infty) \leq \alpha$, under the null $H_0$. Thus, $\tau$ denotes the random time at which the null hypothesis is rejected.</p>
+</blockquote>
+
+<h2 id="the-function-class">The function class</h2>
 
 <h2 id="how-it-works">How It Works</h2>
 
@@ -295,7 +321,9 @@
         <span class="s">'decision'</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">.</span><span class="n">value_counts</span><span class="p">().</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}).</span><span class="nb">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
+</code></pre></div></div>
+
+<p>[^1] <a href="https://en.wikipedia.org/wiki/Ville%27s_inequality">Ville’s inequality</a> bounds the maximum of a martingale by its mean.</p>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
 
