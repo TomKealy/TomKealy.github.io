@@ -38,7 +38,12 @@ Google and Facebook collect data about each ad which is served to you. So, the d
 
 # Sequential Testing by Betting: A Martingale Approach
 
-We are interested in testing which of two hypoteses are true: a null hypothesis $H_0: P \in \mathcal{P}_{\text{null}}$ and alternative $H_1: P \in \mathcal{P}_{\text{alt}}$. We have observations denoted by $Z_1, Z_2, \ldots$ lying in some space $\mathcal{Z}$, and drawn i.i.d. according to $P$.
+We are interested in testing which of two hypoteses are true:
+
+1. The null hypothesis $H_0: P \in \mathcal{P}_{\text{null}}$
+2. The alternative $H_1: P \in \mathcal{P}_{\text{alt}}$. 
+
+We have observations of some procces denoted by $Z_1, Z_2, \ldots$ lying in some space $\mathcal{Z}$, and drawn i.i.d. according to $P$.
 
 Testing by betting reframes hypothesis testing into a gambilng problem, instead of creating a function to produce test statistics. Totest the null $H_0$, a bettor may place repeated bets on the outcomes $\{Z_t : t \geq 1\}$ starting with an initial wealth $K_0 = 1$. A single round of betting (say at time $t$) involves the following two steps:
 
