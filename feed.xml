@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-16T11:05:45+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-16T11:16:08+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
 
@@ -64,9 +64,14 @@
 
 <p>On the other hand, when $H_1$ is true, the bettor’s choice of payoff functions, ${S_t : t \geq 1}$ should ensure that the wealth process grows exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville’s maximal inequality[^1] ensures that this test controls the type-I error at level $\alpha$.</p>
 
-<p>When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known, the payoff fucntion $S_t$ is just the likelihood ratio $dQ/dP$ With this choice of payoff functions, we have $\mathbb{E}<em>P[S_t|\mathcal{F}</em>{t-1}] = 1$, meaning it is a fair bet under the null. Under $H_1$, the wealth
-process with this payoff grows exponentially, with an optimal (expected) growth
-rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.</p>
+<table>
+  <tbody>
+    <tr>
+      <td>When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known, the payoff fucntion $S_t$ is just the likelihood ratio $dQ/dP$. With this choice of payoff functions, we have $\mathbb{E}_P\left[S_t</td>
+      <td>\mathcal{F}_{t-1}\right] = 1$, meaning it is a fair bet under the null. Under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.</td>
+    </tr>
+  </tbody>
+</table>
 
 <p>When dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric there is no obvious choice for the payoff functions. So there are a couple of design choices we need to make before we can use the testing by betting framework:</p>
 
@@ -76,8 +81,8 @@ rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.</p>
     <table>
       <tbody>
         <tr>
-          <td>How to ensure $\mathbb{E}[S_t</td>
-          <td>\mathcal{F}<em>{t-1}] = 1$ uniformly over $\mathcal{P}</em>{\text{null}}$;</td>
+          <td>How to ensure $\mathbb{E}\left[S_t</td>
+          <td>\mathcal{F}<em>{t-1}\right] = 1$ uniformly over $\mathcal{P}</em>{\text{null}}$?</td>
         </tr>
       </tbody>
     </table>
