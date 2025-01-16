@@ -1,4 +1,301 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-15T14:01:56+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-01-16T10:02:13+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
+
+<p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
+
+<p>A <strong>bid</strong> is the amount of money you are willing to spend for a single click on a specific keyword in the Google Ads campaign. Those bids determine where your ads appear in search results. Bidders compete for the highest possible position in Google search rankings for the specific search query. Every time someone does a search in Google, the system runs all offers through Google’s algorithm and ranks the ads according to how much particular advertisers are willing to pay for that term as well as what is its quality score. In short, it is the auction that determines which ads will appear at that moment in that space and your bid puts you in the auction.</p>
+
+<p>Google and Meta provide several ways to control the outcome of each auction: interested parties need to specify a target Return on Ad Spend (tROAS). This is the target ammount that you wish to make on each ad. For example, if a business spends $200 and this generates $1,000 in revenue (or conversion value), then the ROAS is 500%. Setting a tROAS of 500% says that the business needs to make $5 for every $1 that’s spent on Google Ads.</p>
+
+<p>Alternatively a company could control a target Cost per Acquisition (tCPA). Choosing a tCP Abidding strategy will generate the maximum number of conversions using a campaign’s budget. It will also account for the desired target cost per action, which is chosen by the advertiser. For example, if an advertiser has chosen a 20 USD Target CPA, Google will adjust bids to drive conversions and aim to achieve that tCPA.</p>
+
+<p>So you can choose ROAS if you want the maximum conversion value per conversions for your ad budget. You can choose tCPA if you want the maximum number of conversion for a given ad budget.</p>
+
+<p>Companies who bid for these ad spaces are interested in optimising their <strong>ad spend.</strong> That is would a ‘set and forget’ strategy—where you set a <em>fixed</em> tROAS value and leave it throughout a campaign—be outperformed by an adaptive strategy, where the tROAS is adjusted (possibly by an ML model) during the campaign. This is useful, because maybe you set the tCPA to bid 50 USD per conversion, buy you could have gotten away with paying 40 USE instead. A ‘set and forget it’ approach would therefore pay 10 USD extra, and over 1000s of conversions this strategy can cost millions extra over the course of a campaign.</p>
+
+<p>One way to decide whether either strategy is better, is to conduct an A/B test. The challenge is that we cannot directly control the amount of money each strategy spends. The target determines the total spend, which in turn affects the number of conversions and ultimately, the return on investment (ROI). The only aspect I can control is the duration of the experiment. That is, conditioned on the history of outcomes, do I continue for another day?</p>
+
+<p>Our goal is to determine whether the adaptive strategy can outperform the fixed strategy by at least 10\% in terms of ROI.</p>
+
+<p>Here are a few key questions I have:</p>
+
+<ol>
+  <li>What is the appropriate randomisation unit in this case? We can’t be certain that the dollar ammounts or the number of conversions are at all comparible between experiment variations.</li>
+  <li>Given the uncertainty over the randomisation unit, is the simple total profit (revenue - spend) an appropriate metric to determine the outcome of the experiment? What is an appropriate method for statistical inference in this case (I have read this post as a starter).</li>
+  <li>Sample size &amp; duration: How do I determine the appropriate sample size or experiment duration to detect a 10% uplift in ROI with statistical significance? Is it even correct to think of randomisation units being days?</li>
+  <li>Variance estimation: Given that spend is not directly controlled but influenced by target CPA, what metrics or techniques should I use to accurately estimate the variance in ROI across both groups?</li>
+  <li>Bias mitigation: How can I account for differences in spend or conversion patterns that might create bias, especially if one strategy adapts faster than the other?</li>
+  <li>Stopping rules: Since I can only control how long the experiment runs, what would be appropriate stopping criteria or statistical tests to apply during and after the experiment to ensure the results are reliable?</li>
+</ol>
+
+<h1 id="data">Data</h1>
+
+<p>Google and Facebook collect data about each ad which is served to you. So, the data is at the level of the impression. I.e. each time somebody sees see an ad, that is recorded as a separate event. This means that a single person could see the same ad multiple times before clicking through (if they ever do so).</p>
+
+<h1 id="sequential-testing-by-betting-a-martingale-approach">Sequential Testing by Betting: A Martingale Approach</h1>
+
+<p>Consider a hypothesis testing problem with a null hypothesis $H_0: P \in \mathcal{P}<em>{\text{null}}$ and alternative $H_1: P \in \mathcal{P}</em>{\text{alt}}$, and observations denoted by $Z_1, Z_2, \ldots$ lying in some space $\mathcal{Z}$, and drawn i.i.d. according to $P$. To test the null $H_0$, a bettor may place repeated bets on the outcomes ${Z_t : t \geq 1}$ starting with an initial wealth $K_0 = 1$. A single round of betting (say at time $t$) involves the following two steps:</p>
+
+<ol>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>First, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$, under the restriction that it ensures a fair bet if the null is true. Formally, this is imposed by requiring $S_t$ to satisfy $\mathbb{E}_P[S_t(Z_t)</td>
+          <td>\mathcal{F}_{t-1}] = 1$ (or more generally, $\mathbb{E}_P[S_t(Z_t)</td>
+          <td>\mathcal{F}<em>{t-1}] \leq 1$) for all $P \in \mathcal{P}</em>{\text{null}}$, where $\mathcal{F}<em>{t-1} = \sigma(Z_1,\ldots,Z</em>{t-1})$.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>Then, the outcome $Z_t$ is revealed, and the bettor’s wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor’s wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.</li>
+</ol>
+
+<p>The two key technical pieces that underpin the framework are test martingales [Shafer et al., 2011] and Ville’s inequality [Ville, 1939]. To elaborate, the restriction on the conditional expectation of the payoff functions implies that under the null, ${K_t : t \geq 0}$ is a test martingale, which is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.</p>
+
+<p>On the other hand, when $H_1$ is true, the bettor’s choice of payoff functions, ${S_t : t \geq 1}$ should ensure that the wealth process (or equivalently, the amount of evidence against the null) grows at a fast rate, ideally exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville’s maximal inequality ensures that this test controls the type-I error at level $\alpha$.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>The discussion in the previous paragraph highlights some key design choices that must be made to use these ideas for two-sample testing: in which function class should $S_t$ lie; how to ensure $\mathbb{E}[S_t</td>
+      <td>\mathcal{F}<em>{t-1}] = 1$ uniformly over $\mathcal{P}</em>{\text{null}}$; and how to ensure fast growth of $K_t$ under the alternative? When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known, an obvious choice of $S_t$ is the likelihood ratio $dQ/dP$. Indeed, with this choice of payoff functions, we have $\mathbb{E}_P[S_t</td>
+      <td>\mathcal{F}_{t-1}] = 1$, meaning it is a fair bet under the null. Furthermore, it is easy to check that under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$. However, when dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric (as is the case with the two-sample testing problem considered in this paper), there is no obvious choice for the payoff functions.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="how-it-works">How It Works</h2>
+
+<h3 id="the-basic-setup">The Basic Setup</h3>
+
+<ul>
+  <li>Start with $1 of betting capital</li>
+  <li>For each new observation, you place a bet</li>
+  <li>If your betting capital reaches $1/\alpha$ (e.g., $20 for $\alpha=0.05$), you reject the null hypothesis</li>
+</ul>
+
+<p>This setup satisfies a crucial property: under the null hypothesis, your betting capital is a martingale - meaning your expected future wealth equals your current wealth. This property ensures proper Type I error control.</p>
+
+<h3 id="the-betting-process">The Betting Process</h3>
+
+<p>For each observation:</p>
+
+<ul>
+  <li>Choose a betting amount (constrained to ensure you can’t lose all your money)</li>
+  <li>Observe the outcome</li>
+  <li>Update your wealth based on the bet’s outcome</li>
+</ul>
+
+<p>The martingale approach handles this in the context of your bidding strategies. In the paper, Section 2.1 covers this through the filtration ${\mathcal{F}_{t-1}}$ concept. Here’s what’s happening:</p>
+
+<p>At each time $t$, the betting decision ($\lambda_t$) and prediction strategy ($g_t$) must be $\mathcal{F}_{t-1}$-measurable, meaning they can only use information available up to time $t-1$. This accounts for time dependencies because:</p>
+
+\[\mathbb{E}[g_t(X_t) - g_t(Y_t)|\mathcal{F}_{t-1}] = 0\]
+
+<p>For your bidding scenario specifically:</p>
+
+<ul>
+  <li>Each day’s bids and outcomes aren’t independent (today’s bidding may be influenced by yesterday’s performance)</li>
+  <li>But the relative performance difference between strategies each day can still be used for betting</li>
+</ul>
+
+<p>The key adaptation for our case would be:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calculate_bet</span><span class="p">(</span><span class="n">day_data</span><span class="p">,</span> <span class="n">history</span><span class="p">):</span>
+    <span class="c1"># Use history to normalize daily performance
+</span>    <span class="n">normalized_roi_diff</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">day_data</span><span class="p">[</span><span class="s">'adaptive_roi'</span><span class="p">]</span> <span class="o">-</span> <span class="n">day_data</span><span class="p">[</span><span class="s">'fixed_roi'</span><span class="p">])</span> <span class="o">/</span>
+        <span class="n">get_historical_volatility</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">normalized_roi_diff</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Crucially, in the paper’s Remark 7 (page 13):</p>
+
+<p>“The results stated above in Theorem 1 are valid under a much weaker assumption that the stream ${(X_t,Y_t) : t \geq 1}$ consists of independent pairs of observations satisfying $(X_t,Y_t) \stackrel{d}{=} (Y_t,X_t)$ under the null.”</p>
+
+<p>This means we only need:</p>
+
+<ul>
+  <li>Each day’s comparison to be a fair test under the null</li>
+  <li>The betting strategy to only use past information</li>
+</ul>
+
+<p>We don’t need full independence between days, which makes this approach particularly suitable for our adaptive bidding scenario.</p>
+
+<p>The full implementation is:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="k">class</span> <span class="nc">ROISequentialTester</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_wealth</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">min_effect</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.10</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">initial_wealth</span> <span class="o">=</span> <span class="n">initial_wealth</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">min_effect</span> <span class="o">=</span> <span class="n">min_effect</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">wealth</span> <span class="o">=</span> <span class="n">initial_wealth</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">daily_wealth_history</span> <span class="o">=</span> <span class="p">[</span><span class="n">initial_wealth</span><span class="p">]</span>
+        
+    <span class="k">def</span> <span class="nf">calculate_bet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">day_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s">"""
+        Calculate bet size based on ROI comparison
+        Returns a fraction of current wealth to bet
+        """</span>
+        <span class="n">adaptive_roi</span> <span class="o">=</span> <span class="p">(</span><span class="n">day_data</span><span class="p">[</span><span class="s">'adaptive_revenue'</span><span class="p">]</span> <span class="o">-</span> <span class="n">day_data</span><span class="p">[</span><span class="s">'adaptive_spend'</span><span class="p">])</span> <span class="o">/</span> <span class="n">day_data</span><span class="p">[</span><span class="s">'adaptive_spend'</span><span class="p">]</span>
+        <span class="n">fixed_roi</span> <span class="o">=</span> <span class="p">(</span><span class="n">day_data</span><span class="p">[</span><span class="s">'fixed_revenue'</span><span class="p">]</span> <span class="o">-</span> <span class="n">day_data</span><span class="p">[</span><span class="s">'fixed_spend'</span><span class="p">])</span> <span class="o">/</span> <span class="n">day_data</span><span class="p">[</span><span class="s">'fixed_spend'</span><span class="p">]</span>
+        
+        <span class="c1"># Calculate relative ROI improvement
+</span>        <span class="n">relative_improvement</span> <span class="o">=</span> <span class="p">(</span><span class="n">adaptive_roi</span> <span class="o">-</span> <span class="n">fixed_roi</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fixed_roi</span><span class="p">)</span> <span class="k">if</span> <span class="n">fixed_roi</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        
+        <span class="c1"># Scale bet to [-0.5, 0.5] range and center around minimum effect
+</span>        <span class="n">bet</span> <span class="o">=</span> <span class="p">(</span><span class="n">relative_improvement</span> <span class="o">-</span> <span class="bp">self</span><span class="p">.</span><span class="n">min_effect</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">bet</span><span class="p">))</span>
+    
+    <span class="k">def</span> <span class="nf">update_wealth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">day_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s">"""Update wealth based on day's ROI comparison"""</span>
+        <span class="n">bet_fraction</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">calculate_bet</span><span class="p">(</span><span class="n">day_data</span><span class="p">)</span>
+        <span class="n">bet_amount</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">wealth</span> <span class="o">*</span> <span class="n">bet_fraction</span>
+        
+        <span class="c1"># Update wealth with proportional returns
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">wealth</span> <span class="o">+=</span> <span class="n">bet_amount</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">daily_wealth_history</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">wealth</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">wealth</span>
+    
+    <span class="k">def</span> <span class="nf">check_stopping</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="s">"""Check if we should stop the test"""</span>
+        <span class="c1"># Adjusted threshold based on initial wealth
+</span>        <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">initial_wealth</span> <span class="o">/</span> <span class="bp">self</span><span class="p">.</span><span class="n">alpha</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">wealth</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="s">"Reject null hypothesis - Adaptive strategy shows significant ROI improvement"</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="p">.</span><span class="n">wealth</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="p">.</span><span class="n">initial_wealth</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">alpha</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="s">"Accept null hypothesis - Insufficient evidence for ROI improvement"</span>
+        <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="s">"Continue testing"</span>
+
+<span class="k">def</span> <span class="nf">simulate_roi_data</span><span class="p">(</span><span class="n">days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="s">"""Simulate daily ROI data for both strategies"""</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">days</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Fixed strategy
+</span>        <span class="n">fixed_spend</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">rng</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span>  <span class="c1"># Base spend with 10% variance
+</span>        <span class="n">fixed_revenue</span> <span class="o">=</span> <span class="n">fixed_spend</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.2</span> <span class="o">+</span> <span class="n">rng</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span>  <span class="c1"># 20% average ROI
+</span>        
+        <span class="c1"># Adaptive strategy (assumed 30% better on average with more variance)
+</span>        <span class="n">adaptive_spend</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">rng</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
+        <span class="n">adaptive_revenue</span> <span class="o">=</span> <span class="n">adaptive_spend</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.5</span> <span class="o">+</span> <span class="n">rng</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
+        
+        <span class="n">data</span><span class="p">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s">'day'</span><span class="p">:</span> <span class="n">day</span><span class="p">,</span>
+            <span class="s">'fixed_spend'</span><span class="p">:</span> <span class="n">fixed_spend</span><span class="p">,</span>
+            <span class="s">'fixed_revenue'</span><span class="p">:</span> <span class="n">fixed_revenue</span><span class="p">,</span>
+            <span class="s">'adaptive_spend'</span><span class="p">:</span> <span class="n">adaptive_spend</span><span class="p">,</span>
+            <span class="s">'adaptive_revenue'</span><span class="p">:</span> <span class="n">adaptive_revenue</span>
+        <span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">run_roi_experiment</span><span class="p">(</span>
+    <span class="n">initial_wealth</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">num_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">num_simulations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">min_effect</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.10</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="s">"""Run multiple simulations of the ROI-based sequential test"""</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_simulations</span><span class="p">):</span>
+        <span class="c1"># Generate data
+</span>        <span class="n">data</span> <span class="o">=</span> <span class="n">simulate_roi_data</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">num_days</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">sim</span><span class="p">)</span>
+        
+        <span class="c1"># Run test
+</span>        <span class="n">tester</span> <span class="o">=</span> <span class="n">ROISequentialTester</span><span class="p">(</span>
+            <span class="n">initial_wealth</span><span class="o">=</span><span class="n">initial_wealth</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">min_effect</span><span class="o">=</span><span class="n">min_effect</span>
+        <span class="p">)</span>
+        
+        <span class="n">stop_day</span> <span class="o">=</span> <span class="n">num_days</span>
+        <span class="n">final_decision</span> <span class="o">=</span> <span class="s">"Inconclusive"</span>
+        
+        <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_days</span><span class="p">):</span>
+            <span class="n">day_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">day</span><span class="p">]</span>
+            <span class="n">wealth</span> <span class="o">=</span> <span class="n">tester</span><span class="p">.</span><span class="n">update_wealth</span><span class="p">(</span><span class="n">day_data</span><span class="p">)</span>
+            <span class="n">should_stop</span><span class="p">,</span> <span class="n">decision</span> <span class="o">=</span> <span class="n">tester</span><span class="p">.</span><span class="n">check_stopping</span><span class="p">()</span>
+            
+            <span class="k">if</span> <span class="n">should_stop</span><span class="p">:</span>
+                <span class="n">stop_day</span> <span class="o">=</span> <span class="n">day</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">final_decision</span> <span class="o">=</span> <span class="n">decision</span>
+                <span class="k">break</span>
+        
+        <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s">'simulation'</span><span class="p">:</span> <span class="n">sim</span><span class="p">,</span>
+            <span class="s">'stop_day'</span><span class="p">:</span> <span class="n">stop_day</span><span class="p">,</span>
+            <span class="s">'final_wealth'</span><span class="p">:</span> <span class="n">tester</span><span class="p">.</span><span class="n">wealth</span><span class="p">,</span>
+            <span class="s">'initial_wealth'</span><span class="p">:</span> <span class="n">initial_wealth</span><span class="p">,</span>
+            <span class="s">'decision'</span><span class="p">:</span> <span class="n">final_decision</span><span class="p">,</span>
+            <span class="s">'wealth_history'</span><span class="p">:</span> <span class="n">tester</span><span class="p">.</span><span class="n">daily_wealth_history</span>
+        <span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># Run experiments with different initial wealth levels
+</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">initial_wealths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">]</span>
+    <span class="n">all_results</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">initial_wealth</span> <span class="ow">in</span> <span class="n">initial_wealths</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">run_roi_experiment</span><span class="p">(</span>
+            <span class="n">initial_wealth</span><span class="o">=</span><span class="n">initial_wealth</span><span class="p">,</span>
+            <span class="n">num_days</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">num_simulations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+            <span class="n">min_effect</span><span class="o">=</span><span class="mf">0.10</span>
+        <span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s">'initial_wealth'</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_wealth</span>
+        <span class="n">all_results</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    
+    <span class="n">combined_results</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="n">all_results</span><span class="p">)</span>
+    
+    <span class="c1"># Plot results
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">initial_wealth</span> <span class="ow">in</span> <span class="n">initial_wealths</span><span class="p">:</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="n">combined_results</span><span class="p">[</span><span class="n">combined_results</span><span class="p">[</span><span class="s">'initial_wealth'</span><span class="p">]</span> <span class="o">==</span> <span class="n">initial_wealth</span><span class="p">]</span>
+        
+        <span class="c1"># Plot first 5 simulations for each initial wealth
+</span>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">))):</span>
+            <span class="n">wealth_history</span> <span class="o">=</span> <span class="n">subset</span><span class="p">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">'wealth_history'</span><span class="p">]</span>
+            <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wealth_history</span><span class="p">,</span> 
+                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s">'Initial Wealth $</span><span class="si">{</span><span class="n">initial_wealth</span><span class="si">:</span><span class="p">,</span><span class="si">}</span><span class="s">'</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">None</span><span class="p">)</span>
+            
+        <span class="c1"># Plot threshold line
+</span>        <span class="n">plt</span><span class="p">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">initial_wealth</span><span class="o">/</span><span class="mf">0.05</span><span class="p">,</span> 
+                   <span class="n">linestyle</span><span class="o">=</span><span class="s">'--'</span><span class="p">,</span> 
+                   <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                   <span class="n">color</span><span class="o">=</span><span class="s">'gray'</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Day'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Wealth ($)'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'ROI-Based Sequential Testing with Different Initial Wealth Levels'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">yscale</span><span class="p">(</span><span class="s">'log'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+    
+    <span class="c1"># Print summary statistics
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Experiment Summary by Initial Wealth:"</span><span class="p">)</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">combined_results</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'initial_wealth'</span><span class="p">).</span><span class="n">agg</span><span class="p">({</span>
+        <span class="s">'stop_day'</span><span class="p">:</span> <span class="p">[</span><span class="s">'mean'</span><span class="p">,</span> <span class="s">'std'</span><span class="p">],</span>
+        <span class="s">'decision'</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">.</span><span class="n">value_counts</span><span class="p">().</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="p">}).</span><span class="nb">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+</code></pre></div></div>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Hypothesis Testing by Betting</title><link href="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/" rel="alternate" type="text/html" title="Hypothesis Testing by Betting" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/13/testing-by-betting</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/13/testing-by-betting/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
 
@@ -1806,317 +2103,4 @@ S_n = \log \frac{\theta_1}{\theta_0} \sum_{i=1}^{n} x_i + \log \frac{1 - \theta_
 
 <p>Bibliography:</p>
 
-<p>‘Windish DM, Huot SJ, Green ML: Medicine residents’ understanding of the biostatistics and results in the medical literature. JAMA 298:1010- 1022, 2007’</p>]]></content><author><name></name></author><category term="statistics," /><category term="hypothesis" /><category term="testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Running Conda environments from Jupyter Notebook.</title><link href="http://gregorygundersen.com/blog/2022/07/03/conda-and-jupyter-notebook/" rel="alternate" type="text/html" title="Running Conda environments from Jupyter Notebook." /><published>2022-07-03T00:00:00+00:00</published><updated>2022-07-03T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2022/07/03/conda-and-jupyter-notebook</id><content type="html" xml:base="http://gregorygundersen.com/blog/2022/07/03/conda-and-jupyter-notebook/"><![CDATA[<p>This post is mostly take from <a href="https://medium.com/@nrk25693/how-to-add-your-conda-environment-to-your-jupyter-notebook-in-just-4-steps-abeab8b8d084">here</a> as an aide-memoir and to prevent</p>]]></content><author><name></name></author><category term="optimisation" /><summary type="html"><![CDATA[This post is mostly take from here as an aide-memoir and to prevent]]></summary></entry><entry><title type="html">An introduction to Gradient Descent</title><link href="http://gregorygundersen.com/blog/2021/10/10/gradient-descent/" rel="alternate" type="text/html" title="An introduction to Gradient Descent" /><published>2021-10-10T00:00:00+00:00</published><updated>2021-10-10T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2021/10/10/gradient-descent</id><content type="html" xml:base="http://gregorygundersen.com/blog/2021/10/10/gradient-descent/"><![CDATA[<p>Gradient Descent is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.</p>
-
-<h2 id="introduction">Introduction</h2>
-
-<p>Some ideas are so ubiquitous and all-encompassing that it’s difficult to remember that they were once invented. Other ideas are so simple and apparently obvious that they seem less invented and more handed down by God. Gradient descent is one such idea. It there is hardly a branch of applied mathematics which doesn’t use it, or not it seems to have appeared fully formed as an algorithmic idea for both the primordial mathematical time.</p>
-
-<p>It’s worth noting how Agoras trusted an idea, gradient descent is is it allows the researcher to numerically compute an optimal answer even when they can’t analytically describe the function over which they are optimizing. Seen further, all that is required is some measurement of how our solution does as we form the optimal solution, and that the function we are optimizing over be smooth over our domain of interest.</p>
-
-<p>It’s seems too good to be true! Yet the core issue in many applications such as signal processing, operations research, economics, and statistics boil down to the following minimization problem</p>
-
-\[\mathrm{min}_{\theta \in \mathcal{R^m}} J\left(\theta\right)\]
-
-<p>where \(J\left(\theta\right)\) is what is called the <em>cost function,</em> which measures how well the model parameters \(\theta\) fit to a given dataset. A few examples would be</p>
-
-<ul>
-  <li>Logistic regression</li>
-</ul>
-
-\[J\left(\theta\right) = \sum_{n} \log{\left(1 + \exp{y_i X_{i}^T\theta}\right)}\]
-
-<ul>
-  <li>Linear regression</li>
-</ul>
-
-\[J\left(\theta\right) = \frac{1}{2}\lvert\lvert X\theta - y \rvert\rvert^2\]
-
-<ul>
-  <li>Composite</li>
-</ul>
-
-\[J\left(\theta\right) = f\left(\theta\right) + g\left(\theta\right)\]
-
-<p>with $ f $ being ‘well behaved’ and $ g $ causing us some trouble.</p>
-
-<p>We assume that \(J\left(\theta\right)\) is bounded from below (i.e. the minimum is not \(-\infty\)). This just guarantees the existence of a solution. If $ J $ is convex this is no problem, but if $ J $ is not (and also not smooth) then it’s much more difficult. Always check that a solution exists before wasting time minimising!</p>
-
-<p>There are a couple of ways you could find such an $ \theta $, given a cost function. The most straigtforward is to start with some initital value, and then move in the direction of the negative gradient of the cost funtion:</p>
-
-\[\theta_{k+1} = \theta_{k} - \eta\nabla_{\theta} J\left(\theta\right)\]
-
-<p>with $ \Theta_0 = 0 $. Here. $\eta$ is the learning rate - a tuneable parameter. We terminate the algorithm once</p>
-
-\[\lvert \theta_{k+1} -  \theta_{k} \rvert \leq \varepsilon\]
-
-<p>Intuitively, \(J\left(\theta\right)\) defines a surface over \(\theta\\). We, the end-users, want to find the lowest point on that surface (or the lowest point subject to some intersection constraint). Gradient descent finds that lowest point by constructing a sequence of approximations to \(\theta^*\) (the optimal point), with eath \(\theta_{k}\) (the interations of the algorithm) always in the direction of steepest descent from \(\theta_{k-1}\). We will formalise this intuition and provide performance guarantees later.</p>
-
-<h2 id="linear-regression">Linear Regression</h2>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span> 
-<span class="o">%</span><span class="n">config</span> <span class="n">InlineBackend</span><span class="p">.</span><span class="n">figure_format</span> <span class="o">=</span> <span class="s">'retina'</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">style</span><span class="p">.</span><span class="n">use</span><span class="p">([</span><span class="s">'seaborn-colorblind'</span><span class="p">,</span> <span class="s">'seaborn-darkgrid'</span><span class="p">])</span>
-</code></pre></div></div>
-
-<p>We’ll generate some data that we’ll use for the rest of this post:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">2.25</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">stddev</span><span class="o">=</span><span class="mf">1.5</span><span class="p">):</span>
-    <span class="s">"""Generate n data points approximating given line.
-    m, b: line slope and intercept.
-    stddev: standard deviation of added error.
-    Returns pair x, y: arrays of length n.
-    """</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">m</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">stddev</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">y</span>
-
-<span class="n">N</span> <span class="o">=</span> <span class="mi">500</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">generate_data</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>Suppose you have a set of observations of some process you wanted to model, for example the size of a house labelled as \(x_i \in \mathrm{R}^n\), and the house price labeleld as \(y_i \in \mathrm{R}\), \(i = 1 \ldots m\) (i.e. you have \(m\) examples). One good choice for a model is linear:</p>
-
-\[\hat{y}\left(x\right) = Ax + b\]
-
-<p>The goal is to find some suitable \(A \in \mathcal{R}^n\) and \(b \in \mathcal{R}\), to model this process corectly.</p>
-
-<p>For convenience, let’s make some new definitions:</p>
-
-<p>\(\Theta = [A: b]\)
-\(X = [x_1: \ldots : x_m :1]\)
-\(Y = [y_1: \ldots : y_m :1]\)</p>
-
-<p>What we’ve done her is to stack our parameters into \(\Theta\) so that it’s a \(\mathrm{R}^{\left(n+1\right)\times 1}\) vector, we have stacked our examples into an \(\mathrm{R}^{\left(n+1\right) \times m}\) matrix, and we have stacked all the outputs into a \(\mathrm{R}^{\left(n+1\right) \times 1}\) vector. Now our hypothesis can be written as</p>
-
-<p>\(\hat{Y} = \Theta^T X\).</p>
-
-<p>Say you also had good reason to believe that the best reconstruction of $$ x $ you could possilby hope to achieve was to minimise the following (mean squared) error measure:</p>
-
-\[J\left(\Theta\right) = \frac{1}{n} \lVert \hat{Y} - Y\rVert_2^2\]
-
-<p>A function to compute the cost is below:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">MSE</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
-    <span class="s">"""Function to compute MSE between true values and estimate
-    
-    y: true values
-    yhat: estimate
-    """</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">yhat</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)).</span><span class="n">mean</span><span class="p">()</span>
-</code></pre></div></div>
-
-<p>There are a couple of ways you could find such an $4 \hat{Y} $$, given a cost function. The most straigtforward is to start with some initital value, and then move in the direction of the negative gradient of the cost funtion:</p>
-
-\[\Theta_{k+1} = \Theta_{k} - \alpha\nabla_{\Theta} J\left(\Theta\right)\]
-
-<p>with \(\Theta_0 = 0\). Here. \(\alpha\) is the learning rate - a tuneable parameter. We’ll have more to say about that later.</p>
-
-<p>The following function does exactly this,</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">gradient_descent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">250</span><span class="p">):</span>
-    <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="p">.</span><span class="n">shape</span>
-    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="n">yhat</span> <span class="o">=</span> <span class="n">theta</span><span class="p">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">.</span><span class="n">T</span>
-    <span class="k">yield</span> <span class="n">theta</span><span class="p">,</span> <span class="n">cost</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yhat</span><span class="p">.</span><span class="n">T</span><span class="p">)</span>
-    
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iters</span><span class="p">):</span>
-        <span class="n">yhat</span> <span class="o">=</span> <span class="n">theta</span><span class="p">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">.</span><span class="n">T</span>
-        <span class="n">yhatt</span> <span class="o">=</span> <span class="n">yhat</span><span class="p">.</span><span class="n">T</span>
-        <span class="n">nabla</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">yhatt</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">nabla</span><span class="p">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">theta</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">theta</span> <span class="o">+=</span>  <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">learning_rate</span> <span class="o">/</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">nabla</span>
-        <span class="k">yield</span> <span class="n">theta</span><span class="p">,</span> <span class="n">cost</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yhat</span><span class="p">.</span><span class="n">T</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>Some notes on the algorithm: it may be mysterious as to why we divide the learning rate y the number of samples \(m\). But this is a way to average the gradient across all samples. This approach has several important implications:</p>
-
-<p>Scaling of the Gradient: When you compute the gradient of the cost function, you’re essentially summing up the gradients calculated for each individual sample. If you don’t average this sum by dividing by \(m\), the magnitude of the gradient could become very large, especially with a large number of samples. This large gradient could lead to very large steps when updating your parameters, potentially causing overshooting and failure to converge to the minimum of the cost function.</p>
-
-<p>Consistent Learning Rate By dividing by \(m\): you ensure that the learning rate behaves consistently regardless of the number of samples. This means that the learning rate you choose is less dependent on the size of your dataset. Without this scaling, you might need to adjust your learning rate based on the size of your dataset, which is not ideal.</p>
-
-<p>Numerical Stability: Scaling by \(m\) also contributes to numerical stability. It prevents the gradient values from becoming too large, which can cause numerical issues in computation (like overflow or underflow problems).</p>
-
-<p>Interpretability: It makes the learning rate parameter more interpretable and independent of the sample size. This is beneficial when you want to use the same learning rate for datasets of different sizes or when comparing the performance of the algorithm on different datasets.</p>
-
-<p>Now we check graphically if the fitted parameters make sense:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">ones</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">thetas</span> <span class="o">=</span> <span class="n">gradient_descent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">MSE</span><span class="p">)</span>
-<span class="n">final</span> <span class="o">=</span> <span class="p">[(</span><span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
-<span class="n">costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">final</span><span class="p">]</span>
-<span class="n">theta</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">costs</span><span class="p">)</span>
-</code></pre></div></div>
-<h2 id="costs-figure-goes-here">Costs figure goes here</h2>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theta</span>
-    <span class="n">array</span><span class="p">([[</span> <span class="mf">2.27769915</span><span class="p">],</span>
-           <span class="p">[</span> <span class="mf">5.90213934</span><span class="p">]])</span>
-
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
-<span class="n">yhat</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">theta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="s">"r-"</span><span class="p">)</span>
-</code></pre></div></div>
-
-<h2 id="fit-goes-here">Fit goes here.</h2>
-
-<p>We could also seek to minimise the least absolute deviations of our predictions from the data:</p>
-
-\[J\left(\Theta\right)  = \frac{1}{n} \lVert \hat{Y} - Y\rVert_1\]
-
-<p>a function to do this is included below:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">MAE</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">):</span>
-    <span class="s">"""Function to compute LAE between true values and estimate
-    
-    y: true values
-    yhat: estimate
-    """</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">yhat</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">yhat</span><span class="p">).</span><span class="n">mean</span><span class="p">()</span>
-</code></pre></div></div>
-
-<p>Finally, if you are minimising the MSE you can compute it analytically via the normal equations (left as an exercise to the reader):</p>
-
-\[\hat{\theta} = (X^T X)^{-1} X^Ty\]
-
-<p>We can do this with the following code:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">normal_equation</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ones</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-    <span class="s">"""
-    linear regression using the normal equation.
-    X: Feature matrix
-    y: Target variable array
-    ones: Add a col of ones to Feature matrix
-    Returns the calculated theta values.
-    """</span>
-    <span class="c1"># Adding a column of ones to X for the intercept term
-</span>    <span class="k">if</span> <span class="n">ones</span><span class="p">:</span>
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">ones</span><span class="p">,</span> <span class="n">X</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># Compute the coefficients
-</span>    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="p">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
-    <span class="k">return</span> <span class="n">theta</span>
-  
-<span class="n">theta_analytic</span> <span class="o">=</span> <span class="n">normal_equation</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-
-<span class="n">theta</span><span class="p">,</span> <span class="n">theta_analytic</span> 
-</code></pre></div></div>
-
-<p>You can derive this equation as follows:</p>
-
-<ol>
-  <li>Take the (vector) derivative of the cost function to find:</li>
-</ol>
-
-\[\nabla_{\theta} J\left(\theta\right) = X\left(X^T\theta - y\right)\]
-
-<ol>
-  <li>Set the derivative to zero and rearrange:</li>
-</ol>
-
-\[X\left(X^T\theta - y\right) = 0\]
-
-\[X^TX \theta = X^T y\]
-
-\[\theta = \left( X^TX  \right)^{-1} X^T y\]
-
-<p>Intuitivelyy the product \(X^Ty\) is the projection of \(y\) onto the space spanned by the columns of \(X\). This operation translates the target values into the “language” of our features.</p>
-
-<p>The matrix \(X^TX\) is a feature-feature correlation matrix. It’s symmetrical and captures how each feature relates to every other feature. Taking the inverse of this matrix is akin to understanding how to uniquely weigh each feature to best describe the target \(y\). The inverse undoes the mixing of feature influences, allowing us to isolate the effect of each feature.</p>
-
-<p>When you multiply the inverse of \(X^TX\) with \(X^Ty\), you apply the unique weighting to the projection of \(y\) in feature space. This results in the coefficients \(\Theta\) that best map your features to your target in a least-squares sense.</p>
-
-<p>Note that even though this has a nice interpretation calculating \(\left( X^TX  \right)^{-1}\) is prohibitively expensive (it’s on \(\mathcal{O}\left(n^3\right)\) operation). In practice gradient descent is always used.</p>
-
-<h2 id="logistic-regression">Logistic Regression</h2>
-
-<p>Logistic regression is used when we need our outputs to be strictly within the interval \([0, 1]\). It’s usually taught as a classification algorithm, but it’s best thought of as a regression which predictst <strong>probabilities</strong>. Logistic regression minimises the following loss function:</p>
-
-\[J\left(w\right) = y * p\left( y_i | x_i ; w \right) + (1-y) * (1 - p\left( y_i | x_i ; w \right))\]
-
-<p>There is a mathematical justification for why this is the right loss to use, but heuristically, this loss minimises the probability error between the predicition classes and the true classes.</p>
-
-<p>The other major difference is that we choose the sigmoid function. $ \sigma\left(X\theta\right) $ with</p>
-
-\[\sigma\left(z\right) = \frac{1}{1+e^{-z}}\]
-
-<p>instead of \(X^t\theta\) as the hypothesis function. The sigmoid function maps any real-valued number into the range \((0, 1)\), making it useful for a probability estimate. Essentially what we are doing here with logistic regression is doing a linear regression but then transforming the outputs to probability space. We’ll predict the class of each point using softmax (multinomial logistic) regression. The model has a matrix \(W\) of weights, which measures for each feature how likely that feature is to be in a particular. It is of size \(\mathrm{n_{features}} \times \mathrm{n_{classes}}\). The goal of softmax regression is to learn such a matrix. Given a matrix of weights, \(W\), and matrix of points, \(X\), it predicts the probability od each class given the samples.</p>
-
-<p>In code we can do it like this:</p>
-
-<p>```python
-	def sigmoid(z):
-    return 1 / (1 + jnp.exp(-z))</p>
-
-<p>def logistic_cost(theta, X, y):
-    m = len(y)
-    h = sigmoid(X @ theta)
-    cost = -(1/m) * jnp.sum(y * jnp.log(h) + (1 - y) * jnp.log(1 - h))
-    return cost</p>
-
-<p>def logistic_regression(X, y, cost_fn, learning_rate=0.01, num_iters=1000):
-    m, n = X.shape
-    theta = np.zeros((n, 1))
-    y = y[:, 0]
-    y = y.reshape(-1, 1)
-    cost_history = []</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for i in range(num_iters):
-    z = X @ theta
-    h = sigmoid(z)
-    gradient = (1/m) * X.T @ (h - y)
-    theta -= learning_rate * gradient
-    
-    cost = cost_fn(theta, X, y)
-    cost_history.append(cost)
-
-return theta, cost_history
-</code></pre></div></div>
-
-<p>def make_blobs(num_samples=1000, num_features=2, num_classes=2):
-    mu = np.random.rand(num_classes, num_features)
-    sigma = np.ones((num_classes, num_features)) * 0.1
-    samples_per_class = num_samples // num_classes
-    x = np.zeros((num_samples, num_features))
-    y = np.zeros((num_samples, num_classes))
-    for i in range(num_classes):
-        class_samples = np.random.normal(mu[i, :], sigma[i, :], (samples_per_class, num_features))
-        x[i * samples_per_class:(i+1) * samples_per_class] = class_samples
-        y[i * samples_per_class:(i+1) * samples_per_class, i] = 1
-    return x, y</p>
-
-<p>def plot_clusters(x, y, num_classes=2):
-    temp = np.argmax(y, axis=1)
-    colours = [‘r’, ‘g’, ‘b’]
-    for i in range(num_classes):
-        x_class = x[temp == i]
-        plt.scatter(x_class[:, 0], x_class[:, 1], color=colours[i], s=1)
-    plt.show()</p>
-
-<p>NUM_FEATURES=50
-NUM_CLASSES=2
-NUM_SAMPLES=1000</p>
-
-<p>X, y, = make_blobs(num_samples=NUM_SAMPLES, num_features=NUM_FEATURES, num_classes=NUM_CLASSES)
-plot_clusters(X, y, num_classes=NUM_CLASSES)
-``</p>
-
-<h2 id="gradient-descent-without-gradients">Gradient Descent without Gradients</h2>
-
-<p>We can see the outline of what we need: a function which represents the cost of our operation, and something to compute the gradients. Fortunately <code class="language-plaintext highlighter-rouge">autograd</code> does exactly this!</p>
-
-<p>According to the webiste, autograd</p>
-
-<blockquote>
-  <p>Autograd can automatically differentiate native Python and Numpy code. It can handle a large subset of Python’s features, including loops, ifs, recursion and closures, and it can even take derivatives of derivatives of derivatives. It supports reverse-mode differentiation (a.k.a. backpropagation), which means it can efficiently take gradients of scalar-valued functions with respect to array-valued arguments, as well as forward-mode differentiation, and the two can be composed arbitrarily. The main intended application of Autograd is gradient-based optimization.</p>
-</blockquote>]]></content><author><name></name></author><category term="optimisation" /><summary type="html"><![CDATA[Gradient Descent is the simplest learning algorithm. It is very easy to implement, is robust to complex cost functions, and is the foundation of an enormous zoo of variations.]]></summary></entry></feed>
+<p>‘Windish DM, Huot SJ, Green ML: Medicine residents’ understanding of the biostatistics and results in the medical literature. JAMA 298:1010- 1022, 2007’</p>]]></content><author><name></name></author><category term="statistics," /><category term="hypothesis" /><category term="testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Running Conda environments from Jupyter Notebook.</title><link href="http://gregorygundersen.com/blog/2022/07/03/conda-and-jupyter-notebook/" rel="alternate" type="text/html" title="Running Conda environments from Jupyter Notebook." /><published>2022-07-03T00:00:00+00:00</published><updated>2022-07-03T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2022/07/03/conda-and-jupyter-notebook</id><content type="html" xml:base="http://gregorygundersen.com/blog/2022/07/03/conda-and-jupyter-notebook/"><![CDATA[<p>This post is mostly take from <a href="https://medium.com/@nrk25693/how-to-add-your-conda-environment-to-your-jupyter-notebook-in-just-4-steps-abeab8b8d084">here</a> as an aide-memoir and to prevent</p>]]></content><author><name></name></author><category term="optimisation" /><summary type="html"><![CDATA[This post is mostly take from here as an aide-memoir and to prevent]]></summary></entry></feed>
