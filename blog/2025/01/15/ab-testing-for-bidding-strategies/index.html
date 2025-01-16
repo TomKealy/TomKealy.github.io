@@ -119,24 +119,15 @@ MathJax.Hub.Config({
 
 <p>A single round of betting (say at time $t$) involves the following two steps:</p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>Firstly, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff has to satisfy $\mathbb{E}_P[S_t(Z_t)</td>
-      <td>\mathcal{F}_{t-1}] = 1$. I.e. the bet is fair when the null is true.</td>
-    </tr>
-  </tbody>
-</table>
+<p>Firstly, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff has to satisfy $\mathbb{E}<em>P[S_t(Z_t) \mid \mathcal{F}</em>{t-1}] = 1$. I.e. the bet is fair when the null is true. Then, the outcome $Z_t$ is revealed, and the bettor’s wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor’s wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.</p>
 
-<p>Then, the outcome $Z_t$ is revealed, and the bettor’s wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor’s wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.</p>
-
-<p>The restriction on the conditional expectation of the payoff functions implies that under the null, ${K_t : t \geq 0}$ is a test martingale, which is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.</p>
+<p>The restriction on the conditional expectation of the payoff functions implies that under the null, ${K_t : t \geq 0}$ is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.</p>
 
 <p>On the other hand, when $H_1$ is true, the bettor’s choice of payoff functions, ${S_t : t \geq 1}$ should ensure that the wealth process grows exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville’s maximal inequality([^1]) ensures that this test controls the type-I error at level $\alpha$.</p>
 
-<p>When testing simple hypotheses ($H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known), the payoff fucntion $S_t$ is just the likelihood ratio $Q/P$. With this choice of payoff functions, we have</p>
+<p>When testing simple hypotheses ($H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known), the payoff fucntion $S_t$ is just the likelihood ratio $Q/P$. With this choice of payoff functions, we have:</p>
 
-\[\mathbb{E}_P\left[S_t|\mathcal{F}_{t-1}\right] = 1\]
+\[\mathbb{E}_P\left[S_t \mid \mathcal{F}_{t-1}\right] = 1\]
 
 <p>meaning it is a fair bet under the null. Under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.</p>
 
@@ -144,7 +135,7 @@ MathJax.Hub.Config({
 
 <ol>
   <li>In which function class should $S_t$ lie?</li>
-  <li>How to ensure $\mathbb{E}\left[S_t\mid\mathcal{F}<em>{t-1}\right] = 1$ uniformly over $\mathcal{P}</em>{\text{null}}$?</li>
+  <li>How to ensure $\mathbb{E}\left[S_t \mid \mathcal{F}<em>{t-1}\right] = 1$ uniformly over $\mathcal{P}</em>{\text{null}}$?</li>
   <li>How to ensure fast growth of $K_t$ under the alternative?</li>
 </ol>
 
@@ -158,12 +149,12 @@ MathJax.Hub.Config({
 
 <p>We begin by defining the two-sample testing problem.</p>
 
-<p><strong>Definition:Two-sample testing.</strong> Given a stream of paired observations ${(X_t,Y_t) : t \geq 1}$, drawn i.i.d. according to $P_X \times P_Y$ on the observation space $\mathcal{X} \times \mathcal{X}$</p>
+<p><strong>Definition:Two-sample testing.</strong> Given a stream of paired observations ${(X_t,Y_t) : t \geq 1}$, drawn i.i.d. according to $P_X \times P_Y$ on the observation space $\mathcal{X} \times \mathcal{X}$, our goal is to test the null, $H_0 : P_X = P_Y$ against the alternative  $H_0 : P_X \neq P_Y$.</p>
 
 <p>The distributions in the null class are invariant to the action of the operator $T : (\mathcal{X} \times \mathcal{X}) \to (\mathcal{X} \times \mathcal{X})$ that takes elements $(x,y) \in \mathcal{X} \times \mathcal{X}$ and flips their order; that is $T(x,y) = (y,x)$.</p>
 
 <blockquote>
-  <p><strong>Remark</strong> This definition assumes two streams of i.i.d. observations, ${X_t : t \geq 1}$ and ${Y_t : t \geq 1}$. However, <a class="citation" href="#shekhar2023nonparametric">(Shekhar &amp; Ramdas, 2023)</a> prove a theorem whose results are valid under a much weaker assumption that the stream ${(X_t,Y_t) : t \geq 1}$ consists of independent pairs of observations satisfying $(X_t,Y_t) \stackrel{d}{=} (Y_t,X_t)$ under the null, and $(X_t,Y_t) \stackrel{d}{\neq} (Y_t,X_t)$ under the alternative.</p>
+  <p><strong>Remark</strong> This definition assumes two streams of i.i.d. observations, ${X_t : t \geq 1}$ and ${Y_t : t \geq 1}$. However, <a class="citation" href="#shekhar2023nonparametric">(Shekhar &amp; Ramdas, 2023)</a> prove a theorem whose results are valid under a much weaker assumption that the stream ${(X_t,Y_t) : t \geq 1}$ consists of independent pairs of observations satisfying $(X_t,Y_t) \stackrel{d}{=} (Y_t, X_t)$ under the null, and $(X_t,Y_t) \stackrel{d}{\neq} (Y_t,X_t)$ under the alternative.</p>
 </blockquote>
 
 <p>This means we only need:</p>
@@ -331,7 +322,7 @@ MathJax.Hub.Config({
     <span class="k">return</span> <span class="n">bandwidth</span>
 </code></pre></div></div>
 
-<p>For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following function:</p>
+<p>For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following code:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
