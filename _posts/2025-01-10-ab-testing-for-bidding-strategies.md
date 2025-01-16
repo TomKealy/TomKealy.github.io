@@ -5,6 +5,8 @@ date:   2025-01-15
 categories: hypothesis-testing
 ---
 
+{:toc}
+
 # Introduction
 
 Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.
