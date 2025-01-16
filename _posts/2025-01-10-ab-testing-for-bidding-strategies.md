@@ -3,6 +3,7 @@ layout: default
 title:  "AB testing Google Ads Bidding strategies"
 date:   2025-01-15
 categories: hypothesis-testing
+toc: true
 ---
 
 {% include toc.html %}
