@@ -62,7 +62,7 @@ When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ 
 When dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric there is no obvious choice for the payoff functions. So there are a couple of design choices we need to make before we can use the testing by betting framework:
 
 1. In which function class should $S_t$ lie?
-2. How to ensure $\mathbb{E}[S_t|\mathcal{F}_{t-1}] = 1$ uniformly over $\mathcal{P}_{\text{null}}$;
+2. How to ensure $\mathbb{E}\left[S_t|\mathcal{F}_{t-1}\right] = 1$ uniformly over $\mathcal{P}_{\text{null}}$?
 3. How to ensure fast growth of $K_t$ under the alternative?
 
 Before we continue with the exposition, we first define a sequential test:
