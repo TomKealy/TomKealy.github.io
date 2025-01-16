@@ -49,18 +49,16 @@ Testing by betting reframes hypothesis testing into a gambilng problem, instead 
 
 A single round of betting (say at time $t$) involves the following two steps:
 
-Firstly, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff has to satisfy $\mathbb{E}_P[S_t(Z_t)|\mathcal{F}_{t-1}] = 1$. I.e. the bet is fair when the null is true.
+Firstly, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff has to satisfy $\mathbb{E}_P[S_t(Z_t) \mid \mathcal{F}_{t-1}] = 1$. I.e. the bet is fair when the null is true. Then, the outcome $Z_t$ is revealed, and the bettor's wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor's wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.
 
-Then, the outcome $Z_t$ is revealed, and the bettor's wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor's wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.
-
-The restriction on the conditional expectation of the payoff functions implies that under the null, $\{K_t : t \geq 0\}$ is a test martingale, which is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.
+The restriction on the conditional expectation of the payoff functions implies that under the null, $\{K_t : t \geq 0\}$ is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.
 
 On the other hand, when $H_1$ is true, the bettor's choice of payoff functions, $\{S_t : t \geq 1\}$ should ensure that the wealth process grows exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville's maximal inequality([^1]) ensures that this test controls the type-I error at level $\alpha$.
 
-When testing simple hypotheses ($H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known), the payoff fucntion $S_t$ is just the likelihood ratio $Q/P$. With this choice of payoff functions, we have 
+When testing simple hypotheses ($H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known), the payoff fucntion $S_t$ is just the likelihood ratio $Q/P$. With this choice of payoff functions, we have:
 
 $$
-\mathbb{E}_P\left[S_t|\mathcal{F}_{t-1}\right] = 1
+\mathbb{E}_P\left[S_t \mid \mathcal{F}_{t-1}\right] = 1
 $$
 
 meaning it is a fair bet under the null. Under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.
@@ -68,7 +66,7 @@ meaning it is a fair bet under the null. Under $H_1$, the wealth process with th
 When dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric there is no obvious choice for the payoff functions. So there are a couple of design choices we need to make before we can use the testing by betting framework:
 
 1. In which function class should $S_t$ lie?
-2. How to ensure $\mathbb{E}\left[S_t\mid\mathcal{F}_{t-1}\right] = 1$ uniformly over $\mathcal{P}_{\text{null}}$?
+2. How to ensure $\mathbb{E}\left[S_t \mid \mathcal{F}_{t-1}\right] = 1$ uniformly over $\mathcal{P}_{\text{null}}$?
 3. How to ensure fast growth of $K_t$ under the alternative?
 
 Before we continue with the exposition, we first define a sequential test:
@@ -79,11 +77,11 @@ Before we continue with the exposition, we first define a sequential test:
 
 We begin by defining the two-sample testing problem.
 
-**Definition:Two-sample testing.** Given a stream of paired observations $\{(X_t,Y_t) : t \geq 1\}$, drawn i.i.d. according to $P_X \times P_Y$ on the observation space $\mathcal{X} \times \mathcal{X}$
+**Definition:Two-sample testing.** Given a stream of paired observations $\{(X_t,Y_t) : t \geq 1\}$, drawn i.i.d. according to $P_X \times P_Y$ on the observation space $\mathcal{X} \times \mathcal{X}$, our goal is to test the null, $H_0 : P_X = P_Y$ against the alternative  $H_0 : P_X \neq P_Y$.
 
 The distributions in the null class are invariant to the action of the operator $T : (\mathcal{X} \times \mathcal{X}) \to (\mathcal{X} \times \mathcal{X})$ that takes elements $(x,y) \in \mathcal{X} \times \mathcal{X}$ and flips their order; that is $T(x,y) = (y,x)$.
 
-> **Remark** This definition assumes two streams of i.i.d. observations, $\{X_t : t \geq 1\}$ and $\{Y_t : t \geq 1\}$. However, {% cite shekhar2023nonparametric %} prove a theorem whose results are valid under a much weaker assumption that the stream $\{(X_t,Y_t) : t \geq 1\}$ consists of independent pairs of observations satisfying $(X_t,Y_t) \stackrel{d}{=} (Y_t,X_t)$ under the null, and $(X_t,Y_t) \stackrel{d}{\neq} (Y_t,X_t)$ under the alternative.
+> **Remark** This definition assumes two streams of i.i.d. observations, $\{X_t : t \geq 1\}$ and $\{Y_t : t \geq 1\}$. However, {% cite shekhar2023nonparametric %} prove a theorem whose results are valid under a much weaker assumption that the stream $\{(X_t,Y_t) : t \geq 1\}$ consists of independent pairs of observations satisfying $(X_t,Y_t) \stackrel{d}{=} (Y_t, X_t)$ under the null, and $(X_t,Y_t) \stackrel{d}{\neq} (Y_t,X_t)$ under the alternative.
 
 This means we only need:
 
@@ -249,7 +247,7 @@ def get_optimal_kernel_bandwidth(X: np.ndarray,
     return bandwidth
 ```
 
-For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following function:
+For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following code:
 
 ```python
 import numpy as np
