@@ -49,15 +49,17 @@ Testing by betting reframes hypothesis testing into a gambilng problem, instead 
 
 A single round of betting (say at time $t$) involves the following two steps:
 
-1. The bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff has to satisfy $\mathbb{E}_P[S_t(Z_t)|\mathcal{F}_{t-1}] = 1$. I.e. the bet is fair when the null is true.
+Firstly, the bettor selects a payoff function $S_t: \mathcal{Z} \to [0, \infty)$. The payoff has to satisfy $\mathbb{E}_P[S_t(Z_t)|\mathcal{F}_{t-1}] = 1$. I.e. the bet is fair when the null is true.
 
-2. Then, the outcome $Z_t$ is revealed, and the bettor's wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor's wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.
+Then, the outcome $Z_t$ is revealed, and the bettor's wealth grows (or possibly shrinks) by a factor of $S_t(Z_t)$. Thus, the bettor's wealth after $t$ rounds of betting is $K_t = K_0 \prod_{i=1}^t S_i(Z_i)$.
 
 The restriction on the conditional expectation of the payoff functions implies that under the null, $\{K_t : t \geq 0\}$ is a test martingale, which is a nonnegative martingale with an initial value 1. Due to this fact, $K_t$ is unlikely to take large values for any $t \geq 1$.
 
 On the other hand, when $H_1$ is true, the bettor's choice of payoff functions, $\{S_t : t \geq 1\}$ should ensure that the wealth process grows exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville's maximal inequality[^1] ensures that this test controls the type-I error at level $\alpha$.
 
-When testing simple hypotheses ($H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known), the payoff fucntion $S_t$ is just the likelihood ratio $dQ/dP$. With this choice of payoff functions, we have $\mathbb{E}_P\left[S_t|\mathcal{F}_{t-1}\right] = 1$, meaning it is a fair bet under the null. Under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.
+When testing simple hypotheses ($H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known), the payoff fucntion $S_t$ is just the likelihood ratio $dQ/dP$. With this choice of payoff functions, we have $\mathbb{E}_P\left[S_t|\mathcal{F}_{t-1}\right] = 1$, meaning it is a fair bet under the null.
+
+Under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.
 
 When dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric there is no obvious choice for the payoff functions. So there are a couple of design choices we need to make before we can use the testing by betting framework:
 
