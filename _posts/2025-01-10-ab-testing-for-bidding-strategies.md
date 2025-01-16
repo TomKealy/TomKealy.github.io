@@ -57,7 +57,9 @@ The restriction on the conditional expectation of the payoff functions implies t
 
 On the other hand, when $H_1$ is true, the bettor's choice of payoff functions, $\{S_t : t \geq 1\}$ should ensure that the wealth process grows exponentially. Such a wealth process naturally leads to the following sequential test: reject the null if $K_t \geq 1/\alpha$, where $\alpha \in (0, 1)$ is the desired confidence level. Ville's maximal inequality[^1] ensures that this test controls the type-I error at level $\alpha$.
 
-When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known, the payoff fucntion $S_t$ is just the likelihood ratio $dQ/dP$. With this choice of payoff functions, we have $\mathbb{E}_P[S_t|\mathcal{F}_{t-1}] = 1$, meaning it is a fair bet under the null. Under $H_1$, the wealth process with this payoff grows exponentially, with an optimal (expected) growth rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$. 
+When testing simple hypotheses $H_0: Z_t \sim P$ and $H_1: Z_t \sim Q$ with $P$ and $Q$ known, the payoff fucntion $S_t$ is just the likelihood ratio $dQ/dP$ With this choice of payoff functions, we have $\mathbb{E}_P[S_t|\mathcal{F}_{t-1}] = 1$, meaning it is a fair bet under the null. Under $H_1$, the wealth
+process with this payoff grows exponentially, with an optimal (expected) growth
+rate of $\text{KL}(Q, P)$: the KL-divergence between $Q$ and $P$.
 
 When dealing with cases where either one or both of $H_0$ and $H_1$ are composite and nonparametric there is no obvious choice for the payoff functions. So there are a couple of design choices we need to make before we can use the testing by betting framework:
 
