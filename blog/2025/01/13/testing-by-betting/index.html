@@ -72,6 +72,521 @@ MathJax.Hub.Config({
         </div>
         <div class='wrap article'>
             <ul><li><a href="#introduction">Introduction</a></li><li><a href="#testing-by-betting">Testing by betting</a><ul><li><a href="#betting-scores-are-likelihood-ratios">Betting scores are likelihood ratios</a></li><li><a href="#how-much-should-i-bet">How much should I bet?</a><ul><li><a href="#kelly-betting">Kelly Betting</a></li><li><a href="#neyman-pearson">Neyman-Pearson</a></li></ul></li><li><a href="#implied-targets">Implied targets</a></li></ul></li><li><a href="#examples">Examples</a></li><li><a href="#hypotheis-testing-and-code">Hypotheis Testing and Code</a></li></ul>
+            <h1 id="introduction">Introduction</h1>
+
+<p>The $p$-value is the most misunderstood, misused, and maligned scientific quantity. The $p$-value is merely a summary of your data; it tells you how likely you are to see data at least as extreme as the data you have collected when your null hypothesis is correct. However it often does double duty in statistical analyses: it can tell us whether or not to reject the null hypothesis (e.g. if $ p \leq \alpha$) as well as how confident we should be in the alternative hypothesis. Altogether, this makes the $p$-value a poor tool for scientific communication.</p>
+
+<p>A simpler alternative to $p$-values is to report the result of a bet against the null hypothesis. This is <strong>testing by betting.</strong> This method is closely related to the likelihood method, and leads to alternatives for statistical confidence and power.</p>
+
+<p>This post is a longer exposition of <em>Testing by Betting</em>, Gleen Schafer (2021) <a class="citation" href="#shafer2021testing">(Shafer, 2021)</a>. The point was to include more exposition and some code. Any resemblence to the original is therefore natural (and in some cases I’ve jsut changed the language);</p>
+
+<p>Testing by betting is straightforward. First we select a payoff (which can be either be zero or a positive number). Then we buy this payoff for its (hypothesized) expected value. If this bet multiplies the money it risks, we have evidence against the hypothesis. The factor–called the <strong>betting score</strong>–measures the strength of this evidence. Multiplying our money by 5 merits attention; multiplying it by 100 or by 1000 might be considered conclusive.</p>
+
+<p>Testing by betting is simpler than reporting a $p$-value, because a $p$-value represents the probability of obtaining test results at least as extreme as those observed, assuming the null hypothesis is true. The key phrase here is “at least as extreme”–you’re not just looking at the probability of getting exactly your observed result, but rather the probability of getting your result or any more extreme result. A $p$-value is thus the result of a <em>family</em> of tests:</p>
+
+<ul>
+  <li>For any observed test statistic, you need to consider all the possible outcomes that would be “more extreme”</li>
+  <li>You have to decide what counts as “more extreme” (one-tailed vs two-tailed tests)</li>
+  <li>You’re essentially conducting multiple implicit hypothesis tests - one for your actual result and one for each more extreme possible outcome.</li>
+</ul>
+
+<p>The betting score  is simpler because it just looks at one specific bet and its outcome–did you win or lose, and by how much? There’s no need to consider a family of hypothetical outcomes or define what counts as “more extreme.” To take an example:</p>
+
+<ol>
+  <li>With a $p$-value: If you observe a z-score of 2.5, you need to calculate the probability of observing a z-score ≥ 2.5 (or ≤ -2.5 for a two-tailed test)</li>
+  <li>With a betting score: You just calculate how much money your specific bet made or lost (e.g. 10x the initial bet).</li>
+</ol>
+
+<p>Betting scores also have a number of other advantages:</p>
+
+<ol>
+  <li>There is less uncertainty when you get a large betting score, compared with a small $p$-value. You will not forget that a long shot can succeed by sheer luck.</li>
+  <li>When we make a bet, we create an implied alternative hypothesis. The betting score is the likelihood ratio with respect to this alternative. What the betting score means is aligned with what a likelihood ratio means.</li>
+  <li>As well as implying an alternative hypothsis, the bet also implies a <strong>target.</strong> This is the value we desire to make the bet “worthwhile.” Implied targets are useful than power calculations, because an implied target along with an actual betting score tells a coherent story. To interpret a statistical test, you need to know the test’s actual statistical power. This, in turn, requires a fixed significance level. In traditional statistical inference, there’s a  awkward relationship between power calculations and $p$-values: Power calculations are done before the study; but after running the study, you report a $p$-value, which might be any value between 0 and 1. Betting scores are superior because they have a more coherent narrative -both your planning and your results are in the same units (betting scores for your money).</li>
+  <li>Testing by betting is a more agile approach to science, because you don’t have to plan your entire analysis in advance.</li>
+</ol>
+
+<h1 id="testing-by-betting">Testing by betting</h1>
+
+<p>We are interested in phenomenon which we model with a probability distribution, $P$, with an associated set of random variables. $X$. For example:</p>
+
+<ol>
+  <li>The ammount of traffic per hour at an intersection. We could model this as a <a href="https://en.wikipedia.org/wiki/Poisson_distribution">Poisson</a> distribution, and we want to know the mean parameter.</li>
+  <li>The height of pupils in a school. We could model this as a normal distribution, and we would like know the mean and standard deviation.</li>
+</ol>
+
+<p>We will later see the actual value of the parameter $X$, which we denote $x$. How can we give more nuanced content to our claims (e.g. that traffic intensity is best modelled by a Poisson distribution), and how could we challenge them?</p>
+
+<p>The way we choose to proceed is to interpret our claim as a collection of betting offers with Reality<sup id="fnref:1"><a href="#fn:1" class="footnote" rel="footnote" role="doc-noteref">1</a></sup>. Reality offers to sell me any payoff $S\left(x\right)$ for its expected value $\mathcal{E}_P\left(x\right)$. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk.</p>
+
+<p>My betting score is:</p>
+
+\[\frac{S\left(x\right)}{\mathcal{E}_P\left(x\right)}\]
+
+<p>The score doesn’t change when I scale my bet, so I can take $\mathcal{E}_P\left(x\right) = 1$, and so the betting score is simply my payoff.</p>
+
+<p>The standard way of testing a probability distribution $P$ is to select a significance level $α \in \left(0,1\right)$, usually small, and a set $E$ of possible values of $X$ such that $\mathcal{P}\left(X \in E\right) = \alpha$. The event $E$ is called the rejection region. The probability distribution $P$ is discredited (or rejected) if the actual value $x$ is in $E$.</p>
+
+<p>For example, we could test the mean $X$ of a series of measurements $M_1, M_2, \ldots, M_k$ to see if the distribution $P$ has mean zero or not. We believe that $X$ comes from a standard normal distribution, and so we test (with a $z$-test for instance) that $X$ is in the region $X \in \left(-1.96, 1.96\right)$ (i.e. $X$ is within 2 standard deviations of the standard normal distribution). If we see a $x$ (the actual mean) that is bigger than 1.96 (i.e. $\mid x\mid &gt; 1.96$) then we conclude that the $X$ does not have mean 0.</p>
+
+<p>Textbooks seldom make the idea explicit, however a standard test is often thought of as a bet: I pay one dollar for the payoff $S_E$ defined by</p>
+
+\[S_E = \begin{cases}
+\frac{1}{\alpha} &amp; \text{if } x \in E \\
+0 &amp; \text{otherwise}
+\end{cases}\]
+
+<p>If $E$ happens, I have multiplied the dollar I risked by $\frac{1}{\alpha}$. This makes standard testing a special case of testing by betting, where the bet is all-or-nothing. In return for a dollar, I get either $\frac{1}{\alpha}$ or nothing.</p>
+
+<p>So a betting score $S\left(x\right)$ appraises the evidence against $P$. The larger $S\left(x\right)$, the stronger the evidence.</p>
+
+<h2 id="betting-scores-are-likelihood-ratios">Betting scores are likelihood ratios</h2>
+
+<p>Betting against a hypothesis is equivalent to proposing an alternative hypothesis $Q$ and comparing likelihoods. We show this this by first showing a betting score is a likelihood ratio, and then by showing that likelihood ratios are betting scores.</p>
+
+<p>Earlier we defined our betting score as:</p>
+
+\[\frac{S\left(x\right)}{\mathcal{E}_P\left(x\right)}\]
+
+<p>Where our payoff in the bet is denoted by $S\left(x\right)$ and my stake is simplly the expected value $\mathcal{E}_P\left(x\right)$. The betting score is what you win divided by what you paid. I can choose a (nonnegative) payoff $S$, so that $\mathcal{E}_P\left(x\right)$ is all that I risk (i.e. I pay the expected value of this payoff $S$ under probability distribution $P$).</p>
+
+<p>We also noted that the score doesn’t change when I scale my bet (doubling both your payoff and stake gives the same score), so I can take $\mathcal{E}_P\left(y\right) = 1$. The assumption $\mathbb{E}_P(S) = 1$. Another way of saying this is that $\sum_x S(x)P(x) = 1$. Because $S(x)$ and $P(x)$ are:</p>
+
+<ol>
+  <li>nonnegative for all $x$ (and we are assuming that $P &gt; 0$)</li>
+  <li>$\sum_x S(x)P(x) = 1$</li>
+</ol>
+
+<p>$SP$ is a probability distribution. We <em>define</em></p>
+
+\[Q := SP\]
+
+<p>and call $Q$ the alternative <em>implied</em> by the bet $S$. If $P$ is wrong and $Q$ is actually the true distribution, then your bet would be expected to make money. So $Q$ represents what you “think might actually be true” when you make your bet against $P$.</p>
+
+<p>Because we assumed $P(x) &gt; 0$ for all $x$, we can rearrange, and express our payoff as the ratio of these two probability distributions:</p>
+
+\[S(x) = \frac{Q(x)}{P(x)}\]
+
+<p>i.e. the betting score is a simply a likelihood ratio.</p>
+
+<p>A likelihood ratio is a betting score.</p>
+
+<p>If you have two probability distributions $Q$ and $P$ then the likelihood ration $S = Q/P$ satisfies the requirements for a bet:</p>
+
+<ol>
+  <li>$Q/P$ is nonnegative since probabilities are nonnegative.</li>
+  <li>$\sum_x \frac{Q(x)}{P(x)}P(x) = \sum_y Q(x) = 1$. I.e. The expected value of the bet under $P$ is 1.</li>
+</ol>
+
+<p>expected value of this bet under $Q$ is nonnegative: $\mathbb{E}_Q(S) \geq 1$ ($\mathbb{E}_Q(S)$ is how much you expect to win if $Q$ is actually true).</p>
+
+<p>In fact $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. Since $S = Q/P$, we can write $\mathbb{E}_Q(S) = \sum_x S(x)Q(x)$. We substitute $S = Q/P$:</p>
+
+\[\begin{align*}
+\mathbb{E}_Q(S) &amp;= \sum_x \frac{Q(x)}{P(x)}Q(x) \\
+&amp;= \sum_x \frac{Q(x)^2}{P(x)}
+\end{align*}\]
+
+<p>Let’s consider $\mathbb{E}_P(S^2)$:</p>
+
+\[\mathbb{E}_P(S^2) = \sum_y S(x)^2P(x)\]
+
+<p>Again substitute $S = Q/P$:</p>
+
+\[\begin{align*}
+\mathbb{E}_P(S^2) &amp;= \sum_x \left(\frac{Q(x)}{P(x)}\right)^2P(x) \\
+&amp;= \sum_x \frac{Q(x)^2}{P(x)^2}P(x) \\
+&amp;= \sum_x \frac{Q(x)^2}{P(x)}
+\end{align*}\]
+
+<p>We can see that this is the same as what we got for $\mathbb{E}_Q(S)$, thus $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$. When we square $S = Q/P$ and multiply by $P$ in $\mathbb{E}_P(S^2)$, we end up with the same expression as when we multiply $S = Q/P$ by $Q$ in $\mathbb{E}_Q(S)$.</p>
+
+<p>A consequence of this insight is that because we know that $\mathbb{E}_P(S) = 1$ (this was one of our initial assumptions about the betting score), $\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)$ implies:</p>
+
+\[\begin{align*}
+\mathbb{E}_Q(S) - 1
+&amp;= \mathbb{E}_P(S^2) - 1 \quad \text{(substituting }\mathbb{E}_Q(S) = \mathbb{E}_P(S^2)\text{)} \\
+&amp;= \mathbb{E}_P(S^2) - (\mathbb{E}_P(S))^2 \quad \text{(substituting }1 = \mathbb{E}_P(S)\text{)} \\
+&amp;= \text{Var}_P(S)
+\end{align*}\]
+
+<p>Here $\mathbb{E}_Q(S) - 1$ represents what I win if I am right, and not “Reality” ($P$). i.e the more variable your betting score is under the null hypothesis $P$, the more you stand to gain if your alternative $Q$ is actually true. If you make a more extreme bet (higher variance), you have more to gain if you’re right.</p>
+
+<h2 id="how-much-should-i-bet">How much should I bet?</h2>
+
+<p>We began with your claiming that $P$ describes the phenomenon $X$ and my making a bet $S$ satisfying $S \geq 0$ and, for simplicity, $\mathbb{E}_P(S) = 1$. Suppose, however, that I do have an alternative $Q$ in mind. I have a hunch that $Q$ is a valid description of $X$. In this case, should I use $\frac{Q}/{P}$ as my bet?</p>
+
+<p>There are two schools of thought: opportunistic and repeated testing, and testing in a single ‘go.’ The first justification is related to <a href="https://en.wikipedia.org/wiki/Kelly_criterion">Kelly Betting</a>, and the second is related to the <a href="https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma">Neyman-Pearson Lemma</a>.</p>
+
+<h3 id="kelly-betting">Kelly Betting</h3>
+<p>The thought that I should is supported by Gibbs’s inequality which says that<sup id="fnref:2"><a href="#fn:2" class="footnote" rel="footnote" role="doc-noteref">2</a></sup>:</p>
+
+\[\mathbb{E}_Q \ln\frac{Q}{P} \geq \mathbb{E}_Q \ln\frac{R}{P}\]
+
+<p>for <strong>any</strong> probability distribution $R$ for $Y$. Because any bet $S$ is of the form $R/P$ for some such $R$, Gibb’s inequality tells us that $\mathbb{E}_Q(\ln S)$ is maximized over $S$ by setting $S := Q/P$. This tells that if we have a hunch that $Q$ is more correct than $P$ (or any other probability distribution $R$) then we should be $\frac{Q}{P}$.</p>
+
+<p>The quanitiy $\mathbb{E}_Q(\ln(Q/P))$ is known as the Kullback-Leibler divergence between $Q$ and $P$. It is the mean number of bits of information you gain when $Q$ is the true encoding distribution and not $P$.</p>
+
+<p>Why should I choose $S$ to maximize $\mathbb{E}_Q(\ln S)$? Why not maximize $\mathbb{E}_Q(S)$? Or perhaps $Q(S \geq 20)$ or $Q(S \geq 1/\alpha)$ for some other significance level $\alpha$?</p>
+
+<p>Maximizing $\mathbb{E}(\ln S)$ makes sense in a scientific context where we combine successive betting scores by multiplication. i.e. when we are testing opportunistically. When $S$ is the product of many successive factors, maximizing $\mathbb{E}(\ln S)$ maximizes $S$’s rate of growth. Logarithms are <em>additive</em> in repeated bets.</p>
+
+<h3 id="neyman-pearson">Neyman-Pearson</h3>
+<p>Conversely choosing $S$ to maximize $Q(S \geq 1/\alpha)$ is appropriate when the hypothesis being tested will not be tested again.</p>
+
+<p>For a given significance level $\alpha$, we choose a rejection region $E$ such that $Q(x)/P(x)$ is at least as large for all $x \in E$ as for any $x \notin E$, where $Q$ is an alternative hypothesis.</p>
+
+<p>Let us call the bet $S_E$ with this choice of $E$ the <em>level-$\alpha$ bet</em> against $P$ with respect to $Q$. The <em>Neyman-Pearson lemma</em> says that this choice of $E$ maximizes</p>
+
+\[Q(\text{test rejects }P) = Q(X \in E) = Q(S_E(X) \geq 1/\alpha)\]
+
+<p>which we call the <em>power</em> of the test with respect to $Q$. In fact, $S_E$ with this choice of $E$ maximizes</p>
+
+\[Q(S(Y) \geq 1/\alpha)\]
+
+<p>over all bets $S$, not merely over all-or-nothing bets. <a class="citation" href="#shafer2021testing">(Shafer, 2021)</a> offers a proof of this statement.</p>
+
+<h2 id="implied-targets">Implied targets</h2>
+
+<p>When I get my betting score for a particular bet $S$ against $P$, how do I know if the score is good or not?</p>
+
+<p>Choosing a payoff $S$ defines an alternative probability distribution, $Q : = SP$, and with $S$ being the bet against $P$ that maximizes $\mathbb{E}<em>Q(\ln S)$. We might hope for a betting score whose _logarithm</em> is in the ballpark of $\mathbb{E}_Q(\ln S)$. I.e a betting score like:</p>
+
+\[S_{*} : = \exp{\mathbb{E}_Q(\ln S)}\]
+
+<p>We call $S_{∗}$ the <strong>implied target</strong> of the bet $S$. The implied target of the all-or-nothing bet is always $\frac{1}{\alpha}$.</p>
+
+<p>The notion of an implied target is analogous to the notion of statistical power with respect to a particular alternative. But it has the advantage that we cannot avoid discussing it by refusing to specify a particular alternative. The implied alternative $Q$ and the implied target $S_{∗}$ are determined as soon as the distribution $P$ and the bet $S$ are specified. The implied target can be computed without even mentioning $Q$, because:</p>
+
+\[\mathbb{E}_Q(\ln S) = \sum_x Q(x)\ln S(x) = \sum_y P(x)S(x)\ln S(x) = \mathbb{E}_P(S\ln S)\]
+
+<p>(def expectation, then def of $Q$, collect like terms). i.e. this is expected log betting score under <em>either</em> $Q$ (as $\mathbb{E}<em>Q(\ln S)$) _or</em> $P$ (as $\mathbb{E}_P(S\ln S)$).</p>
+
+<h1 id="examples">Examples</h1>
+
+<p><strong>Example 1.</strong></p>
+
+<p>Suppose $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 1 and standard deviation 10, and we observe $x = 30$.</p>
+
+<ol>
+  <li>
+    <p>Statistician A simply calculates a p-value: $P(X \geq 30) \approx 0.00135$. She concludes that $P$ is strongly discredited.</p>
+  </li>
+  <li>
+    <p>Statistician B uses the Neyman-Pearson test with significance level $\alpha = 0.05$, which rejects $P$ when $x &gt; 16.5$. Its power is only about 6%<sup id="fnref:3"><a href="#fn:3" class="footnote" rel="footnote" role="doc-noteref">3</a></sup>.</p>
+  </li>
+</ol>
+
+<p>Seeing $x = 30$, it does reject $P$. Had she formulated her test as a bet, she would have multiplied the money she risked by 20.</p>
+
+<ol>
+  <li>Statistician C uses the bet $S$ given by:</li>
+</ol>
+
+\[S(y) := \frac{q(x)}{p(x)} = \frac{\sqrt{10^2\pi}\exp(-(x-1)^2/200)}{\sqrt{10^2\pi}\exp(-x^2/200)} = \exp(\frac{2x-1}{200})\]
+
+<p>So</p>
+
+\[\mathbb{E}_Q(\ln(S)) = \frac{1}{200} = \frac{1}{200}\]
+
+<p>I.e. the implied target is $\exp(1/200) \approx 1.005$. She does a little better than this very low target; she multiplies the money she risked by $\exp(59/200) \approx 1.34$.</p>
+
+<p>The power and the implied target both told us in advance that the study was a waste of time. The betting score of 1.34 confirms that little was accomplished, while the low $p$-value and the Neyman-Pearson rejection of $P$ give a misleading verdict in favour of $Q$.</p>
+
+<h1 id="hypotheis-testing-and-code">Hypotheis Testing and Code</h1>
+
+<p>We now present three implementations of the ideas in <a class="citation" href="#shafer2021testing">(Shafer, 2021)</a>. Firstly we implement a version of Protocol 1, which formalises the above method of testing a probability distribution $P$ for a phenomenon X that takes values in a set $\mathcal{X}$.</p>
+
+<blockquote>
+  <p>Protocol 1. Testing a probability distribution
+   Sceptic announces $S: X → \left[0, \infty\right)$ such that $\mathbb{E}_P(S) = 1$. 
+Reality announces $X \in \mathcal{X}$.
+\mathcal{K}: = $S(x)$.</p>
+</blockquote>
+
+<p>Where $\mathcal{K}$ is our final capital.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">BettingTest</code> class below implements this Protocol.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="o">@</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">TestParameters</span><span class="p">:</span>
+    <span class="s">"""Container for test parameters"""</span>
+
+    <span class="n">null_mean</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">null_std</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">alternative_mean</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">alternative_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># If None, uses null_std
+</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Set alternative_std to null_std if not provided"""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">alternative_std</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">alternative_std</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">null_std</span>
+
+<span class="k">class</span> <span class="nc">BettingTest</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">TestParameters</span><span class="p">):</span>
+        <span class="s">"""
+        Initialize a betting-based hypothesis test.
+
+        Parameters:
+        - params: TestParameters object containing distribution parameters
+        """</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_null</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">null_mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s">"BettingTest"</span><span class="p">:</span>
+        <span class="s">"""
+        Alternative constructor using just null hypothesis parameters.
+
+        Parameters:
+        - null_mean: Mean under the null hypothesis
+        - null_std: Standard deviation under the null hypothesis
+        """</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span>
+            <span class="n">null_mean</span><span class="o">=</span><span class="n">null_mean</span><span class="p">,</span>
+            <span class="n">null_std</span><span class="o">=</span><span class="n">null_std</span><span class="p">,</span>
+            <span class="n">alternative_mean</span><span class="o">=</span><span class="n">null_mean</span><span class="p">,</span>  <span class="c1"># Will be updated in compute_betting_score
+</span>        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_betting_score</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="s">"""
+        Compute the betting score (likelihood ratio) comparing the null hypothesis
+        to an alternative hypothesis.
+
+        Parameters:
+        - data: Observed data
+        - alternative_mean: Mean under the alternative hypothesis
+
+        Returns:
+        - betting_score: The factor by which we multiply our money
+        - implied_target: The expected betting score under the alternative
+        """</span>
+        <span class="n">null_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">null_mean</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">null_std</span><span class="p">)</span>
+        <span class="n">alt_density</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">alternative_mean</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">null_std</span>
+        <span class="p">)</span>
+
+        <span class="n">betting_score</span> <span class="o">=</span> <span class="n">alt_density</span> <span class="o">/</span> <span class="n">null_density</span>
+
+        <span class="n">log_scores</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">betting_score</span><span class="p">)</span>
+        <span class="n">implied_target</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_scores</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">betting_score</span><span class="p">,</span> <span class="n">implied_target</span>
+</code></pre></div></div>
+
+<p>We can use the code like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>
+    <span class="n">true_mean</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">null_mean</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">null_std</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">true_mean</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">bt</span> <span class="o">=</span> <span class="n">BettingTest</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">betting_scores</span><span class="p">,</span> <span class="n">implied_target</span> <span class="o">=</span> <span class="n">bt</span><span class="p">.</span><span class="n">compute_betting_score</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">final_betting_score</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">betting_scores</span><span class="p">)))</span>
+    <span class="n">t_stat</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">ttest_1samp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">null_mean</span><span class="p">)</span>
+    <span class="n">is_significant</span> <span class="o">=</span> <span class="n">p_value</span> <span class="o">&lt;</span> <span class="n">alpha</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Results:"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Sample mean: </span><span class="si">{</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Traditional Test:"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"P-value: </span><span class="si">{</span><span class="n">p_value</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Significant at 0.05 level: </span><span class="si">{</span><span class="n">is_significant</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Betting Test:"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Final betting score: </span><span class="si">{</span><span class="n">final_betting_score</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Implied target: </span><span class="si">{</span><span class="n">implied_target</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+    <span class="n">score_interp</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s">"strong"</span>
+        <span class="k">if</span> <span class="n">final_betting_score</span> <span class="o">&gt;</span> <span class="mi">20</span>
+        <span class="k">else</span> <span class="s">"moderate"</span> <span class="k">if</span> <span class="n">final_betting_score</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="k">else</span> <span class="s">"weak"</span>
+    <span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Betting score indicates </span><span class="si">{</span><span class="n">score_interp</span><span class="si">}</span><span class="s"> evidence against null hypothesis"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"(We multiplied our money by a factor of </span><span class="si">{</span><span class="n">final_betting_score</span><span class="si">:</span><span class="p">.</span><span class="mi">1</span><span class="n">f</span><span class="si">}</span><span class="s">)"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>This prints out:</p>
+
+<blockquote>
+  <p>Results:
+Sample mean: 0.396
+=================================================================
+Traditional Test:
+P-value: 0.000
+Significant at 0.05 level: True
+=================================================================
+Betting Test:
+Final betting score: 1.076
+Implied target: 1.076
+Betting score indicates weak evidence against null hypothesis
+(We multiplied our money by a factor of 1.1)</p>
+</blockquote>
+
+<p>Finally, we will use this example to work through a couple of examples from the paper. The following function will actually run the examples:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_example</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">TestParameters</span><span class="p">,</span> <span class="n">example_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="s">"""
+    Run complete example showing all three statistical approaches.
+
+    Parameters:
+    - y: Observed value
+    - params: TestParameters object containing distribution parameters
+    - example_num: Example number for display
+    """</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="se">\n</span><span class="s">Example </span><span class="si">{</span><span class="n">example_num</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"="</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="c1"># Statistician A: p-value
+</span>    <span class="n">p_value</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">null_mean</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">null_std</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Statistician A (p-value):"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"p-value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+    <span class="c1"># Statistician B: Neyman-Pearson test
+</span>    <span class="n">power</span><span class="p">,</span> <span class="n">critical_value</span> <span class="o">=</span> <span class="n">compute_power</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">np_rejects</span> <span class="o">=</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">critical_value</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Statistician B (Neyman-Pearson):"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Power = </span><span class="si">{</span><span class="n">power</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="o">%</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Critical value = </span><span class="si">{</span><span class="n">critical_value</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Rejects null: </span><span class="si">{</span><span class="n">np_rejects</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np_rejects</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Multiplies money by 20"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Loses all money"</span><span class="p">)</span>
+
+    <span class="c1"># Statistician C: Betting score
+</span>    <span class="n">bt</span> <span class="o">=</span> <span class="n">BettingTest</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">betting_score</span><span class="p">,</span> <span class="n">implied_target</span> <span class="o">=</span> <span class="n">bt</span><span class="p">.</span><span class="n">compute_betting_score</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Statistician C (Betting):"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Betting score = </span><span class="si">{</span><span class="n">betting_score</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Implied target = </span><span class="si">{</span><span class="n">implied_target</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+    <span class="c1"># Interpretation
+</span>    <span class="k">if</span> <span class="n">betting_score</span> <span class="o">&gt;</span> <span class="n">implied_target</span><span class="p">:</span>
+        <span class="n">conclusion</span> <span class="o">=</span> <span class="s">"favors Q over P"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">conclusion</span> <span class="o">=</span> <span class="s">"favors P over Q"</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Evidence </span><span class="si">{</span><span class="n">conclusion</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>and this is a helper function to calculate the power of a Neyman-Pearson test:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">compute_power</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">TestParameters</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">):</span>
+    <span class="s">"""
+    Compute power of Neyman-Pearson test.
+
+    Parameters:
+    - params: TestParameters object containing distribution parameters
+    - alpha: Significance level (default=0.05)
+
+    Returns:
+    - power: Power of the test
+    - critical_value: Critical value for rejection region
+    """</span>
+    <span class="n">critical_value</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">params</span><span class="p">.</span><span class="n">null_std</span> <span class="o">+</span> <span class="n">params</span><span class="p">.</span><span class="n">null_mean</span>
+    <span class="n">power</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="p">.</span><span class="n">norm</span><span class="p">.</span><span class="n">cdf</span><span class="p">(</span>
+        <span class="n">critical_value</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">alternative_mean</span><span class="p">,</span> <span class="n">params</span><span class="p">.</span><span class="n">alternative_std</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">power</span><span class="p">,</span> <span class="n">critical_value</span>
+</code></pre></div></div>
+
+<p><strong>Example 2:</strong></p>
+
+<blockquote>
+  <p>$P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 37 and standard deviation 10, and we observe $x = 16.5$.</p>
+</blockquote>
+
+<p>We run it like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params2</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mi">37</span><span class="p">)</span>
+<span class="n">run_example</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mf">16.5</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params2</span><span class="p">,</span> <span class="n">example_num</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And get the following output:</p>
+
+<blockquote>
+  <p>Statistician A (p-value):
+p-value = 0.0495
+=================================================================
+Statistician B (Neyman-Pearson):
+Power = 98.0068%
+Critical value = 16.449
+Rejects null: True
+Multiplies money by 20
+=================================================================
+Statistician C (Betting):
+Betting score = 0.477
+Implied target = 0.477
+Evidence favors P over Q</p>
+</blockquote>
+
+<ol>
+  <li>Statistician A again calculates a $p$-value: $P(X \geq 16.5) \approx 0.0495$. She concludes that $P$ is discredited.</li>
+  <li>Statistician B uses the Neyman–Pearson test that rejects when $x &gt; 16.445$. This test has significance level $\alpha = 0.05$, and its power under $Q$ is almost $98%$. It rejects; Statistician B multiplies the money she risked by $20$.</li>
+  <li>Statistician C uses the bet $S$ given by $S(x) := q(x)/p(x)$. Calculating as in the previous example, we see that $S$’s implied target is $939$ and yet the betting score is only $S(16.5) = 0.477$. Rather than multiply her money, Statistician C has lost more than half of it. She concludes that the evidence from her bet very mildly favours $P$ relative to $Q$.</li>
+</ol>
+
+<p>Assuming that $Q$ is indeed a plausible alternative, the high power and high implied target suggest that the study is meritorious. But the low $p$-value and the Neyman–Pearson rejection of $P$ are misleading. The betting score points in the other direction, albeit not enough to merit attention.
+<strong>Example3:</strong></p>
+
+<p>Now the case of a non-significant outcome: $P$ says that $X$ is normal with mean 0 and standard deviation 10, $Q$ says that $X$ is normal with mean 20 and standard deviation 10, and we observe $x = 5$.</p>
+
+<p>We run it like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params3</span> <span class="o">=</span> <span class="n">TestParameters</span><span class="p">(</span><span class="n">null_mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">null_std</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">alternative_mean</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">run_example</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params3</span><span class="p">,</span> <span class="n">example_num</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And get the following output:</p>
+
+<blockquote>
+  <p>Statistician A (p-value):
+p-value = 0.3085
+=================================================================
+Statistician B (Neyman-Pearson):
+Power = 63.8760%
+Critical value = 16.449
+Rejects null: False
+Loses all money
+=================================================================
+Statistician C (Betting):
+Betting score = 0.368
+Implied target = 0.368
+Evidence favours P over Q</p>
+</blockquote>
+
+<ol>
+  <li>Statistician A calculates the $p$-value $P(X \geq 5) \approx 0.3085$. As this is not very small, she concludes that the study provides no evidence about $P$.</li>
+  <li>Statistician B uses the Neyman–Pearson test that rejects when $x &gt; 16.445$. This test has significance level $\alpha = 0.05$, and its power under $Q$ is about $64%$. It does not reject; Statistician B loses all the money she risked.</li>
+  <li>Statistician C uses the bet $S$ given by $S(x) := q(x)/p(x)$. This time $S$’s implied target is approximately $7.39$ and yet the actual betting score is only $S(5) \approx 0.368$. Statistician C again loses more than half her money. She again concludes that the evidence from her bet favours $P$ relative to $Q$ but not enough to merit attention.</li>
+</ol>
+
+<p>In this case, the power and the implied target both suggested that the study was marginal. The Neyman–Pearson conclusion was ‘no evidence’. The bet $S$ provides the same conclusion; the score $S(x)$ favours $P$ relative to $Q$ but too weakly to merit attention.</p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1">
+      <p>You will have to be generous with notions here. <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>The standard form of Gibbs’s inequality (also known as the information inequality) states that: $-\sum_{i=1}^n p_i \log p_i \leq -\sum_{i=1}^n p_i \log q_i$ with equality if and only if $p_i = q_i$ for all $i$. <a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:3">
+      <p>To find the power, we need to calculate $Q(X &gt; 16.5)$ where under $Q$, $X \sim N(1, 10^2)$. $P(X &gt; 16.5) = P(\frac{X-1}{10} &gt; \frac{16.5-1}{10}) = P(Z &gt; 1.55) \text{ where } Z \text{ is standard normal} = 1 - \Phi(1.55) \approx 0.06 \text{ or } 6\%$ <a href="#fnref:3" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
         </div>
         
     </div>

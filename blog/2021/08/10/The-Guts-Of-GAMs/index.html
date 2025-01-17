@@ -72,6 +72,437 @@ MathJax.Hub.Config({
         </div>
         <div class='wrap article'>
             <ul><li><a href="#introduction">Introduction</a></li><li><a href="#why-would-we-do-this">Why would we do this!?</a></li><li><a href="#splines">Splines</a></li><li><a href="#fitting-splines">Fitting Splines</a></li><li><a href="#example-wage-data">Example: Wage Data</a></li></ul>
+            <p>Generalised Additive Models look harder than they actually are. We fit a single dimension GAM from scratch, including generating splines.</p>
+
+<p>This post will explain  the internals of (generalised) additive models (GAMs): how to estimate the feature functions. We first explain <em>why</em> we want to fit additive models, and then we go on to explain how they are estimated in practice via splines (we will also explain what a spline is).  Finally we’ll fit simple splines on wage data, then we’ll go on to fit more complicated splines on some accelerometer data with a highly non-linear realtionship between in the input and the output.</p>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>The additive model for regression expresses the conditional expectation function as a sum of partial response functions, one for each predictor variable. The idea is that each input feature makes a separate contribution to the response, and these contributions just add up (hence the name “partial response function”). However, these contributions don’t have to be strictly proportional to the inputs.</p>
+
+<p>Formally, when the vector \(\mathbf{X}\) of predictor variables has \(p\) dimensions, \(x_1, \ldots, x_p\), the model is given by:</p>
+
+\[E[Y|\mathbf{X} = \mathbf{x}] = \alpha + \sum_{j=1}^{p} f_j(x_j)\]
+
+<p>This  includes the linear model as a special case, where \(f_j(x_j) = \beta_j x_j\), but it’s clearly more general because the \(f_j\)’s can be arbitrary nonlinear functions.</p>
+
+<p>To make the model identifiable, we add a restriction. Without loss of generality, we assume:</p>
+
+\[E[Y] = \alpha \quad \text{and} \quad E[f_j(X_j)] = 0\]
+
+<p>To see why this restriction is necessary, consider a simple case where \(p = 2\). If we add constants \(c_1\) to \(f_1\) and \(c_2\) to \(f_2\), but subtract \(c_1 + c_2\) from \(\alpha\), nothing observable changes in the model. This kind of degeneracy or lack of identifiability is similar to the way collinearity prevents us from defining true slopes in linear regression. However, it’s less harmful than collinearity because we can resolve it by imposing this constraint.</p>
+
+<h1 id="why-would-we-do-this">Why would we do this!?</h1>
+
+<p>Before we dive into how additive models work in practice, let’s take a step back and understand <em>why</em> we might want to use them. Think of regression models as existing on a spectrum, with linear models on one end and fully nonparametric models on the other. Additive models sit somewhere in between.</p>
+
+<p>Linear regression is fast—it converges quickly as we get more data, but it assumes the world is simple and linear, which it almost never is. Even with infinite data, a linear model will make systematic mistakes due to its inability to capture non-linear relationships. Its mean squared error (MSE) shrinks at a rate of \(O(n^{-1})\), and this speed is unaffected by the number of parameters.</p>
+
+<p>At the opposite extreme, fully nonparametric methods like kernel regression or k-nearest neighbors make no such assumptions. They can capture complex shapes, but they pay for that flexibility with much slower convergence, especially in higher dimensions. In one dimension, these models converge at a rate of \(O(n^{-4/5})\), but in higher dimensions, the rate drops dramatically to something like \(O(n^{-1/26})\) in 100 dimensions—this is the notorious “curse of dimensionality.” Essentially, the more features you have, the more data you need to maintain the same level of precision, and the data demands grow exponentially.</p>
+
+<p>So where do additive models fit in? They balance these two extremes. Additive models allow for some non-linearity while avoiding the curse of dimensionality by estimating each component function \(f_j(x_j)\) independently, using one-dimensional smoothing techniques. The result is a model that converges almost as fast as parametric ones—at a rate of \(O(n^{-4/5})\), rather than the much slower rate of fully nonparametric models. Sure, there’s a little approximation bias, but the trade-off is worth it. In practice, additive models often outperform linear models once you have enough data, because they capture more of the underlying structure without demanding the impossible amount of data required by fully nonparametric approaches.</p>
+
+<p>This is where additive models shine: they hit that sweet spot between simplicity and flexibility, giving you enough structure to work with high-dimensional data, but with far less approximation bias than linear models.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">patsy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="n">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="n">sm</span>
+<span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="n">smf</span>
+
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+</code></pre></div></div>
+<h1 id="splines">Splines</h1>
+
+<p>We build the \(f_i\) using a type of function called a spline; splines allow us to automatically model non-linear relationships without having to manually try out many different transformations on each variable. The name “spline” comes from a tool used by craftsmen to draw smooth curves—a thin, flexible strip of material like soft wood. You pin it down at specific points, called knots, and let it bend between them.</p>
+
+<p>Bending a spline takes energy—the stiffer the material, the more energy is needed to bend it into shape. A stiffer spline creates a straighter curve between points. For smoothing splines, increasing \(\lambda\) corresponds to using a stiffer material.</p>
+
+<p>We have data points \((x_1, y_1), (x_2, y_2), \ldots, (x_n, y_n)\), and we want to find a good approximation \(\hat{\mu}\) to the true conditional expectation or regression function \(\mu\). In many regression setting we control how smooth we made \(\hat{\mu}\) indirectly. For instance, in kernel regression, we use a bandwidth parameter to adjust the size of the neighborhood around each data point that contributed to the prediction. A larger bandwidth would create a smoother curve by averaging over more data points, but this could lead to underfitting, where the model fails to capture important details in the data. On the other hand, a smaller bandwidth creates a more jagged, detailed curve, which might overfit the data by following every minor fluctuation.</p>
+
+<p>In \(k\)-nearest neighbors (k-NN) regression, the smoothness of the prediction depends on how many neighbors \(k\) we use to make predictions. A higher value of \(k\) effectively increases the “bandwidth,” as we are averaging over more points, which smooths out the predictions. This can lead to a smoother but less flexible model that might miss important patterns in the data (underfitting). A lower value of \(k\) results in predictions based on fewer neighbors, leading to more jagged, less smooth results, as the model reacts to small variations in the data (overfitting).</p>
+
+<p>Why not be more direct, and control smoothness itself?</p>
+
+<p>A natural way to do this is by minimizing the spline objective function:</p>
+
+\[L(m, \lambda) \equiv \frac{1}{n} \sum_{i=1}^{n} \left( y_i - m(x_i) \right)^2 + \lambda \int \left( m''(x) \right)^2 dx \tag{spline_cost}\]
+
+<p>The first term here is just the mean squared error (MSE) of using the curve \(m(x)\) to predict \(y\). The second term, penalises the MSE in the direction of smoother curves. \(m''(x)\) is the second derivative of \(m\) with respect to \(x\)—it would be zero if \(m\) were linear, so this term measures the curvature of \(m\) at \(x\). The sign of \(m''(x)\) tells us whether the curvature is concave or convex, but we don’t care about that, so we square it. Then, we integrate this over all \(x\) to get the total curvature. Finally, we multiply by \(lambda\) and add that to the MSE. This adds a penalty to the MSE criterion—given two functions with the same MSE, we prefer the one with less average curvature. In practice, we’ll accept changes in \(m\) that increase the MSE by 1 unit if they reduce the average curvature by at least \(lambda\).</p>
+
+<p>The curve or function that solves this minimization problem:</p>
+
+\[\hat{\mu}_{\lambda} = \arg \min_m L(m, \lambda) \tag{7.2}\]
+
+<p>is called a smoothing spline or spline curve.</p>
+
+<p>All solutions to the spline cost equation no matter what the data, are piecewise cubic polynomials that are continuous and have continuous first and second derivatives. That is, \(\hat{\mu}\), \(\hat{\mu}'\), and \(\hat{\mu}''\) are all continuous. The boundaries between the pieces are the original data points, and, like the craftsman’s spline, these boundary points are called the knots of the smoothing spline. The function remains continuous beyond the largest and smallest data points but is always linear in those regions.</p>
+
+<p>Let’s think a little more about the optimisation proboem. There are two limits to consider: as \(\lambda \to \infty\) and As \(\lambda \to 0\). As \(\lambda \to \infty\), any curvature at all becomes infinitely costly, and only linear functions are allowed. This makes sense because minimizing mean squared error (MSE) with linear functions is simply <strong>Ordinary Least Squares (OLS)</strong> regression. So, we understand that in this limit, the smoothing spline behaves just like a linear regression model.</p>
+
+<p>On the other hand, as \(\lambda \to 0\), we don’t care about curvature at all. In this case, we can always come up with a function that just <strong>interpolates between the data points</strong>—this is called an <strong>interpolation spline</strong>, which passes exactly through each point. More specifically, of the infinitely many functions that interpolate between those points, we pick the one with the minimum average curvature.</p>
+
+<p>At intermediate values of \(\lambda\), the smoothing spline \(\hat{\mu}_{\lambda}\) becomes a compromise between fitting the data closely and keeping the curve smooth. The larger we make \(\lambda\), the more heavily we penalize curvature. There’s a clear <strong>bias-variance trade-off</strong> here:</p>
+
+<ul>
+  <li>As \(\lambda\) grows, the spline becomes less sensitive to the data. It’s <strong>less wiggly</strong>, meaning lower variance in its predictions but higher bias since it may fail to capture intricate patterns.</li>
+  <li>As \(\lambda\) shrinks, the bias decreases, but the spline becomes <strong>more sensitive</strong> to fluctuations in the data, resulting in higher variance.</li>
+</ul>
+
+<p>For example, if \(\lambda\) is large, the spline may resemble a simple line that overlooks small dips and peaks in the data. If \(\lambda\) is small, the spline may start capturing noise and overfitting, creating a curve that twists excessively between points.</p>
+
+<p>For consistency, we want to let \(\lambda \to 0\) as \(n \to \infty\), just as we allow the bandwidth \(h \to 0\) in kernel smoothing when \(n \to \infty\). This allows the spline to capture more complexity as we gather more data, while still avoiding overfitting.</p>
+
+<p>The way to think about smoothing splines is as functions that minimize MSE, but with a constraint on the average curvature. This follows a general principle in optimization where <strong>penalized optimization</strong> corresponds to <strong>optimization under constraints</strong>.  The short version is that each level of \(\lambda\) corresponds to setting a cap on how much curvature the function is allowed to have on average. The spline we fit for a particular \(\lambda\) is the MSE-minimizing curve, subject to that constraint. As we get more data, we can <strong>relax the constraint</strong> (by letting \(\lambda\) shrink) without sacrificing reliable estimation.</p>
+
+<p>It should come as no surprise that we select \(\lambda\) by <strong>cross-validation</strong>. Ordinary <strong>k-fold cross-validation</strong> works, but <strong>leave-one-out CV</strong> performs well for splines. In fact, the default in most spline software is either leave-one-out CV or the faster approximation called <strong>generalized cross-validation (GCV)</strong>.</p>
+
+<h1 id="fitting-splines">Fitting Splines</h1>
+
+<p>Splines are piecewise cubic polynomials. To see how to fit them, let’s think about how to fit a global cubic polynomial. We would define four basis functions,</p>
+
+\[B_1(x) = 1\]
+
+\[B_2(x) = x\]
+
+\[B_3(x) = x^2\]
+
+\[B_4(x) = x^3\]
+
+<p>and choose to only consider regression functions that are linear combinations of the basis functions:</p>
+
+\[\mu(x) = \sum_{j=1}^4 \beta_j B_j(x)\]
+
+<p>Such regression functions would be linear in the transformed variables \(B_1(x), \dots, B_4(x)\), even though it is nonlinear in \(x\).</p>
+
+<p>To estimate the coefficients of the cubic polynomial, we would apply each basis function to each data point \(x_i\) and gather the results in an \(n \times 4\) matrix \(B\):</p>
+
+\[B_{ij} = B_j(x_i)\]
+
+<p>Then we would do OLS using the \(B\) matrix in place of the usual data matrix \(x\):</p>
+
+\[\hat{\beta} = (B^T B)^{-1} B^T y\]
+
+<p>Since splines are piecewise cubics, things proceed similarly, but we need to be a little more careful in defining the basis functions. Recall that we have \(n\) values of the input variable \(x\), \(x_1 , x_2 , \dots, x_n\). Assume that these are in increasing order, because it simplifies the notation. These \(n\) “knots” define \(n + 1\) pieces or segments: \(n - 1\) of them between the knots, one from \(-\infty\) to \(x_1\), and one from \(x_n\) to \(+\infty\). A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from \(x_i\) to \(x_{i+1}\) would need the basis functions</p>
+
+\[1(x_i,x_{i+1})(x), \, (x - x_i) 1(x_i,x_{i+1})(x), \, (x - x_i)^2 1(x_i,x_{i+1})(x), \, (x - x_i)^3 1(x_i,x_{i+1})(x)\]
+
+<p>where the indicator function \(1(x_i,x_{i+1})(x)\) is 1 if \(x \in (x_i,x_{i+1})\) and 0 otherwise. This makes it seem like we need \(4(n + 1) = 4n + 4\) basis functions.</p>
+
+<p>However, we know from linear algebra that the number of basis vectors we need is equal to the number of dimensions of the vector space. The number of adjustable coefficients for an arbitrary piecewise cubic with \(n + 1\) segments is indeed \(4n + 4\), but splines are constrained to be smooth. The spline must be continuous, which means that at each \(x_i\), the value of the cubic from the left, defined on \((x_{i-1},x_i)\), must match the value of the cubic from the right, defined on \((x_i, x_{i+1})\). This gives us one constraint per data point, reducing the number of adjustable coefficients to at most \(3n + 4\). Since the first and second derivatives are also continuous, we are down to just \(n + 4\) coefficients. Finally, we know that the spline function is linear outside the range of the data, i.e., on \((-\infty,x_1)\) and on \((x_n,\infty)\), lowering the number of coefficients to \(n\). There are no more constraints, so we end up needing only \(n\) basis functions. And in fact, from linear algebra, any set of \(n\) piecewise cubic functions which are linearly independent can be used as a basis.</p>
+
+<p>One common choice is:</p>
+
+\[B_1(x) = 1\]
+
+\[B_2(x) = x\]
+
+\[B_{i+2}(x) = \frac{(x - x_i)^3_+ - (x - x_n)^3_+}{x_n - x_i} - \frac{(x - x_{n-1})^3_+ - (x - x_n)^3_+}{x_n - x_{n-1}}\]
+
+<p>where \((a)_+ = a\) if \(a &gt; 0\), and \(= 0\) otherwise. This rather unintuitive-looking basis has the nice property that the second and third derivatives of each \(B_j\) are zero outside the interval \((x_1, x_n)\).</p>
+
+<p>Now that we have our basis functions, we can once again write the spline as a weighted sum of them:</p>
+
+\[m(x) = \sum_{j=1}^m \beta_j B_j(x)\]
+
+<p>and put together the matrix \(B\) where \(B_{ij} = B_j(x_i)\). We can write the spline objective function in terms of the basis functions:</p>
+
+\[L = (y - B\beta)^T (y - B\beta) + n\lambda\beta^T \Omega\beta\]
+
+<p>where the matrix \(\Omega\) encodes information about the curvature of the basis functions:</p>
+
+\[\Omega_{jk} = \int B_j''(x) B_k''(x) dx \tag{7.16}\]
+
+<p>Notice that only the quadratic and cubic basis functions will make non-zero contributions to \(\Omega\). With the choice of basis above, the second derivatives are non-zero on, at most, the interval \((x_1,x_n)\), so each of the integrals in \(\Omega\) is going to be finite. This is something we (or, realistically, R) can calculate once, no matter what \(\lambda\) is. Now we can find the smoothing spline by differentiating with respect to \(\beta\):</p>
+
+\[0 = -2B^T y + 2B^T B\hat{\beta} + 2n\lambda\Omega\hat{\beta}\]
+
+\[B^T y = (B^T B + n\lambda\Omega) \hat{\beta}\]
+
+\[\hat{\beta} = (B^T B + n\lambda\Omega)^{-1} B^T y\]
+
+<p>Notice, incidentally, that we can now show splines are linear smoothers:</p>
+
+\[\hat{\mu}(x) = B\hat{\beta} = B(B^T B + n\lambda\Omega)^{-1} B^T y \tag{7.20}\]
+
+<p>Once again, if this were ordinary linear regression, the OLS estimate of the coefficients would be \((x^T x)^{-1} x^T y\). In comparison to that, we’ve made two changes. First, we’ve substituted the basis function matrix \(B\) for the original matrix of independent variables, \(x\)—a change we’d have made already for a polynomial regression. Second, the “denominator” is not \(x^T x\), or even \(B^T B\), but \(B^T B + n\lambda\Omega\). Since \(x^T x\) is \(n\) times the covariance matrix of the independent variables, we are taking the covariance matrix of the spline basis functions and adding some extra covariance—how much depends on the shapes of the functions (through \(\Omega\)) and how much smoothing we want to do (through \(\lambda\)). The larger we make \(\lambda\), the less the actual data matters to the fit.</p>
+
+<p>In addition to explaining how splines can be fit quickly (do some matrix arithmetic), this illustrates two important tricks. One, which we won’t explore further here, is to turn a nonlinear regression problem into one which is linear in another set of basis functions. This is like using not just one transformation of the input variables, but a whole library of them, and letting the data decide which transformations are important. There remains the issue of selecting the basis functions, which can be quite tricky. In addition to the spline basis, most choices are various sorts of waves—sine and cosine waves of different frequencies, various wave-forms of limited spatial extent (“wavelets”), etc. The ideal is to choose a function basis where only a few non-zero coefficients would need to be estimated, but this requires some understanding of the data.</p>
+
+<p>The other trick is that of stabilizing an unstable estimation problem by adding a penalty term. This reduces variance at the cost of introducing some bias.</p>
+
+<h1 id="example-wage-data">Example: Wage Data</h1>
+
+<p>First of all, we’ll use <code class="language-plaintext highlighter-rouge">patsy</code> to construct a few spline bases and fit generalised linear models with <code class="language-plaintext highlighter-rouge">statsmodels</code>. Then, we’ll dive into constructing splines ourselves; following Simon Wood’s book we’ll use penalised regression splines.</p>
+
+<p>Firstly, we’ll use <code class="language-plaintext highlighter-rouge">patsy</code> to create some basic pline models. The data we’re using comes from https://vincentarelbundock.github.io/Rdatasets/doc/ISLR/Wage.html. It’s plotted below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'Wage.csv'</span><span class="p">)</span>
+<span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">'None'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.collections.PathCollection at 0x11d0a5898&gt;
+</code></pre></div></div>
+
+<p><img src="2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_3_1.png" alt="png" /></p>
+
+<p>GAMs are essentially linear models, but in a very special (and useful!) basis made of regression splines. We can use the <code class="language-plaintext highlighter-rouge">bs()</code> function in <code class="language-plaintext highlighter-rouge">patsy</code> to create such a basis for us:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">transformed_x1</span> <span class="o">=</span> <span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"bs(df.age, knots=(25,40,60), degree=3, include_intercept=False)"</span><span class="p">,</span> <span class="p">{</span><span class="s">"df.age"</span><span class="p">:</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">)</span>
+<span class="n">fit1</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">GLM</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">transformed_x1</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fit1</span><span class="p">.</span><span class="n">params</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Intercept                                                               60.493714
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[0]     3.980500
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[1]    44.630980
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[2]    62.838788
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[3]    55.990830
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[4]    50.688098
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[5]    16.606142
+dtype: float64
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">fit1</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"bs(age_grid, knots=(25,40,60), include_intercept=False)"</span><span class="p">,</span>
+<span class="p">{</span><span class="s">"age_grid"</span><span class="p">:</span> <span class="n">age_grid</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">'None'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Specifying three knots'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">85</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'age'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'wage'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Text(0,0.5,'wage')
+</code></pre></div></div>
+
+<p><img src="2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_7_1.png" alt="png" /></p>
+
+<p>Here we have prespecified knots at ages 25, 40, and 60. This produces a spline with six basis functions. A cubic spline has 7 degrees of freedom: one for the intercept, and two for each order. We could also have specified knot points at uniform quantiles of the data:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Specifying 6 degrees of freedom
+</span><span class="n">transformed_x2</span> <span class="o">=</span> <span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"bs(df.age, df=6, include_intercept=False)"</span><span class="p">,</span>
+<span class="p">{</span><span class="s">"df.age"</span><span class="p">:</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">)</span>
+<span class="n">fit2</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">GLM</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">transformed_x2</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">fit2</span><span class="p">.</span><span class="n">params</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Intercept                                       56.313841
+bs(df.age, df=6, include_intercept=False)[0]    27.824002
+bs(df.age, df=6, include_intercept=False)[1]    54.062546
+bs(df.age, df=6, include_intercept=False)[2]    65.828391
+bs(df.age, df=6, include_intercept=False)[3]    55.812734
+bs(df.age, df=6, include_intercept=False)[4]    72.131473
+bs(df.age, df=6, include_intercept=False)[5]    14.750876
+dtype: float64
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">fit2</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"bs(age_grid, df=6, include_intercept=False)"</span><span class="p">,</span>
+<span class="p">{</span><span class="s">"age_grid"</span><span class="p">:</span> <span class="n">age_grid</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">'None'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Specifying three knots'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">85</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'age'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'wage'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Text(0,0.5,'wage')
+</code></pre></div></div>
+
+<p><img src="2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_10_1.png" alt="png" /></p>
+
+<p>Finally, we can also fit natural splines with the <code class="language-plaintext highlighter-rouge">cr()</code> function:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Specifying 4 degrees of freedom
+</span><span class="n">transformed_x3</span> <span class="o">=</span> <span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"cr(df.age, df=4)"</span><span class="p">,</span> <span class="p">{</span><span class="s">"df.age"</span><span class="p">:</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">)</span>
+<span class="n">fit3</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">GLM</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">transformed_x3</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">fit3</span><span class="p">.</span><span class="n">params</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Intercept             -6.970341e+13
+cr(df.age, df=4)[0]    6.970341e+13
+cr(df.age, df=4)[1]    6.970341e+13
+cr(df.age, df=4)[2]    6.970341e+13
+cr(df.age, df=4)[3]    6.970341e+13
+dtype: float64
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pred</span> <span class="o">=</span> <span class="n">fit3</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"cr(age_grid, df=4)"</span><span class="p">,</span> <span class="p">{</span><span class="s">"age_grid"</span><span class="p">:</span> <span class="n">age_grid</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">'None'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Natural spline df=4'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">85</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'age'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'wage'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Text(0,0.5,'wage')
+</code></pre></div></div>
+
+<p><img src="2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_13_1.png" alt="png" /></p>
+
+<p>Let’s see how these fits all stack together:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Generate a sequence of age values spanning the range
+</span><span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Make some predictions
+</span><span class="n">pred1</span> <span class="o">=</span> <span class="n">fit1</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"bs(age_grid, knots=(25,40,60), include_intercept=False)"</span><span class="p">,</span>
+<span class="p">{</span><span class="s">"age_grid"</span><span class="p">:</span> <span class="n">age_grid</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">))</span>
+<span class="n">pred2</span> <span class="o">=</span> <span class="n">fit2</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"bs(age_grid, df=6, include_intercept=False)"</span><span class="p">,</span>
+<span class="p">{</span><span class="s">"age_grid"</span><span class="p">:</span> <span class="n">age_grid</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">))</span>
+<span class="n">pred3</span> <span class="o">=</span> <span class="n">fit3</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">"cr(age_grid, df=4)"</span><span class="p">,</span> <span class="p">{</span><span class="s">"age_grid"</span><span class="p">:</span> <span class="n">age_grid</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">))</span>
+<span class="c1"># Plot the splines and error bands
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">'None'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">pred1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Specifying three knots'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">pred2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Specifying df=6'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">pred3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Natural spline df=4'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">85</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'age'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'wage'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Text(0,0.5,'wage')
+</code></pre></div></div>
+
+<p><img src="2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_15_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">patsy</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="n">sp</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">from</span> <span class="nn">statsmodels</span> <span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">sm</span>
+
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'mcycle.csv'</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="s">'Unnamed: 0'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">blue</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">times</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">accel</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'time'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Acceleration'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Text(0,0.5,'Acceleration')
+</code></pre></div></div>
+
+<p><img src="2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_18_1.png" alt="png" /></p>
+
+<p>As discussed earlier: GAMs are smooth, semi-parametric models of the form:
+​
+\(y = \sum_{i=0}^{n-1} \beta_i f_i\left(x_i\right)\)
+​
+where \(y\) is the dependent variable, \(x_i\) are the independent variables, \(\beta\) are the model coefficients, and \(f_i\) are the feature functions.
+​
+We build the \(f_i\) using a type of function called a spline. Since our data is 1D, we can model it as:</p>
+
+\[y = \beta_0 + f\left( x \right) + \varepsilon\]
+
+<p>We must also choose a basis for \( f \):</p>
+
+\[f \left( x \right) = \beta_1 B_1\left(x\right) + \ldots + \beta_k B_k\left(x\right)\]
+
+<p>We define</p>
+
+\[X = \left[1, x_1,  \ldots,  x_k \right]\]
+
+<p>so we can write:</p>
+
+<p>$ y = \beta_0 + f\left( x \right) + \varepsilon = X\beta + \varepsilon $$</p>
+
+<p>We choose to minimise the sum of squares again, this time with a regularisation term:</p>
+
+\[\frac{1}{2} \lVert y - X\beta \rVert + \lambda \int_0^1 f''\left(x\right)^2 dx\]
+
+<p>You can show (you, not me!) that the second term can always be written:</p>
+
+\[\int_0^1 f''\left(x\right)^2 dx = \beta^T S \beta\]
+
+<p>where \( S \) is a postive (semi)-definiate matrix (i.e. all it’s eigenvalues are positive or 0). Therefore our objective function becomes:</p>
+
+\[\frac{1}{2} \lVert y - X\beta \rVert + \lambda \beta^T S \beta dx\]
+
+<p>and we can use the techniques we’ve developed fitting linear models to fit additive models! We’ll start by fitting a univariate spline, then maybe something more complicated.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">z</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">-</span> <span class="p">((</span><span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">240</span><span class="p">)</span> <span class="o">/</span> <span class="mi">24</span>
+
+<span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">frompyfunc</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">R_</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">R</span><span class="p">.</span><span class="n">outer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">knots</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">float64</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="n">knots</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">times</span><span class="p">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">patsy</span><span class="p">.</span><span class="n">dmatrices</span><span class="p">(</span><span class="s">'accel ~ times + R_(times)'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">R_</span><span class="p">(</span><span class="n">knots</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+<span class="n">B</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">sp</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:]),</span> <span class="n">tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/Users/thomas.kealy/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:2: ComplexWarning: Casting complex values to real discards the imaginary part
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="c1"># build the augmented matrices
+</span>    <span class="n">y_</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
+    <span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lambda_</span><span class="p">)</span> <span class="o">*</span> <span class="n">B</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">sm</span><span class="p">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span> <span class="n">X_</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">min_time</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">times</span><span class="p">.</span><span class="nb">min</span><span class="p">()</span>
+<span class="n">max_time</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">times</span><span class="p">.</span><span class="nb">max</span><span class="p">()</span>
+
+<span class="n">plot_x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plot_X</span> <span class="o">=</span> <span class="n">patsy</span><span class="p">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">'times + R_(times)'</span><span class="p">,</span> <span class="p">{</span><span class="s">'times'</span><span class="p">:</span> <span class="n">plot_x</span><span class="p">})</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">blue</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">times</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">accel</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_x</span><span class="p">,</span> <span class="n">results</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">plot_X</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'time'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'accel'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s">'$\lambda = {}$'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Text(0.5,1,'$\\lambda = 1.0$')
+</code></pre></div></div>
+
+<p><img src="2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_27_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
         </div>
         
     </div>
