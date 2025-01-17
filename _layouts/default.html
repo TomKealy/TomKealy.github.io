@@ -49,7 +49,7 @@
             </div>
         </div>
         <div class='wrap article'>
-            {{ content }}
+            {% include toc.html html=content %}
         </div>
         {% if page.bibliography %}
         <div id='bibliography'>
