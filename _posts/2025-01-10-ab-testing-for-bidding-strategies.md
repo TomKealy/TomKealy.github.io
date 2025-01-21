@@ -104,19 +104,25 @@ $$
 dG\left(P, Q\right) = sup_{g∈G} \midEP[g(X)] - EQ[g(Y)]\mid
 $$
 
-The function class $G$ should contain functions mapping to $\left[-1/2, 1/2\right]$. {cite % shekhar2023nonparametric %} choose a specific class of functions $G$ using the kernel maximum mean discrepancy (MMD) metric defined below:
+The function class $G$ should contain functions mapping to $\left[-1/2, 1/2\right]$.
 
-**Definition (kernel MMD)** Let $\mathcal{X}$ denote the observation space, which for simplicity, we set to $\mathbb{R}^m$ for some $m \geq 1$, and let $K : \mathcal{X} \times \mathcal{X} \to \mathbb{R}$ be a positive definite kernel on $\mathcal{X}$. We assume that $K$ is uniformly bounded, that is, $\sup_{x,x'\in\mathcal{X}} K(x, x') \leq 1$, and let $\mathcal{H}_K$ denote the reproducing kernel Hilbert space (RKHS) associated with $K$. 
+{cite % shekhar2023nonparametric %} choose a specific class of functions $G$ using the kernel maximum mean discrepancy (MMD) metric defined below:
 
-The associated IPM, called the kernel-MMD metric, is defined as follows:
+**Definition (kernel MMD)** Let $\mathcal{X}$ denote the observation space which we set to $\mathbb{R}^m$ for some $m \geq 1$. Let $K : \mathcal{X} \times \mathcal{X} \to \mathbb{R}$ be a positive definite kernel on $\mathcal{X}$. We assume that $K$ is uniformly bounded, that is, $\sup_{x,x'\in\mathcal{X}} K(x, x') \leq 1$, and let $\mathcal{H}_K$ denote the reproducing kernel Hilbert space (RKHS) associated with $K$.
+
+The kernel-MMD metric, is defined as follows:
 
 $d_{MMD}(P, Q) = \sup_{\|g\|_K \leq 1} \mathbb{E}_P[g(X)] - \mathbb{E}_Q[g(Y)]$
 
-where $\|g\|_K$ denotes the RKHS norm of the function $g$. The mean map of a distribution $P$ is a function in the RKHS given by $\mu_P := \mathbb{E}_P[K(X, \cdot)]$. When $P \neq Q$, the "witness" function $h^*$ that achieves the supremum in $d_{MMD}(P,Q)$ (i.e. witnesses the difference between $P,Q$) is simply given by $h^* := \mu_P - \mu_Q$, meaning that $d_{MMD}(P, Q) = \mathbb{E}_P[h^*(X)] - \mathbb{E}_Q[h^*(Y)]$.
+where $\|g\|_K$ denotes the RKHS norm of the function $g$. The mean map of a distribution $P$ is a function in the RKHS given by $\mu_P := \mathbb{E}_P[K(X, \cdot)]$. When $P \neq Q$, the "witness" function $h^*$ that achieves the supremum in $d_{MMD}(P,Q)$ (i.e. witnesses the maximal difference between $P,Q$) is simply given by $h^* := \frac{\mu_P - \mu_Q}{\| \mu_P - \mu_Q \|_K}$, meaning that $d_{MMD}(P, Q) = \mathbb{E}_P[h^*(X)] - \mathbb{E}_Q[h^*(Y)]$, and $g^* = \frac{1}{2}h^*$.
 
-and $g^* = \frac{1}{2}h^*$.
+The kernal-mMMD functions are a computationally feasible test which to distinguish between two probability distributions $P_X$ and $P_Y$. Specifically, for the kernel-MMD metric, the witness function $h_*$ maximizes the difference between the expectations under $P_X$ and $P_Y$ providing the strongest signal for detecting differences between distributions. The goal of the sequential testing algorithm is to approximate the witness function well (measured in terms of regret).
 
-A predictor playing $\{g_t : t \geq 1\}$ is $\|\mu_P - \mu_Q\|_K$. 
+ Witness functions transform the sequential testing problem into an online learning problem, where the goal is to learn increasingly better approximations of these optimal test functions. The witness functions guide how to construct the test statistics (wealth process) in a principled way. When testing simple hypotheses, the optimal test statistic is the likelihood ratio. For the nonparametric case, we do not hav ea likelihood ratio. Instead the witness function serves an analogous role by providing the maximum discrepancy between distributions.
+
+By using empirical estimates of witness functions that adapt to the observed data, the sequential tests can automatically adjust their behavior based on the difficulty of the testing problem. This leads to tests that use fewer samples when the distributions are very different and more samples when they are similar.
+
+So the resulting sequential test will behave like a desirable statistical test (in that it controls the false positive rate under the null, it has power 1 under the alternative, it has a finite sample size, and the test statistic grows exponentially if the alternative is true).
 
 The above discussion suggests the choice of $\mathcal{G} = \{g \in \mathcal{H}_K : \|g\| \leq 1/2\}$
 
@@ -247,6 +253,205 @@ def get_optimal_kernel_bandwidth(X: np.ndarray,
     
     return bandwidth
 ```
+
+### Betting strategy
+
+Having selected $\mathcal{G}$, the final step in instantiating the sequential test is choosing an appropriate prediction strategy. The regret of the prediction game after $n$ observations is:
+
+$R_n \equiv R_n(A_{pred}, \mathcal{G}, X_1^n, Y_1^n) = \max_{g \in \mathcal{G}} \sum_{t=1}^n \langle g - g_t, K(X_t,\cdot) - K(Y_t,\cdot)\rangle.$
+
+A natural choice is the plug-in or the empirical risk minimization (ERM) strategy, that simply selects $g_t = \arg\max_{g\in\mathcal{G}}\langle g,\mu_{\hat{P}_{X,t-1}} - \mu_{\hat{P}_{Y,t-1}}\rangle$. We can check that this choice results in a consistent sequential test. 
+
+To get the exponent and bound on the expected stopping time under the alternative, however, we need to use an adaptive version of the online gradient ascent (OGA) strategy, that proceeds as follows, with $M_t := \sum_{i=1}^t \|g_i(X_i, \cdot) - g_i(Y_i, \cdot)\|^2_K$:
+
+$g_1 = 0, \text{ and } g_{t+1} = \Pi_{\mathcal{G}}\left(g_t + \frac{1}{2\sqrt{M_t}}(K(X_t,\cdot) - K(Y_t,\cdot))\right) \text{ for } t \geq 1. \tag{17}$
+
+Recall that $\Pi_{\mathcal{G}}$ denotes the projection operator (in terms of the RKHS norm $\|\cdot\|_K$) onto the function class $\mathcal{G}$, which acts as follows: $\Pi_{\mathcal{G}}(h) = \frac{h}{2\|h\|_K}$.
+
+**Definition: Sequential Kernel MMD Test:**
+
+Set $K_0 = 1$, $\lambda_1 = 0$, and $g_1 = 0 \in \mathcal{H}_K$. For $t = 1,2,...$:
+
+- Observe $X_t$, $Y_t$
+- Update the wealth: $K_t = K_{t-1} \times (1 + \lambda_t\langle g_t, K(X_t, \cdot) - K(Y_t, \cdot)\rangle)$
+- Reject the null if $K_t \geq 1/\alpha$
+- Update $g_{t+1}$ using the OGA prediction strategy described above
+- Update $\lambda_{t+1}$ as follows:
+
+$\lambda_{t+1} = \min\{1,\max\{-1,\lambda_t - \frac{2z_t}{2-\log_3a_t^2}\}\}$
+
+The full MMD Test is in the following code:
+
+```python
+import numpy as np
+from typing import Callable, Dict, Optional, Tuple
+from dataclasses import dataclass
+
+class SequentialKernelMMDTest:
+    def __init__(self, 
+                 kernel_func: Callable,
+                 alpha: float = 0.05):
+        """
+        Sequential Kernel MMD Test as defined in paper Definition 8.
+        
+        Args:
+            kernel_func: Kernel function k(x,y)
+            alpha: Type I error rate
+        """
+        self.kernel = kernel_func
+        self.alpha = alpha
+        
+        # Initialize test statistics
+        self.K0 = 1.0
+        self.Kt = 1.0  # Current wealth
+        self.wealth_history = [1.0]
+        
+        # Initialize betting strategy
+        self.lambda1 = 0.0
+        self.lambda_t = 0.0
+        self.a0 = 1.0  # For ONS strategy
+        
+        # Initialize prediction strategy
+        self.g1 = None
+        self.gt = None
+        self.Mt = 0.0  # Sum of squared RKHS norms
+        
+    def _ons_betting_update(self, vt: float) -> float:
+        """
+        Online Newton Step betting strategy (Definition 5 in paper).
+        """
+        # Update at based on zt
+        zt = vt / (1 - vt * self.lambda_t)
+        self.a0 += zt * zt
+        
+        # Update lambda using ONS update rule
+        lambda_next = self.lambda_t - (2 - np.log(3)) * zt / self.a0
+        
+        # Project to [-1/2, 1/2]
+        lambda_next = np.clip(lambda_next, -0.5, 0.5)
+        
+        return lambda_next
+    
+    def _oga_prediction_update(self, 
+                             Xt: np.ndarray, 
+                             Yt: np.ndarray, 
+                             kt_x: np.ndarray,
+                             kt_y: np.ndarray) -> np.ndarray:
+        """
+        Online Gradient Ascent prediction strategy (Equation 17 in paper).
+        """
+        if self.gt is None:
+            self.gt = np.zeros_like(kt_x)
+            return self.gt
+            
+        # Compute RKHS norm of difference
+        diff = kt_x - kt_y
+        self.Mt += np.sum(diff * diff)
+        
+        # Update using OGA
+        grad = diff / (2 * np.sqrt(self.Mt))
+        gt_new = self.gt + grad
+        
+        # Project onto G using RKHS norm
+        norm = np.sqrt(np.sum(gt_new * gt_new))
+        if norm > 0:
+            gt_new = gt_new / (2 * norm)  # ΠG operator
+            
+        return gt_new
+
+    def update(self, 
+               Xt: np.ndarray, 
+               Yt: np.ndarray) -> Tuple[bool, str]:
+        """
+        Update test statistics for new observations.
+        
+        Args:
+            Xt: New X observation
+            Yt: New Y observation
+            
+        Returns:
+            (should_stop, decision)
+        """
+        # Compute kernel evaluations
+        kt_x = self.kernel(Xt)
+        kt_y = self.kernel(Yt)
+        
+        # Update prediction gt+1 using OGA
+        self.gt = self._oga_prediction_update(Xt, Yt, kt_x, kt_y)
+        
+        # Compute test statistic
+        vt = np.dot(self.gt, (kt_x - kt_y))
+        
+        # Update wealth
+        self.Kt *= (1 + self.lambda_t * vt)
+        self.wealth_history.append(self.Kt)
+        
+        # Update betting fraction λt+1 using ONS
+        self.lambda_t = self._ons_betting_update(vt)
+        
+        # Check stopping condition
+        if self.Kt >= 1.0/self.alpha:
+            return True, "Reject null hypothesis - Distributions differ significantly"
+        
+        return False, "Continue testing"
+        
+    def get_results(self) -> Dict:
+        """Get test results."""
+        return {
+            'stopped': self.Kt >= 1.0/self.alpha,
+            'wealth': self.Kt,
+            'wealth_history': self.wealth_history,
+            'lambda_final': self.lambda_t
+        }
+
+def run_sequential_mmd_test(X_stream: np.ndarray,
+                           Y_stream: np.ndarray,
+                           kernel_func: Callable,
+                           alpha: float = 0.05,
+                           max_samples: Optional[int] = None) -> Dict:
+    """
+    Run sequential kernel MMD test on two sample streams.
+    
+    Args:
+        X_stream: First sample stream 
+        Y_stream: Second sample stream
+        kernel_func: Kernel function
+        alpha: Type I error rate
+        max_samples: Maximum samples to test (optional)
+        
+    Returns:
+        Dict containing test results
+    """
+    # Initialize test
+    test = SequentialKernelMMDTest(kernel_func, alpha)
+    
+    # Set max samples
+    if max_samples is None:
+        max_samples = len(X_stream)
+    n = min(len(X_stream), len(Y_stream), max_samples)
+    
+    # Run sequential test
+    for t in range(n):
+        Xt = X_stream[t]
+        Yt = Y_stream[t]
+        
+        should_stop, decision = test.update(Xt, Yt)
+        if should_stop:
+            break
+            
+    # Get results
+    results = test.get_results()
+    results.update({
+        'samples_used': t + 1,
+        'decision': decision
+    })
+    
+    return results
+```
+
+## Numerical experiments
+
+# Sequential Testing for Smart Bidding
 
 For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following code:
 
@@ -449,197 +654,3 @@ def run_roi_mmd_experiment(
     }
 ```
 
-### Betting strategy
-
-Having selected $\mathcal{G}$, the final step in instantiating the sequential test is choosing an appropriate prediction strategy. The regret of the prediction game after $n$ observations is:
-
-$R_n \equiv R_n(A_{pred}, \mathcal{G}, X_1^n, Y_1^n) = \max_{g \in \mathcal{G}} \sum_{t=1}^n \langle g - g_t, K(X_t,\cdot) - K(Y_t,\cdot)\rangle.$
-
-A natural choice is the plug-in or the empirical risk minimization (ERM) strategy, that simply selects $g_t = \arg\max_{g\in\mathcal{G}}\langle g,\mu_{\hat{P}_{X,t-1}} - \mu_{\hat{P}_{Y,t-1}}\rangle$. We can check that this choice results in a consistent sequential test. 
-
-To get the exponent and bound on the expected stopping time under the alternative, however, we need to use an adaptive version of the online gradient ascent (OGA) strategy, that proceeds as follows, with $M_t := \sum_{i=1}^t \|g_i(X_i, \cdot) - g_i(Y_i, \cdot)\|^2_K$:
-
-$g_1 = 0, \text{ and } g_{t+1} = \Pi_{\mathcal{G}}\left(g_t + \frac{1}{2\sqrt{M_t}}(K(X_t,\cdot) - K(Y_t,\cdot))\right) \text{ for } t \geq 1. \tag{17}$
-
-Recall that $\Pi_{\mathcal{G}}$ denotes the projection operator (in terms of the RKHS norm $\|\cdot\|_K$) onto the function class $\mathcal{G}$, which acts as follows: $\Pi_{\mathcal{G}}(h) = \frac{h}{2\|h\|_K}$.
-
-**Definition: Sequential Kernel MMD Test:**
-
-Set $K_0 = 1$, $\lambda_1 = 0$, and $g_1 = 0 \in \mathcal{H}_K$. For $t = 1,2,...$:
-
-- Observe $X_t$, $Y_t$
-- Update the wealth: $K_t = K_{t-1} \times (1 + \lambda_t\langle g_t, K(X_t, \cdot) - K(Y_t, \cdot)\rangle)$
-- Reject the null if $K_t \geq 1/\alpha$
-- Update $g_{t+1}$ using the OGA prediction strategy described above
-- Update $\lambda_{t+1}$ as follows: 
-
-$\lambda_{t+1} = \min\{1,\max\{-1,\lambda_t - \frac{2z_t}{2-\log_3a_t^2}\}\}$
-
-The full MMD Test is in the following code:
-
-```python
-import numpy as np
-from typing import Callable, Dict, Optional, Tuple
-from dataclasses import dataclass
-
-class SequentialKernelMMDTest:
-    def __init__(self, 
-                 kernel_func: Callable,
-                 alpha: float = 0.05):
-        """
-        Sequential Kernel MMD Test as defined in paper Definition 8.
-        
-        Args:
-            kernel_func: Kernel function k(x,y)
-            alpha: Type I error rate
-        """
-        self.kernel = kernel_func
-        self.alpha = alpha
-        
-        # Initialize test statistics
-        self.K0 = 1.0
-        self.Kt = 1.0  # Current wealth
-        self.wealth_history = [1.0]
-        
-        # Initialize betting strategy
-        self.lambda1 = 0.0
-        self.lambda_t = 0.0
-        self.a0 = 1.0  # For ONS strategy
-        
-        # Initialize prediction strategy
-        self.g1 = None
-        self.gt = None
-        self.Mt = 0.0  # Sum of squared RKHS norms
-        
-    def _ons_betting_update(self, vt: float) -> float:
-        """
-        Online Newton Step betting strategy (Definition 5 in paper).
-        """
-        # Update at based on zt
-        zt = vt / (1 - vt * self.lambda_t)
-        self.a0 += zt * zt
-        
-        # Update lambda using ONS update rule
-        lambda_next = self.lambda_t - (2 - np.log(3)) * zt / self.a0
-        
-        # Project to [-1/2, 1/2]
-        lambda_next = np.clip(lambda_next, -0.5, 0.5)
-        
-        return lambda_next
-    
-    def _oga_prediction_update(self, 
-                             Xt: np.ndarray, 
-                             Yt: np.ndarray, 
-                             kt_x: np.ndarray,
-                             kt_y: np.ndarray) -> np.ndarray:
-        """
-        Online Gradient Ascent prediction strategy (Equation 17 in paper).
-        """
-        if self.gt is None:
-            self.gt = np.zeros_like(kt_x)
-            return self.gt
-            
-        # Compute RKHS norm of difference
-        diff = kt_x - kt_y
-        self.Mt += np.sum(diff * diff)
-        
-        # Update using OGA
-        grad = diff / (2 * np.sqrt(self.Mt))
-        gt_new = self.gt + grad
-        
-        # Project onto G using RKHS norm
-        norm = np.sqrt(np.sum(gt_new * gt_new))
-        if norm > 0:
-            gt_new = gt_new / (2 * norm)  # ΠG operator
-            
-        return gt_new
-
-    def update(self, 
-               Xt: np.ndarray, 
-               Yt: np.ndarray) -> Tuple[bool, str]:
-        """
-        Update test statistics for new observations.
-        
-        Args:
-            Xt: New X observation
-            Yt: New Y observation
-            
-        Returns:
-            (should_stop, decision)
-        """
-        # Compute kernel evaluations
-        kt_x = self.kernel(Xt)
-        kt_y = self.kernel(Yt)
-        
-        # Update prediction gt+1 using OGA
-        self.gt = self._oga_prediction_update(Xt, Yt, kt_x, kt_y)
-        
-        # Compute test statistic
-        vt = np.dot(self.gt, (kt_x - kt_y))
-        
-        # Update wealth
-        self.Kt *= (1 + self.lambda_t * vt)
-        self.wealth_history.append(self.Kt)
-        
-        # Update betting fraction λt+1 using ONS
-        self.lambda_t = self._ons_betting_update(vt)
-        
-        # Check stopping condition
-        if self.Kt >= 1.0/self.alpha:
-            return True, "Reject null hypothesis - Distributions differ significantly"
-        
-        return False, "Continue testing"
-        
-    def get_results(self) -> Dict:
-        """Get test results."""
-        return {
-            'stopped': self.Kt >= 1.0/self.alpha,
-            'wealth': self.Kt,
-            'wealth_history': self.wealth_history,
-            'lambda_final': self.lambda_t
-        }
-
-def run_sequential_mmd_test(X_stream: np.ndarray,
-                           Y_stream: np.ndarray,
-                           kernel_func: Callable,
-                           alpha: float = 0.05,
-                           max_samples: Optional[int] = None) -> Dict:
-    """
-    Run sequential kernel MMD test on two sample streams.
-    
-    Args:
-        X_stream: First sample stream 
-        Y_stream: Second sample stream
-        kernel_func: Kernel function
-        alpha: Type I error rate
-        max_samples: Maximum samples to test (optional)
-        
-    Returns:
-        Dict containing test results
-    """
-    # Initialize test
-    test = SequentialKernelMMDTest(kernel_func, alpha)
-    
-    # Set max samples
-    if max_samples is None:
-        max_samples = len(X_stream)
-    n = min(len(X_stream), len(Y_stream), max_samples)
-    
-    # Run sequential test
-    for t in range(n):
-        Xt = X_stream[t]
-        Yt = Y_stream[t]
-        
-        should_stop, decision = test.update(Xt, Yt)
-        if should_stop:
-            break
-            
-    # Get results
-    results = test.get_results()
-    results.update({
-        'samples_used': t + 1,
-        'decision': decision
-    })
-    
-    return results
-```
