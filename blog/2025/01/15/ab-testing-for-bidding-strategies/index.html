@@ -71,7 +71,7 @@ MathJax.Hub.Config({
             </div>
         </div>
         <div class='wrap article'>
-            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#data">Data</a></li><li><a href="#sequential-testing-by-betting-a-martingale-approach">Sequential Testing by Betting: A Martingale Approach</a><ul><li><a href="#a-general-two-sample-test">A General Two Sample test</a><ul><li><a href="#constructing-test-functions">Constructing test functions</a></li><li><a href="#betting-strategy">Betting strategy</a></li></ul></li></ul></li></ul>
+            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#data">Data</a></li><li><a href="#sequential-testing-by-betting-a-martingale-approach">Sequential Testing by Betting: A Martingale Approach</a><ul><li><a href="#a-general-two-sample-test">A General Two Sample test</a><ul><li><a href="#constructing-test-functions">Constructing test functions</a></li><li><a href="#betting-strategy">Betting strategy</a></li></ul></li><li><a href="#numerical-experiments">Numerical experiments</a></li></ul></li><li><a href="#sequential-testing-for-smart-bidding">Sequential Testing for Smart Bidding</a></li></ul>
             <h1 id="introduction">Introduction</h1>
 
 <p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
@@ -180,19 +180,25 @@ MathJax.Hub.Config({
 
 \[dG\left(P, Q\right) = sup_{g∈G} \midEP[g(X)] - EQ[g(Y)]\mid\]
 
-<p>The function class $G$ should contain functions mapping to $\left[-1/2, 1/2\right]$. {cite % shekhar2023nonparametric %} choose a specific class of functions $G$ using the kernel maximum mean discrepancy (MMD) metric defined below:</p>
+<p>The function class $G$ should contain functions mapping to $\left[-1/2, 1/2\right]$.</p>
 
-<p><strong>Definition (kernel MMD)</strong> Let $\mathcal{X}$ denote the observation space, which for simplicity, we set to $\mathbb{R}^m$ for some $m \geq 1$, and let $K : \mathcal{X} \times \mathcal{X} \to \mathbb{R}$ be a positive definite kernel on $\mathcal{X}$. We assume that $K$ is uniformly bounded, that is, $\sup_{x,x’\in\mathcal{X}} K(x, x’) \leq 1$, and let $\mathcal{H}_K$ denote the reproducing kernel Hilbert space (RKHS) associated with $K$.</p>
+<p>{cite % shekhar2023nonparametric %} choose a specific class of functions $G$ using the kernel maximum mean discrepancy (MMD) metric defined below:</p>
 
-<p>The associated IPM, called the kernel-MMD metric, is defined as follows:</p>
+<p><strong>Definition (kernel MMD)</strong> Let $\mathcal{X}$ denote the observation space which we set to $\mathbb{R}^m$ for some $m \geq 1$. Let $K : \mathcal{X} \times \mathcal{X} \to \mathbb{R}$ be a positive definite kernel on $\mathcal{X}$. We assume that $K$ is uniformly bounded, that is, $\sup_{x,x’\in\mathcal{X}} K(x, x’) \leq 1$, and let $\mathcal{H}_K$ denote the reproducing kernel Hilbert space (RKHS) associated with $K$.</p>
+
+<p>The kernel-MMD metric, is defined as follows:</p>
 
 <p>$d_{MMD}(P, Q) = \sup_{|g|_K \leq 1} \mathbb{E}_P[g(X)] - \mathbb{E}_Q[g(Y)]$</p>
 
-<p>where $|g|<em>K$ denotes the RKHS norm of the function $g$. The mean map of a distribution $P$ is a function in the RKHS given by $\mu_P := \mathbb{E}_P[K(X, \cdot)]$. When $P \neq Q$, the “witness” function $h^*$ that achieves the supremum in $d</em>{MMD}(P,Q)$ (i.e. witnesses the difference between $P,Q$) is simply given by $h^* := \mu_P - \mu_Q$, meaning that $d_{MMD}(P, Q) = \mathbb{E}_P[h^<em>(X)] - \mathbb{E}_Q[h^</em>(Y)]$.</p>
+<p>where $|g|<em>K$ denotes the RKHS norm of the function $g$. The mean map of a distribution $P$ is a function in the RKHS given by $\mu_P := \mathbb{E}_P[K(X, \cdot)]$. When $P \neq Q$, the “witness” function $h^*$ that achieves the supremum in $d</em>{MMD}(P,Q)$ (i.e. witnesses the maximal difference between $P,Q$) is simply given by $h^* := \frac{\mu_P - \mu_Q}{| \mu_P - \mu_Q |<em>K}$, meaning that $d</em>{MMD}(P, Q) = \mathbb{E}_P[h^<em>(X)] - \mathbb{E}_Q[h^</em>(Y)]$, and $g^* = \frac{1}{2}h^*$.</p>
 
-<p>and $g^* = \frac{1}{2}h^*$.</p>
+<p>The kernal-mMMD functions are a computationally feasible test which to distinguish between two probability distributions $P_X$ and $P_Y$. Specifically, for the kernel-MMD metric, the witness function $h_*$ maximizes the difference between the expectations under $P_X$ and $P_Y$ providing the strongest signal for detecting differences between distributions. The goal of the sequential testing algorithm is to approximate the witness function well (measured in terms of regret).</p>
 
-<p>A predictor playing ${g_t : t \geq 1}$ is $|\mu_P - \mu_Q|_K$.</p>
+<p>Witness functions transform the sequential testing problem into an online learning problem, where the goal is to learn increasingly better approximations of these optimal test functions. The witness functions guide how to construct the test statistics (wealth process) in a principled way. When testing simple hypotheses, the optimal test statistic is the likelihood ratio. For the nonparametric case, we do not hav ea likelihood ratio. Instead the witness function serves an analogous role by providing the maximum discrepancy between distributions.</p>
+
+<p>By using empirical estimates of witness functions that adapt to the observed data, the sequential tests can automatically adjust their behavior based on the difficulty of the testing problem. This leads to tests that use fewer samples when the distributions are very different and more samples when they are similar.</p>
+
+<p>So the resulting sequential test will behave like a desirable statistical test (in that it controls the false positive rate under the null, it has power 1 under the alternative, it has a finite sample size, and the test statistic grows exponentially if the alternative is true).</p>
 
 <p>The above discussion suggests the choice of $\mathcal{G} = {g \in \mathcal{H}_K : |g| \leq 1/2}$</p>
 
@@ -322,6 +328,206 @@ MathJax.Hub.Config({
     
     <span class="k">return</span> <span class="n">bandwidth</span>
 </code></pre></div></div>
+
+<h3 id="betting-strategy">Betting strategy</h3>
+
+<p>Having selected $\mathcal{G}$, the final step in instantiating the sequential test is choosing an appropriate prediction strategy. The regret of the prediction game after $n$ observations is:</p>
+
+<p>$R_n \equiv R_n(A_{pred}, \mathcal{G}, X_1^n, Y_1^n) = \max_{g \in \mathcal{G}} \sum_{t=1}^n \langle g - g_t, K(X_t,\cdot) - K(Y_t,\cdot)\rangle.$</p>
+
+<p>A natural choice is the plug-in or the empirical risk minimization (ERM) strategy, that simply selects $g_t = \arg\max_{g\in\mathcal{G}}\langle g,\mu_{\hat{P}<em>{X,t-1}} - \mu</em>{\hat{P}_{Y,t-1}}\rangle$. We can check that this choice results in a consistent sequential test.</p>
+
+<p>To get the exponent and bound on the expected stopping time under the alternative, however, we need to use an adaptive version of the online gradient ascent (OGA) strategy, that proceeds as follows, with $M_t := \sum_{i=1}^t |g_i(X_i, \cdot) - g_i(Y_i, \cdot)|^2_K$:</p>
+
+<p>$g_1 = 0, \text{ and } g_{t+1} = \Pi_{\mathcal{G}}\left(g_t + \frac{1}{2\sqrt{M_t}}(K(X_t,\cdot) - K(Y_t,\cdot))\right) \text{ for } t \geq 1. \tag{17}$</p>
+
+<p>Recall that $\Pi_{\mathcal{G}}$ denotes the projection operator (in terms of the RKHS norm $|\cdot|<em>K$) onto the function class $\mathcal{G}$, which acts as follows: $\Pi</em>{\mathcal{G}}(h) = \frac{h}{2|h|_K}$.</p>
+
+<p><strong>Definition: Sequential Kernel MMD Test:</strong></p>
+
+<p>Set $K_0 = 1$, $\lambda_1 = 0$, and $g_1 = 0 \in \mathcal{H}_K$. For $t = 1,2,…$:</p>
+
+<ul>
+  <li>Observe $X_t$, $Y_t$</li>
+  <li>Update the wealth: $K_t = K_{t-1} \times (1 + \lambda_t\langle g_t, K(X_t, \cdot) - K(Y_t, \cdot)\rangle)$</li>
+  <li>Reject the null if $K_t \geq 1/\alpha$</li>
+  <li>Update $g_{t+1}$ using the OGA prediction strategy described above</li>
+  <li>Update $\lambda_{t+1}$ as follows:</li>
+</ul>
+
+<p>$\lambda_{t+1} = \min{1,\max{-1,\lambda_t - \frac{2z_t}{2-\log_3a_t^2}}}$</p>
+
+<p>The full MMD Test is in the following code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="k">class</span> <span class="nc">SequentialKernelMMDTest</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                 <span class="n">kernel_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+                 <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">):</span>
+        <span class="s">"""
+        Sequential Kernel MMD Test as defined in paper Definition 8.
+        
+        Args:
+            kernel_func: Kernel function k(x,y)
+            alpha: Type I error rate
+        """</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel_func</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        
+        <span class="c1"># Initialize test statistics
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">K0</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Current wealth
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">wealth_history</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+        
+        <span class="c1"># Initialize betting strategy
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">lambda1</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">a0</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># For ONS strategy
+</span>        
+        <span class="c1"># Initialize prediction strategy
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">g1</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">Mt</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># Sum of squared RKHS norms
+</span>        
+    <span class="k">def</span> <span class="nf">_ons_betting_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vt</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s">"""
+        Online Newton Step betting strategy (Definition 5 in paper).
+        """</span>
+        <span class="c1"># Update at based on zt
+</span>        <span class="n">zt</span> <span class="o">=</span> <span class="n">vt</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">vt</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">a0</span> <span class="o">+=</span> <span class="n">zt</span> <span class="o">*</span> <span class="n">zt</span>
+        
+        <span class="c1"># Update lambda using ONS update rule
+</span>        <span class="n">lambda_next</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="n">zt</span> <span class="o">/</span> <span class="bp">self</span><span class="p">.</span><span class="n">a0</span>
+        
+        <span class="c1"># Project to [-1/2, 1/2]
+</span>        <span class="n">lambda_next</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lambda_next</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">lambda_next</span>
+    
+    <span class="k">def</span> <span class="nf">_oga_prediction_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                             <span class="n">Xt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                             <span class="n">Yt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                             <span class="n">kt_x</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span>
+                             <span class="n">kt_y</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="s">"""
+        Online Gradient Ascent prediction strategy (Equation 17 in paper).
+        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">kt_x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">gt</span>
+            
+        <span class="c1"># Compute RKHS norm of difference
+</span>        <span class="n">diff</span> <span class="o">=</span> <span class="n">kt_x</span> <span class="o">-</span> <span class="n">kt_y</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">Mt</span> <span class="o">+=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span><span class="p">)</span>
+        
+        <span class="c1"># Update using OGA
+</span>        <span class="n">grad</span> <span class="o">=</span> <span class="n">diff</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">Mt</span><span class="p">))</span>
+        <span class="n">gt_new</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">+</span> <span class="n">grad</span>
+        
+        <span class="c1"># Project onto G using RKHS norm
+</span>        <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">gt_new</span> <span class="o">*</span> <span class="n">gt_new</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">norm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">gt_new</span> <span class="o">=</span> <span class="n">gt_new</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">norm</span><span class="p">)</span>  <span class="c1"># ΠG operator
+</span>            
+        <span class="k">return</span> <span class="n">gt_new</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+               <span class="n">Xt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> 
+               <span class="n">Yt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="s">"""
+        Update test statistics for new observations.
+        
+        Args:
+            Xt: New X observation
+            Yt: New Y observation
+            
+        Returns:
+            (should_stop, decision)
+        """</span>
+        <span class="c1"># Compute kernel evaluations
+</span>        <span class="n">kt_x</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">kernel</span><span class="p">(</span><span class="n">Xt</span><span class="p">)</span>
+        <span class="n">kt_y</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">kernel</span><span class="p">(</span><span class="n">Yt</span><span class="p">)</span>
+        
+        <span class="c1"># Update prediction gt+1 using OGA
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_oga_prediction_update</span><span class="p">(</span><span class="n">Xt</span><span class="p">,</span> <span class="n">Yt</span><span class="p">,</span> <span class="n">kt_x</span><span class="p">,</span> <span class="n">kt_y</span><span class="p">)</span>
+        
+        <span class="c1"># Compute test statistic
+</span>        <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">gt</span><span class="p">,</span> <span class="p">(</span><span class="n">kt_x</span> <span class="o">-</span> <span class="n">kt_y</span><span class="p">))</span>
+        
+        <span class="c1"># Update wealth
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">*</span> <span class="n">vt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">wealth_history</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">Kt</span><span class="p">)</span>
+        
+        <span class="c1"># Update betting fraction λt+1 using ONS
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_ons_betting_update</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+        
+        <span class="c1"># Check stopping condition
+</span>        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="p">.</span><span class="n">alpha</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="s">"Reject null hypothesis - Distributions differ significantly"</span>
+        
+        <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="s">"Continue testing"</span>
+        
+    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="s">"""Get test results."""</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">'stopped'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="p">.</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="s">'wealth'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span><span class="p">,</span>
+            <span class="s">'wealth_history'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">wealth_history</span><span class="p">,</span>
+            <span class="s">'lambda_final'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span>
+        <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">run_sequential_mmd_test</span><span class="p">(</span><span class="n">X_stream</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span>
+                           <span class="n">Y_stream</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span>
+                           <span class="n">kernel_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+                           <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+                           <span class="n">max_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="s">"""
+    Run sequential kernel MMD test on two sample streams.
+    
+    Args:
+        X_stream: First sample stream 
+        Y_stream: Second sample stream
+        kernel_func: Kernel function
+        alpha: Type I error rate
+        max_samples: Maximum samples to test (optional)
+        
+    Returns:
+        Dict containing test results
+    """</span>
+    <span class="c1"># Initialize test
+</span>    <span class="n">test</span> <span class="o">=</span> <span class="n">SequentialKernelMMDTest</span><span class="p">(</span><span class="n">kernel_func</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+    
+    <span class="c1"># Set max samples
+</span>    <span class="k">if</span> <span class="n">max_samples</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">max_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_stream</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_stream</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">Y_stream</span><span class="p">),</span> <span class="n">max_samples</span><span class="p">)</span>
+    
+    <span class="c1"># Run sequential test
+</span>    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">Xt</span> <span class="o">=</span> <span class="n">X_stream</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+        <span class="n">Yt</span> <span class="o">=</span> <span class="n">Y_stream</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+        
+        <span class="n">should_stop</span><span class="p">,</span> <span class="n">decision</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">Xt</span><span class="p">,</span> <span class="n">Yt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">should_stop</span><span class="p">:</span>
+            <span class="k">break</span>
+            
+    <span class="c1"># Get results
+</span>    <span class="n">results</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">get_results</span><span class="p">()</span>
+    <span class="n">results</span><span class="p">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="s">'samples_used'</span><span class="p">:</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s">'decision'</span><span class="p">:</span> <span class="n">decision</span>
+    <span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div></div>
+
+<h2 id="numerical-experiments">Numerical experiments</h2>
+
+<h1 id="sequential-testing-for-smart-bidding">Sequential Testing for Smart Bidding</h1>
 
 <p>For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following code:</p>
 
@@ -523,201 +729,6 @@ MathJax.Hub.Config({
     <span class="p">}</span>
 </code></pre></div></div>
 
-<h3 id="betting-strategy">Betting strategy</h3>
-
-<p>Having selected $\mathcal{G}$, the final step in instantiating the sequential test is choosing an appropriate prediction strategy. The regret of the prediction game after $n$ observations is:</p>
-
-<p>$R_n \equiv R_n(A_{pred}, \mathcal{G}, X_1^n, Y_1^n) = \max_{g \in \mathcal{G}} \sum_{t=1}^n \langle g - g_t, K(X_t,\cdot) - K(Y_t,\cdot)\rangle.$</p>
-
-<p>A natural choice is the plug-in or the empirical risk minimization (ERM) strategy, that simply selects $g_t = \arg\max_{g\in\mathcal{G}}\langle g,\mu_{\hat{P}<em>{X,t-1}} - \mu</em>{\hat{P}_{Y,t-1}}\rangle$. We can check that this choice results in a consistent sequential test.</p>
-
-<p>To get the exponent and bound on the expected stopping time under the alternative, however, we need to use an adaptive version of the online gradient ascent (OGA) strategy, that proceeds as follows, with $M_t := \sum_{i=1}^t |g_i(X_i, \cdot) - g_i(Y_i, \cdot)|^2_K$:</p>
-
-<p>$g_1 = 0, \text{ and } g_{t+1} = \Pi_{\mathcal{G}}\left(g_t + \frac{1}{2\sqrt{M_t}}(K(X_t,\cdot) - K(Y_t,\cdot))\right) \text{ for } t \geq 1. \tag{17}$</p>
-
-<p>Recall that $\Pi_{\mathcal{G}}$ denotes the projection operator (in terms of the RKHS norm $|\cdot|<em>K$) onto the function class $\mathcal{G}$, which acts as follows: $\Pi</em>{\mathcal{G}}(h) = \frac{h}{2|h|_K}$.</p>
-
-<p><strong>Definition: Sequential Kernel MMD Test:</strong></p>
-
-<p>Set $K_0 = 1$, $\lambda_1 = 0$, and $g_1 = 0 \in \mathcal{H}_K$. For $t = 1,2,…$:</p>
-
-<ul>
-  <li>Observe $X_t$, $Y_t$</li>
-  <li>Update the wealth: $K_t = K_{t-1} \times (1 + \lambda_t\langle g_t, K(X_t, \cdot) - K(Y_t, \cdot)\rangle)$</li>
-  <li>Reject the null if $K_t \geq 1/\alpha$</li>
-  <li>Update $g_{t+1}$ using the OGA prediction strategy described above</li>
-  <li>Update $\lambda_{t+1}$ as follows:</li>
-</ul>
-
-<p>$\lambda_{t+1} = \min{1,\max{-1,\lambda_t - \frac{2z_t}{2-\log_3a_t^2}}}$</p>
-
-<p>The full MMD Test is in the following code:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-
-<span class="k">class</span> <span class="nc">SequentialKernelMMDTest</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-                 <span class="n">kernel_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-                 <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">):</span>
-        <span class="s">"""
-        Sequential Kernel MMD Test as defined in paper Definition 8.
-        
-        Args:
-            kernel_func: Kernel function k(x,y)
-            alpha: Type I error rate
-        """</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel_func</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
-        
-        <span class="c1"># Initialize test statistics
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">K0</span> <span class="o">=</span> <span class="mf">1.0</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Current wealth
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">wealth_history</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
-        
-        <span class="c1"># Initialize betting strategy
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">lambda1</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">a0</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># For ONS strategy
-</span>        
-        <span class="c1"># Initialize prediction strategy
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">g1</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">Mt</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># Sum of squared RKHS norms
-</span>        
-    <span class="k">def</span> <span class="nf">_ons_betting_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vt</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="s">"""
-        Online Newton Step betting strategy (Definition 5 in paper).
-        """</span>
-        <span class="c1"># Update at based on zt
-</span>        <span class="n">zt</span> <span class="o">=</span> <span class="n">vt</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">vt</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">a0</span> <span class="o">+=</span> <span class="n">zt</span> <span class="o">*</span> <span class="n">zt</span>
-        
-        <span class="c1"># Update lambda using ONS update rule
-</span>        <span class="n">lambda_next</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="n">zt</span> <span class="o">/</span> <span class="bp">self</span><span class="p">.</span><span class="n">a0</span>
-        
-        <span class="c1"># Project to [-1/2, 1/2]
-</span>        <span class="n">lambda_next</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lambda_next</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="n">lambda_next</span>
-    
-    <span class="k">def</span> <span class="nf">_oga_prediction_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-                             <span class="n">Xt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                             <span class="n">Yt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                             <span class="n">kt_x</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span>
-                             <span class="n">kt_y</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="s">"""
-        Online Gradient Ascent prediction strategy (Equation 17 in paper).
-        """</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">kt_x</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">gt</span>
-            
-        <span class="c1"># Compute RKHS norm of difference
-</span>        <span class="n">diff</span> <span class="o">=</span> <span class="n">kt_x</span> <span class="o">-</span> <span class="n">kt_y</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">Mt</span> <span class="o">+=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span><span class="p">)</span>
-        
-        <span class="c1"># Update using OGA
-</span>        <span class="n">grad</span> <span class="o">=</span> <span class="n">diff</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">Mt</span><span class="p">))</span>
-        <span class="n">gt_new</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">+</span> <span class="n">grad</span>
-        
-        <span class="c1"># Project onto G using RKHS norm
-</span>        <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">gt_new</span> <span class="o">*</span> <span class="n">gt_new</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">norm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">gt_new</span> <span class="o">=</span> <span class="n">gt_new</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">norm</span><span class="p">)</span>  <span class="c1"># ΠG operator
-</span>            
-        <span class="k">return</span> <span class="n">gt_new</span>
-
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-               <span class="n">Xt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> 
-               <span class="n">Yt</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="s">"""
-        Update test statistics for new observations.
-        
-        Args:
-            Xt: New X observation
-            Yt: New Y observation
-            
-        Returns:
-            (should_stop, decision)
-        """</span>
-        <span class="c1"># Compute kernel evaluations
-</span>        <span class="n">kt_x</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">kernel</span><span class="p">(</span><span class="n">Xt</span><span class="p">)</span>
-        <span class="n">kt_y</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">kernel</span><span class="p">(</span><span class="n">Yt</span><span class="p">)</span>
-        
-        <span class="c1"># Update prediction gt+1 using OGA
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">gt</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_oga_prediction_update</span><span class="p">(</span><span class="n">Xt</span><span class="p">,</span> <span class="n">Yt</span><span class="p">,</span> <span class="n">kt_x</span><span class="p">,</span> <span class="n">kt_y</span><span class="p">)</span>
-        
-        <span class="c1"># Compute test statistic
-</span>        <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">gt</span><span class="p">,</span> <span class="p">(</span><span class="n">kt_x</span> <span class="o">-</span> <span class="n">kt_y</span><span class="p">))</span>
-        
-        <span class="c1"># Update wealth
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">*</span> <span class="n">vt</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">wealth_history</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">Kt</span><span class="p">)</span>
-        
-        <span class="c1"># Update betting fraction λt+1 using ONS
-</span>        <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_ons_betting_update</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
-        
-        <span class="c1"># Check stopping condition
-</span>        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="p">.</span><span class="n">alpha</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="s">"Reject null hypothesis - Distributions differ significantly"</span>
-        
-        <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="s">"Continue testing"</span>
-        
-    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-        <span class="s">"""Get test results."""</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s">'stopped'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="p">.</span><span class="n">alpha</span><span class="p">,</span>
-            <span class="s">'wealth'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">Kt</span><span class="p">,</span>
-            <span class="s">'wealth_history'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">wealth_history</span><span class="p">,</span>
-            <span class="s">'lambda_final'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">lambda_t</span>
-        <span class="p">}</span>
-
-<span class="k">def</span> <span class="nf">run_sequential_mmd_test</span><span class="p">(</span><span class="n">X_stream</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span>
-                           <span class="n">Y_stream</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span>
-                           <span class="n">kernel_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-                           <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
-                           <span class="n">max_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-    <span class="s">"""
-    Run sequential kernel MMD test on two sample streams.
-    
-    Args:
-        X_stream: First sample stream 
-        Y_stream: Second sample stream
-        kernel_func: Kernel function
-        alpha: Type I error rate
-        max_samples: Maximum samples to test (optional)
-        
-    Returns:
-        Dict containing test results
-    """</span>
-    <span class="c1"># Initialize test
-</span>    <span class="n">test</span> <span class="o">=</span> <span class="n">SequentialKernelMMDTest</span><span class="p">(</span><span class="n">kernel_func</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
-    
-    <span class="c1"># Set max samples
-</span>    <span class="k">if</span> <span class="n">max_samples</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">max_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_stream</span><span class="p">)</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_stream</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">Y_stream</span><span class="p">),</span> <span class="n">max_samples</span><span class="p">)</span>
-    
-    <span class="c1"># Run sequential test
-</span>    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-        <span class="n">Xt</span> <span class="o">=</span> <span class="n">X_stream</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
-        <span class="n">Yt</span> <span class="o">=</span> <span class="n">Y_stream</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
-        
-        <span class="n">should_stop</span><span class="p">,</span> <span class="n">decision</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">Xt</span><span class="p">,</span> <span class="n">Yt</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">should_stop</span><span class="p">:</span>
-            <span class="k">break</span>
-            
-    <span class="c1"># Get results
-</span>    <span class="n">results</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">get_results</span><span class="p">()</span>
-    <span class="n">results</span><span class="p">.</span><span class="n">update</span><span class="p">({</span>
-        <span class="s">'samples_used'</span><span class="p">:</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s">'decision'</span><span class="p">:</span> <span class="n">decision</span>
-    <span class="p">})</span>
-    
-    <span class="k">return</span> <span class="n">results</span>
-</code></pre></div></div>
 
         </div>
         
