@@ -103,22 +103,22 @@ It should come as no surprise that we select $$ \lambda $$ by **cross-validation
 
 # Fitting Splines
 
-Splines are piecewise cubic polynomials. To see how to fit them, let’s think about how to fit a global cubic polynomial. We would define four basis functions,
+Splines are piecewise cubic polynomials. To see how to fit them, let’s think about how to fit a global cubic polynomial. We would define four (because we need one for every derivative we penalise and one for the intercept) basis functions,
 
 $$
-B_1(x) = 1 
-$$
-
-$$
-B_2(x) = x 
+B_1(x) = 1
 $$
 
 $$
-B_3(x) = x^2 
+B_2(x) = x
 $$
 
 $$
-B_4(x) = x^3 
+B_3(x) = x^2
+$$
+
+$$
+B_4(x) = x^3
 $$
 
 and choose to only consider regression functions that are linear combinations of the basis functions:
@@ -138,13 +138,25 @@ $$
 Then we would do OLS using the $$B$$ matrix in place of the usual data matrix $$x$$:
 
 $$
-\hat{\beta} = (B^T B)^{-1} B^T y 
+\hat{\beta} = (B^T B)^{-1} B^T y
 $$
 
-Since splines are piecewise cubics, things proceed similarly, but we need to be a little more careful in defining the basis functions. Recall that we have $$n$$ values of the input variable $$x$$, $$x_1 , x_2 , \dots, x_n$$. Assume that these are in increasing order, because it simplifies the notation. These $$n$$ “knots” define $$n + 1$$ pieces or segments: $$n - 1$$ of them between the knots, one from $$-\infty$$ to $$x_1$$, and one from $$x_n$$ to $$+\infty$$. A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from $$x_i$$ to $$x_{i+1}$$ would need the basis functions
+Since splines are piecewise cubics, things proceed similarly, but we need to take care wehn defining the basis functions. We have $$n$$ values of the input variable $$x$$, $$x_1 , x_2 , \dots, x_n$$. Assume that these are in increasing order, because it simplifies the notation. These $$n$$ “knots” define $$n + 1$$ pieces or segments: $$n - 1$$ of them between the knots, one from $$-\infty$$ to $$x_1$$, and one from $$x_n$$ to $$+\infty$$. A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from $$x_i$$ to $$x_{i+1}$$ would need the basis functions
 
 $$
-1(x_i,x_{i+1})(x), \, (x - x_i) 1(x_i,x_{i+1})(x), \, (x - x_i)^2 1(x_i,x_{i+1})(x), \, (x - x_i)^3 1(x_i,x_{i+1})(x)
+1(x_i,x_{i+1})(x)
+$$
+
+$$
+(x - x_i) 1(x_i,x_{i+1})(x)
+$$
+
+$$
+(x - x_i)^2 1(x_i,x_{i+1})(x)
+$$
+
+$$
+(x - x_i)^3 1(x_i,x_{i+1})(x)
 $$
 
 where the indicator function $$1(x_i,x_{i+1})(x)$$ is 1 if $$x \in (x_i,x_{i+1})$$ and 0 otherwise. This makes it seem like we need $$4(n + 1) = 4n + 4$$ basis functions.
@@ -173,7 +185,9 @@ $$
 m(x) = \sum_{j=1}^m \beta_j B_j(x)
 $$
 
-and put together the matrix $$B$$ where $$B_{ij} = B_j(x_i)$$. We can write the spline objective function in terms of the basis functions:
+and put together the matrix $$B$$ where $$B_{ij} = B_j(x_i)$$. 
+
+We can write the spline objective function in terms of the basis functions:
 
 $$
 L = (y - B\beta)^T (y - B\beta) + n\lambda\beta^T \Omega\beta
@@ -185,7 +199,7 @@ $$
 \Omega_{jk} = \int B_j''(x) B_k''(x) dx \tag{7.16}
 $$
 
-Notice that only the quadratic and cubic basis functions will make non-zero contributions to $$\Omega$$. With the choice of basis above, the second derivatives are non-zero on, at most, the interval $$(x_1,x_n)$$, so each of the integrals in $$\Omega$$ is going to be finite. This is something we (or, realistically, R) can calculate once, no matter what $$\lambda$$ is. Now we can find the smoothing spline by differentiating with respect to $$\beta$$:
+Notice that only the quadratic and cubic basis functions will make non-zero contributions to $$\Omega$$. With the choice of basis above, the second derivatives are non-zero on, at most, the interval $$(x_1,x_n)$$, so each of the integrals in $$\Omega$$ is going to be finite. This is something a computer can calculate once, no matter what $$\lambda$$ is. Now we can find the smoothing spline by differentiating with respect to $$\beta$$:
 
 $$
 0 = -2B^T y + 2B^T B\hat{\beta} + 2n\lambda\Omega\hat{\beta}
@@ -205,11 +219,18 @@ $$
 \hat{\mu}(x) = B\hat{\beta} = B(B^T B + n\lambda\Omega)^{-1} B^T y \tag{7.20}
 $$
 
-Once again, if this were ordinary linear regression, the OLS estimate of the coefficients would be $$(x^T x)^{-1} x^T y$$. In comparison to that, we’ve made two changes. First, we’ve substituted the basis function matrix $$B$$ for the original matrix of independent variables, $$x$$—a change we’d have made already for a polynomial regression. Second, the "denominator" is not $$x^T x$$, or even $$B^T B$$, but $$B^T B + n\lambda\Omega$$. Since $$x^T x$$ is $$n$$ times the covariance matrix of the independent variables, we are taking the covariance matrix of the spline basis functions and adding some extra covariance—how much depends on the shapes of the functions (through $$\Omega$$) and how much smoothing we want to do (through $$\lambda$$). The larger we make $$\lambda$$, the less the actual data matters to the fit.
+If this were ordinary linear regression, the OLS estimate of the coefficients would be $$(x^T x)^{-1} x^T y$$. In comparison to that, we’ve made two changes.
 
-In addition to explaining how splines can be fit quickly (do some matrix arithmetic), this illustrates two important tricks. One, which we won’t explore further here, is to turn a nonlinear regression problem into one which is linear in another set of basis functions. This is like using not just one transformation of the input variables, but a whole library of them, and letting the data decide which transformations are important. There remains the issue of selecting the basis functions, which can be quite tricky. In addition to the spline basis, most choices are various sorts of waves—sine and cosine waves of different frequencies, various wave-forms of limited spatial extent ("wavelets"), etc. The ideal is to choose a function basis where only a few non-zero coefficients would need to be estimated, but this requires some understanding of the data.
+1. We’ve substituted the basis function matrix $$B$$ for the original matrix of independent variables, $$x$$—a change we’d have made already for a polynomial regression.
+2. The "denominator" is not $$x^Tx$$, or even $$B^TB$$, but $$B^TB + n\lambda\Omega$$.
 
-The other trick is that of stabilizing an unstable estimation problem by adding a penalty term. This reduces variance at the cost of introducing some bias.
+Since $$x^Tx$$ is $$n$$ times the covariance matrix of the independent variables, we are taking the covariance matrix of the spline basis functions and adding some extra covariance. How much depends on the shapes of the functions (through $$\Omega$$) and how much smoothing we want to do (through $$\lambda$$). The larger we make $$\lambda$$, the less the actual data matters to the fit.
+
+In addition to explaining how splines can be fit quickly (do some matrix arithmetic), this illustrates two important tricks.  
+
+1. Turn a nonlinear regression problem into one which is linear in another set of basis functions. This is like using not just one transformation of the input variables, but a whole library of them, and letting the data decide which transformations are important. Choosing the basis functions can be tricky, but there are plenty of resources to help you choose. The ideal is to choose a function basis where only a few non-zero coefficients would need to be estimated, but this requires some understanding of the data.
+
+2. Stabilizing an unstable estimation problem by adding a penalty term. This reduces variance at the cost of introducing some bias.
 
 # Example: Wage Data
 
@@ -223,47 +244,31 @@ df = pd.read_csv('Wage.csv')
 age_grid = np.arange(df.age.min(), df.age.max()).reshape(-1,1)
 plt.scatter(df.age, df.wage, facecolor='None', edgecolor='k', alpha=0.1)
 ```
-
-
-
-
     <matplotlib.collections.PathCollection at 0x11d0a5898>
-
-
-
 
     
 ![png](2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_3_1.png)
     
 
-
 GAMs are essentially linear models, but in a very special (and useful!) basis made of regression splines. We can use the `bs()` function in `patsy` to create such a basis for us:
-
 
 ```python
 transformed_x1 = patsy.dmatrix("bs(df.age, knots=(25,40,60), degree=3, include_intercept=False)", {"df.age": df.age}, return_type='dataframe')
 fit1 = sm.GLM(df.wage, transformed_x1).fit()
 ```
 
-
 ```python
 fit1.params
+    
+Intercept                                                               60.493714
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[0]     3.980500
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[1]    44.630980
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[2]    62.838788
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[3]    55.990830
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[4]    50.688098
+bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[5]    16.606142
+dtype: float64
 ```
-
-
-
-
-    Intercept                                                               60.493714
-    bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[0]     3.980500
-    bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[1]    44.630980
-    bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[2]    62.838788
-    bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[3]    55.990830
-    bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[4]    50.688098
-    bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[5]    16.606142
-    dtype: float64
-
-
-
 
 ```python
 age_grid = np.arange(df.age.min(), df.age.max()).reshape(-1,1)
@@ -277,21 +282,12 @@ plt.xlabel('age')
 plt.ylabel('wage')
 ```
 
-
-
-
     Text(0,0.5,'wage')
 
 
-
-
-    
 ![png](2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_7_1.png)
     
-
-
 Here we have prespecified knots at ages 25, 40, and 60. This produces a spline with six basis functions. A cubic spline has 7 degrees of freedom: one for the intercept, and two for each order. We could also have specified knot points at uniform quantiles of the data:
-
 
 ```python
 # Specifying 6 degrees of freedom
@@ -299,19 +295,16 @@ transformed_x2 = patsy.dmatrix("bs(df.age, df=6, include_intercept=False)",
 {"df.age": df.age}, return_type='dataframe')
 fit2 = sm.GLM(df.wage, transformed_x2).fit()
 fit2.params
+
+Intercept                                       56.313841
+bs(df.age, df=6, include_intercept=False)[0]    27.824002
+bs(df.age, df=6, include_intercept=False)[1]    54.062546
+bs(df.age, df=6, include_intercept=False)[2]    65.828391
+bs(df.age, df=6, include_intercept=False)[3]    55.812734
+bs(df.age, df=6, include_intercept=False)[4]    72.131473
+bs(df.age, df=6, include_intercept=False)[5]    14.750876
+dtype: float64
 ```
-
-
-
-
-    Intercept                                       56.313841
-    bs(df.age, df=6, include_intercept=False)[0]    27.824002
-    bs(df.age, df=6, include_intercept=False)[1]    54.062546
-    bs(df.age, df=6, include_intercept=False)[2]    65.828391
-    bs(df.age, df=6, include_intercept=False)[3]    55.812734
-    bs(df.age, df=6, include_intercept=False)[4]    72.131473
-    bs(df.age, df=6, include_intercept=False)[5]    14.750876
-    dtype: float64
 
 
 
@@ -375,18 +368,10 @@ plt.xlabel('age')
 plt.ylabel('wage')
 ```
 
-
-
-
     Text(0,0.5,'wage')
-
-
-
-
-    
+  
 ![png](2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_13_1.png)
     
-
 
 Let's see how these fits all stack together:
 
@@ -412,19 +397,11 @@ plt.xlabel('age')
 plt.ylabel('wage')
 ```
 
-
-
-
     Text(0,0.5,'wage')
 
 
-
-
-    
 ![png](2021-08-10-The-Guts-Of-GAMs_files/2021-08-10-The-Guts-Of-GAMs_15_1.png)
     
-
-
 
 ```python
 from matplotlib import pyplot as plt
@@ -488,7 +465,7 @@ $$ X = \left[1, x_1,  \ldots,  x_k \right] $$
 
 so we can write:
 
-$ y = \beta_0 + f\left( x \right) + \varepsilon = X\beta + \varepsilon $$
+$$ y = \beta_0 + f\left( x \right) + \varepsilon = X\beta + \varepsilon $$
 
 We choose to minimise the sum of squares again, this time with a regularisation term:
 
