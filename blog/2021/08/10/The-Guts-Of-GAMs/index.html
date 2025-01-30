@@ -102,18 +102,6 @@ MathJax.Hub.Config({
 
 <p>This is where additive models shine: they give you enough structure to work with high-dimensional data, but with far less approximation bias than linear models.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="kn">import</span> <span class="nn">patsy</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="n">mpl</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
-<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="n">sm</span>
-<span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="n">smf</span>
-
-<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-</code></pre></div></div>
 <h1 id="splines">Splines</h1>
 
 <p>We build the \(f_i\) using a type of function called a spline; splines allow us to automatically model non-linear relationships without having to manually try out many different transformations on each variable. The name “spline” comes from a tool used by craftsmen to draw smooth curves—a thin, flexible strip of material like soft wood. You pin it down at specific points, called knots, and let it bend between them.</p>
@@ -259,9 +247,22 @@ When we increase $\lambda$, we’re essentially saying “pay less attention to 
 
 <h1 id="example-wage-data">Example: Wage Data</h1>
 
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">patsy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="n">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="n">sm</span>
+<span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="n">smf</span>
+
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+</code></pre></div></div>
+
 <p>First of all, we’ll use <code class="language-plaintext highlighter-rouge">patsy</code> to construct a few spline bases and fit generalised linear models with <code class="language-plaintext highlighter-rouge">statsmodels</code>. Then, we’ll dive into constructing splines ourselves; following Simon Wood’s book we’ll use penalised regression splines.</p>
 
-<p>Firstly, we’ll use <code class="language-plaintext highlighter-rouge">patsy</code> to create some basic pline models. The data we’re using comes from https://vincentarelbundock.github.io/Rdatasets/doc/ISLR/Wage.html. It’s plotted below:</p>
+<p>Firstly, we’ll use <code class="language-plaintext highlighter-rouge">patsy</code> to create some basic pline models. The data we’re using comes from <a href="https://vincentarelbundock.github.io/Rdatasets/doc/ISLR/Wage.html">here</a>. It’s plotted below:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'Wage.csv'</span><span class="p">)</span>
 <span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
