@@ -223,9 +223,7 @@ If this were ordinary linear regression, the OLS estimate of the coefficients wo
 
 1. We’ve substituted the basis function matrix $$B$$ for the original matrix of independent variables, $$x$$—a change we’d have made already for a polynomial regression.
 2. In ordinary linear regression, we use $(x^Tx)^{-1}x^Ty$ to find our coefficients. But with splines, we're using $(B^TB + n\lambda\Omega)^{-1}B^Ty$ instead. The key difference is that extra term $n\lambda\Omega$ that we're adding to $B^TB$. Here's what this means:
-**$B^TB$ captures how our basis functions relate to each other (their covariance) - just like $x^Tx$ did for regular variables in ordinary regression $n\lambda\Omega$ is an additional term that controls smoothing.
-**$\Omega$ reflects the "wiggliness" or curvature of our basis functions.
-**$\lambda$ is our smoothing parameter that we can adjust.
+**$B^TB$ captures how our basis functions relate to each other (their covariance) - just like $x^Tx$ did for regular variables in ordinary regression $n\lambda\Omega$ is an additional term that controls smoothing. $\Omega$ reflects the "wiggliness" or curvature of our basis functions. $\lambda$ is our smoothing parameter that we can adjust.
 When we increase $\lambda$, we're essentially saying "pay less attention to the actual data ($B^TB$) and make the curve smoother." When $\lambda$ is very small, we're closer to regular regression and the fit will follow the data more closely, When $\lambda$ is large, the fit becomes smoother because we're giving more weight to the smoothing penalty ($\Omega$)
 
 Think of it like a balance: $B^TB$ wants to fit the data points exactly, while $n\lambda\Omega$ wants to make everything smooth. The parameter $\lambda$ lets us decide which goal is more important.
