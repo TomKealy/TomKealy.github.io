@@ -41,19 +41,6 @@ So where do additive models fit in? They balance these two extremes. Additive mo
 
 This is where additive models shine: they give you enough structure to work with high-dimensional data, but with far less approximation bias than linear models.
 
-```python
-import pandas as pd
-import patsy
-import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import PolynomialFeatures
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
-
-%matplotlib inline
-```
 # Splines
 
 We build the $$ f_i $$ using a type of function called a spline; splines allow us to automatically model non-linear relationships without having to manually try out many different transformations on each variable. The name “spline” comes from a tool used by craftsmen to draw smooth curves—a thin, flexible strip of material like soft wood. You pin it down at specific points, called knots, and let it bend between them.
@@ -236,10 +223,23 @@ In addition to explaining how splines can be fit quickly (do some matrix arithme
 
 # Example: Wage Data
 
+```python
+import pandas as pd
+import patsy
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import PolynomialFeatures
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+%matplotlib inline
+```
+
 First of all, we'll use `patsy` to construct a few spline bases and fit generalised linear models with `statsmodels`. Then, we'll dive into constructing splines ourselves; following Simon Wood's book we'll use penalised regression splines.
 
-Firstly, we'll use `patsy` to create some basic pline models. The data we're using comes from https://vincentarelbundock.github.io/Rdatasets/doc/ISLR/Wage.html. It's plotted below:
-
+Firstly, we'll use `patsy` to create some basic pline models. The data we're using comes from [here](https://vincentarelbundock.github.io/Rdatasets/doc/ISLR/Wage.html). It's plotted below:
 
 ```python
 df = pd.read_csv('Wage.csv')
