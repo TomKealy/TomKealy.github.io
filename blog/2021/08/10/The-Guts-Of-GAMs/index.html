@@ -71,7 +71,7 @@ MathJax.Hub.Config({
             </div>
         </div>
         <div class='wrap article'>
-            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#why-would-we-do-this">Why would we do this!?</a></li><li><a href="#splines">Splines</a></li><li><a href="#fitting-splines">Fitting Splines</a></li><li><a href="#example-wage-data">Example: Wage Data</a></li></ul>
+            <ul><li><a href="#introduction">Introduction</a><ul><li><a href="#why-would-we-do-this">Why would we do this!?</a></li></ul></li><li><a href="#splines">Splines</a><ul><li><a href="#fitting-splines">Fitting Splines</a></li></ul></li><li><a href="#example-wage-data">Example: Wage Data</a></li></ul>
             <p>This post will explain  the internals of (generalised) additive models (GAMs): how to estimate the feature functions. We first explain <em>why</em> we want to fit additive models, and then we go on to explain how they are estimated in practice via splines (we will also explain what a spline is).  Finally we’ll fit simple splines on wage data, then we’ll go on to fit more complicated splines on some accelerometer data with a highly non-linear realtionship between in the input and the output.</p>
 
 <h1 id="introduction">Introduction</h1>
@@ -90,7 +90,7 @@ MathJax.Hub.Config({
 
 <p>To see why this restriction is necessary, consider a simple case where \(p = 2\). If we add constants \(c_1\) to \(f_1\) and \(c_2\) to \(f_2\), but subtract \(c_1 + c_2\) from \(\alpha\), nothing observable changes in the model. This kind of degeneracy or lack of identifiability is similar to the way collinearity prevents us from defining true slopes in linear regression. However, it’s less harmful than collinearity because we can resolve it by imposing this constraint.</p>
 
-<h1 id="why-would-we-do-this">Why would we do this!?</h1>
+<h2 id="why-would-we-do-this">Why would we do this!?</h2>
 
 <p>Before we dive into how additive models work in practice, let’s take a step back and understand <em>why</em> we might want to use them. Think of regression models as existing on a spectrum, with linear models on one end and fully nonparametric models on the other. Additive models sit somewhere in between.</p>
 
@@ -159,7 +159,7 @@ MathJax.Hub.Config({
 
 <p>It should come as no surprise that we select \(\lambda\) by <strong>cross-validation</strong>. Ordinary <strong>k-fold cross-validation</strong> works, but <strong>leave-one-out CV</strong> performs well for splines. In fact, the default in most spline software is either leave-one-out CV or the faster approximation called <strong>generalized cross-validation (GCV)</strong>.</p>
 
-<h1 id="fitting-splines">Fitting Splines</h1>
+<h2 id="fitting-splines">Fitting Splines</h2>
 
 <p>Splines are piecewise cubic polynomials. To see how to fit them, let’s think about how to fit a global cubic polynomial. We would define four (because we need one for every derivative we penalise and one for the intercept) basis functions,</p>
 
@@ -185,7 +185,7 @@ MathJax.Hub.Config({
 
 \[\hat{\beta} = (B^T B)^{-1} B^T y\]
 
-<p>Since splines are piecewise cubics, things proceed similarly, but we need to take care wehn defining the basis functions. We have \(n\) values of the input variable \(x\), \(x_1 , x_2 , \dots, x_n\). Assume that these are in increasing order, because it simplifies the notation. These \(n\) “knots” define \(n + 1\) pieces or segments: \(n - 1\) of them between the knots, one from \(-\infty\) to \(x_1\), and one from \(x_n\) to \(+\infty\). A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from \(x_i\) to \(x_{i+1}\) would need the basis functions</p>
+<p>Since splines are piecewise cubics, things proceed similarly, but we need to take care wehn defining the basis functions. We have \(n\) values of the input variable \(x\), \(x_1 , x_2 , \dots, x_n\). Assume that these are in increasing order, because it simplifies the notation. These \(n\) “knots” define \(n + 1\) pieces or segments: \(n - 1\) of them between the knots, one from \(-\infty\) to \(x_1\), and one from \(x_n\) to \(+\infty\). A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from \(x_i\) to \(x_{i+1}\) would need the basis functions:</p>
 
 \[1(x_i,x_{i+1})(x)\]
 
