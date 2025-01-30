@@ -1,16 +1,17 @@
 ---
 layout: default
 title:  "Understanding the Guts of Generalized Additive Models (GAMs) with Hands-on Examples."
+subtitle: Generalised Additive Models look harder than they actually are.
 date:   2021-08-10
 categories: GAMs
+toc: true
 ---
-Generalised Additive Models look harder than they actually are. We fit a single dimension GAM from scratch, including generating splines.
 
 This post will explain  the internals of (generalised) additive models (GAMs): how to estimate the feature functions. We first explain *why* we want to fit additive models, and then we go on to explain how they are estimated in practice via splines (we will also explain what a spline is).  Finally we'll fit simple splines on wage data, then we'll go on to fit more complicated splines on some accelerometer data with a highly non-linear realtionship between in the input and the output.
 
 # Introduction
 
-The additive model for regression expresses the conditional expectation function as a sum of partial response functions, one for each predictor variable. The idea is that each input feature makes a separate contribution to the response, and these contributions just add up (hence the name "partial response function"). However, these contributions don’t have to be strictly proportional to the inputs.
+The additive model for regression expresses the conditional expectation function as a sum of partial response functions, one for each predictor variable. That's a lot to take in in a single sentence! The idea is that each input feature makes a separate contribution to the response, and these contributions just add up (hence the name "partial response function"). However, these contributions don’t have to be strictly proportional to the inputs.
 
 Formally, when the vector $$ \mathbf{X} $$ of predictor variables has $$ p $$ dimensions, $$ x_1, \ldots, x_p $$, the model is given by:
 
@@ -23,7 +24,7 @@ This  includes the linear model as a special case, where $$ f_j(x_j) = \beta_j x
 To make the model identifiable, we add a restriction. Without loss of generality, we assume:
 
 $$
-E[Y] = \alpha \quad \text{and} \quad E[f_j(X_j)] = 0 
+E[Y] = \alpha \quad \text{and} \quad E[f_j(X_j)] = 0
 $$
 
 To see why this restriction is necessary, consider a simple case where $$ p = 2 $$. If we add constants $$ c_1 $$ to $$ f_1 $$ and $$ c_2 $$ to $$ f_2 $$, but subtract $$ c_1 + c_2 $$ from $$ \alpha $$, nothing observable changes in the model. This kind of degeneracy or lack of identifiability is similar to the way collinearity prevents us from defining true slopes in linear regression. However, it’s less harmful than collinearity because we can resolve it by imposing this constraint.
@@ -32,16 +33,13 @@ To see why this restriction is necessary, consider a simple case where $$ p = 2 
 
 Before we dive into how additive models work in practice, let’s take a step back and understand *why* we might want to use them. Think of regression models as existing on a spectrum, with linear models on one end and fully nonparametric models on the other. Additive models sit somewhere in between.
 
-Linear regression is fast—it converges quickly as we get more data, but it assumes the world is simple and linear, which it almost never is. Even with infinite data, a linear model will make systematic mistakes due to its inability to capture non-linear relationships. Its mean squared error (MSE) shrinks at a rate of $$ O(n^{-1}) $$, and this speed is unaffected by the number of parameters.
+Linear regression is fast—it converges quickly as we get more data, but it assumes the world is simple and linear, which it almost never is. Even with infinite data, a linear model will make systematic mistakes due to its inability to capture non-linear relationships. Its mean squared error (MSE) shrinks at a rate of $$\mathcal{O}(n^{-1}) $$, and this speed is unaffected by the number of parameters.
 
-At the opposite extreme, fully nonparametric methods like kernel regression or k-nearest neighbors make no such assumptions. They can capture complex shapes, but they pay for that flexibility with much slower convergence, especially in higher dimensions. In one dimension, these models converge at a rate of $$ O(n^{-4/5}) $$, but in higher dimensions, the rate drops dramatically to something like $$ O(n^{-1/26}) $$ in 100 dimensions—this is the notorious "curse of dimensionality." Essentially, the more features you have, the more data you need to maintain the same level of precision, and the data demands grow exponentially.
+At the opposite extreme, fully nonparametric methods like kernel regression or k-nearest neighbors make no such assumptions. They can capture complex shapes, but they pay for that flexibility with much slower convergence, especially in higher dimensions. In one dimension, these models converge at a rate of $$ \mathcal{O}(n^{-4/5}) $$, but in higher dimensions, the rate drops dramatically to something like $$ \mathcal{O}(n^{-1/26}) $$ in 100 dimensions—this is the notorious "curse of dimensionality." Essentially, the more features you have, the more data you need to maintain the same level of precision, and the data demands grow exponentially.
 
-So where do additive models fit in? They balance these two extremes. Additive models allow for some non-linearity while avoiding the curse of dimensionality by estimating each component function $$ f_j(x_j) $$ independently, using one-dimensional smoothing techniques. The result is a model that converges almost as fast as parametric ones—at a rate of $$ O(n^{-4/5}) $$, rather than the much slower rate of fully nonparametric models. Sure, there’s a little approximation bias, but the trade-off is worth it. In practice, additive models often outperform linear models once you have enough data, because they capture more of the underlying structure without demanding the impossible amount of data required by fully nonparametric approaches.
+So where do additive models fit in? They balance these two extremes. Additive models allow for some non-linearity while avoiding the curse of dimensionality. They achieve this by estimating each component function $$ f_j(x_j) $$ independently, using one-dimensional smoothing techniques. The result is a model that converges almost as fast as parametric ones—at a rate of $$ \mathcal{O}(n^{-4/5}) $$, rather than the much slower rate of fully nonparametric models. Sure, there’s a little approximation bias, but the trade-off is worth it. In practice, additive models often outperform linear models once you have enough data, because they capture more of the underlying structure without demanding the impossible amount of data required by fully nonparametric approaches.
 
-This is where additive models shine: they hit that sweet spot between simplicity and flexibility, giving you enough structure to work with high-dimensional data, but with far less approximation bias than linear models.
-
-
-
+This is where additive models shine: they give you enough structure to work with high-dimensional data, but with far less approximation bias than linear models.
 
 ```python
 import pandas as pd
@@ -71,7 +69,7 @@ Why not be more direct, and control smoothness itself?
 A natural way to do this is by minimizing the spline objective function:
 
 $$
-L(m, \lambda) \equiv \frac{1}{n} \sum_{i=1}^{n} \left( y_i - m(x_i) \right)^2 + \lambda \int \left( m''(x) \right)^2 dx \tag{spline_cost}
+L(m, \lambda) \equiv \frac{1}{n} \sum_{i=1}^{n} \left( y_i - m(x_i) \right)^2 + \lambda \int \left( m''(x) \right)^2 dx
 $$
 
 The first term here is just the mean squared error (MSE) of using the curve $$m(x)$$ to predict $$y$$. The second term, penalises the MSE in the direction of smoother curves. $$m''(x)$$ is the second derivative of $$m$$ with respect to $$x$$—it would be zero if $$m$$ were linear, so this term measures the curvature of $$m$$ at $$x$$. The sign of $$m''(x)$$ tells us whether the curvature is concave or convex, but we don’t care about that, so we square it. Then, we integrate this over all $$x$$ to get the total curvature. Finally, we multiply by $$lambda$$ and add that to the MSE. This adds a penalty to the MSE criterion—given two functions with the same MSE, we prefer the one with less average curvature. In practice, we’ll accept changes in $$m$$ that increase the MSE by 1 unit if they reduce the average curvature by at least $$lambda$$.
