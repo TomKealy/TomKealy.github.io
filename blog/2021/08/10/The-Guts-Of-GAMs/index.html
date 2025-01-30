@@ -161,7 +161,7 @@ MathJax.Hub.Config({
 
 <h1 id="fitting-splines">Fitting Splines</h1>
 
-<p>Splines are piecewise cubic polynomials. To see how to fit them, let’s think about how to fit a global cubic polynomial. We would define four basis functions,</p>
+<p>Splines are piecewise cubic polynomials. To see how to fit them, let’s think about how to fit a global cubic polynomial. We would define four (because we need one for every derivative we penalise and one for the intercept) basis functions,</p>
 
 \[B_1(x) = 1\]
 
@@ -185,9 +185,15 @@ MathJax.Hub.Config({
 
 \[\hat{\beta} = (B^T B)^{-1} B^T y\]
 
-<p>Since splines are piecewise cubics, things proceed similarly, but we need to be a little more careful in defining the basis functions. Recall that we have \(n\) values of the input variable \(x\), \(x_1 , x_2 , \dots, x_n\). Assume that these are in increasing order, because it simplifies the notation. These \(n\) “knots” define \(n + 1\) pieces or segments: \(n - 1\) of them between the knots, one from \(-\infty\) to \(x_1\), and one from \(x_n\) to \(+\infty\). A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from \(x_i\) to \(x_{i+1}\) would need the basis functions</p>
+<p>Since splines are piecewise cubics, things proceed similarly, but we need to take care wehn defining the basis functions. We have \(n\) values of the input variable \(x\), \(x_1 , x_2 , \dots, x_n\). Assume that these are in increasing order, because it simplifies the notation. These \(n\) “knots” define \(n + 1\) pieces or segments: \(n - 1\) of them between the knots, one from \(-\infty\) to \(x_1\), and one from \(x_n\) to \(+\infty\). A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from \(x_i\) to \(x_{i+1}\) would need the basis functions</p>
 
-\[1(x_i,x_{i+1})(x), \, (x - x_i) 1(x_i,x_{i+1})(x), \, (x - x_i)^2 1(x_i,x_{i+1})(x), \, (x - x_i)^3 1(x_i,x_{i+1})(x)\]
+\[1(x_i,x_{i+1})(x)\]
+
+\[(x - x_i) 1(x_i,x_{i+1})(x)\]
+
+\[(x - x_i)^2 1(x_i,x_{i+1})(x)\]
+
+\[(x - x_i)^3 1(x_i,x_{i+1})(x)\]
 
 <p>where the indicator function \(1(x_i,x_{i+1})(x)\) is 1 if \(x \in (x_i,x_{i+1})\) and 0 otherwise. This makes it seem like we need \(4(n + 1) = 4n + 4\) basis functions.</p>
 
@@ -207,7 +213,9 @@ MathJax.Hub.Config({
 
 \[m(x) = \sum_{j=1}^m \beta_j B_j(x)\]
 
-<p>and put together the matrix \(B\) where \(B_{ij} = B_j(x_i)\). We can write the spline objective function in terms of the basis functions:</p>
+<p>and put together the matrix \(B\) where \(B_{ij} = B_j(x_i)\).</p>
+
+<p>We can write the spline objective function in terms of the basis functions:</p>
 
 \[L = (y - B\beta)^T (y - B\beta) + n\lambda\beta^T \Omega\beta\]
 
@@ -215,7 +223,7 @@ MathJax.Hub.Config({
 
 \[\Omega_{jk} = \int B_j''(x) B_k''(x) dx \tag{7.16}\]
 
-<p>Notice that only the quadratic and cubic basis functions will make non-zero contributions to \(\Omega\). With the choice of basis above, the second derivatives are non-zero on, at most, the interval \((x_1,x_n)\), so each of the integrals in \(\Omega\) is going to be finite. This is something we (or, realistically, R) can calculate once, no matter what \(\lambda\) is. Now we can find the smoothing spline by differentiating with respect to \(\beta\):</p>
+<p>Notice that only the quadratic and cubic basis functions will make non-zero contributions to \(\Omega\). With the choice of basis above, the second derivatives are non-zero on, at most, the interval \((x_1,x_n)\), so each of the integrals in \(\Omega\) is going to be finite. This is something a computer can calculate once, no matter what \(\lambda\) is. Now we can find the smoothing spline by differentiating with respect to \(\beta\):</p>
 
 \[0 = -2B^T y + 2B^T B\hat{\beta} + 2n\lambda\Omega\hat{\beta}\]
 
@@ -227,11 +235,25 @@ MathJax.Hub.Config({
 
 \[\hat{\mu}(x) = B\hat{\beta} = B(B^T B + n\lambda\Omega)^{-1} B^T y \tag{7.20}\]
 
-<p>Once again, if this were ordinary linear regression, the OLS estimate of the coefficients would be \((x^T x)^{-1} x^T y\). In comparison to that, we’ve made two changes. First, we’ve substituted the basis function matrix \(B\) for the original matrix of independent variables, \(x\)—a change we’d have made already for a polynomial regression. Second, the “denominator” is not \(x^T x\), or even \(B^T B\), but \(B^T B + n\lambda\Omega\). Since \(x^T x\) is \(n\) times the covariance matrix of the independent variables, we are taking the covariance matrix of the spline basis functions and adding some extra covariance—how much depends on the shapes of the functions (through \(\Omega\)) and how much smoothing we want to do (through \(\lambda\)). The larger we make \(\lambda\), the less the actual data matters to the fit.</p>
+<p>If this were ordinary linear regression, the OLS estimate of the coefficients would be \((x^T x)^{-1} x^T y\). In comparison to that, we’ve made two changes.</p>
 
-<p>In addition to explaining how splines can be fit quickly (do some matrix arithmetic), this illustrates two important tricks. One, which we won’t explore further here, is to turn a nonlinear regression problem into one which is linear in another set of basis functions. This is like using not just one transformation of the input variables, but a whole library of them, and letting the data decide which transformations are important. There remains the issue of selecting the basis functions, which can be quite tricky. In addition to the spline basis, most choices are various sorts of waves—sine and cosine waves of different frequencies, various wave-forms of limited spatial extent (“wavelets”), etc. The ideal is to choose a function basis where only a few non-zero coefficients would need to be estimated, but this requires some understanding of the data.</p>
+<ol>
+  <li>We’ve substituted the basis function matrix \(B\) for the original matrix of independent variables, \(x\)—a change we’d have made already for a polynomial regression.</li>
+  <li>The “denominator” is not \(x^Tx\), or even \(B^TB\), but \(B^TB + n\lambda\Omega\).</li>
+</ol>
 
-<p>The other trick is that of stabilizing an unstable estimation problem by adding a penalty term. This reduces variance at the cost of introducing some bias.</p>
+<p>Since \(x^Tx\) is \(n\) times the covariance matrix of the independent variables, we are taking the covariance matrix of the spline basis functions and adding some extra covariance. How much depends on the shapes of the functions (through \(\Omega\)) and how much smoothing we want to do (through \(\lambda\)). The larger we make \(\lambda\), the less the actual data matters to the fit.</p>
+
+<p>In addition to explaining how splines can be fit quickly (do some matrix arithmetic), this illustrates two important tricks.</p>
+
+<ol>
+  <li>
+    <p>Turn a nonlinear regression problem into one which is linear in another set of basis functions. This is like using not just one transformation of the input variables, but a whole library of them, and letting the data decide which transformations are important. Choosing the basis functions can be tricky, but there are plenty of resources to help you choose. The ideal is to choose a function basis where only a few non-zero coefficients would need to be estimated, but this requires some understanding of the data.</p>
+  </li>
+  <li>
+    <p>Stabilizing an unstable estimation problem by adding a penalty term. This reduces variance at the cost of introducing some bias.</p>
+  </li>
+</ol>
 
 <h1 id="example-wage-data">Example: Wage Data</h1>
 
@@ -243,7 +265,6 @@ MathJax.Hub.Config({
 <span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">'None'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </code></pre></div></div>
-
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.collections.PathCollection at 0x11d0a5898&gt;
 </code></pre></div></div>
 
@@ -256,16 +277,15 @@ MathJax.Hub.Config({
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fit1</span><span class="p">.</span><span class="n">params</span>
-</code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Intercept                                                               60.493714
-bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[0]     3.980500
-bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[1]    44.630980
-bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[2]    62.838788
-bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[3]    55.990830
-bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[4]    50.688098
-bs(df.age, knots=(25, 40, 60), degree=3, include_intercept=False)[5]    16.606142
-dtype: float64
+    
+<span class="n">Intercept</span>                                                               <span class="mf">60.493714</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>     <span class="mf">3.980500</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>    <span class="mf">44.630980</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>    <span class="mf">62.838788</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>    <span class="mf">55.990830</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span>    <span class="mf">50.688098</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">5</span><span class="p">]</span>    <span class="mf">16.606142</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
@@ -291,16 +311,15 @@ dtype: float64
 <span class="p">{</span><span class="s">"df.age"</span><span class="p">:</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">},</span> <span class="n">return_type</span><span class="o">=</span><span class="s">'dataframe'</span><span class="p">)</span>
 <span class="n">fit2</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">GLM</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">wage</span><span class="p">,</span> <span class="n">transformed_x2</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
 <span class="n">fit2</span><span class="p">.</span><span class="n">params</span>
-</code></pre></div></div>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Intercept                                       56.313841
-bs(df.age, df=6, include_intercept=False)[0]    27.824002
-bs(df.age, df=6, include_intercept=False)[1]    54.062546
-bs(df.age, df=6, include_intercept=False)[2]    65.828391
-bs(df.age, df=6, include_intercept=False)[3]    55.812734
-bs(df.age, df=6, include_intercept=False)[4]    72.131473
-bs(df.age, df=6, include_intercept=False)[5]    14.750876
-dtype: float64
+<span class="n">Intercept</span>                                       <span class="mf">56.313841</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>    <span class="mf">27.824002</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>    <span class="mf">54.062546</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>    <span class="mf">65.828391</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>    <span class="mf">55.812734</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span>    <span class="mf">72.131473</span>
+<span class="n">bs</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="mi">5</span><span class="p">]</span>    <span class="mf">14.750876</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="nb">max</span><span class="p">()).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
@@ -424,7 +443,7 @@ We build the \(f_i\) using a type of function called a spline. Since our data is
 
 <p>so we can write:</p>
 
-<p>$ y = \beta_0 + f\left( x \right) + \varepsilon = X\beta + \varepsilon $$</p>
+\[y = \beta_0 + f\left( x \right) + \varepsilon = X\beta + \varepsilon\]
 
 <p>We choose to minimise the sum of squares again, this time with a regularisation term:</p>
 
