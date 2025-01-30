@@ -29,7 +29,7 @@ $$
 
 To see why this restriction is necessary, consider a simple case where $$ p = 2 $$. If we add constants $$ c_1 $$ to $$ f_1 $$ and $$ c_2 $$ to $$ f_2 $$, but subtract $$ c_1 + c_2 $$ from $$ \alpha $$, nothing observable changes in the model. This kind of degeneracy or lack of identifiability is similar to the way collinearity prevents us from defining true slopes in linear regression. However, it’s less harmful than collinearity because we can resolve it by imposing this constraint.
 
-# Why would we do this!?
+## Why would we do this!?
 
 Before we dive into how additive models work in practice, let’s take a step back and understand *why* we might want to use them. Think of regression models as existing on a spectrum, with linear models on one end and fully nonparametric models on the other. Additive models sit somewhere in between.
 
@@ -101,7 +101,7 @@ The way to think about smoothing splines is as functions that minimize MSE, but 
 
 It should come as no surprise that we select $$ \lambda $$ by **cross-validation**. Ordinary **k-fold cross-validation** works, but **leave-one-out CV** performs well for splines. In fact, the default in most spline software is either leave-one-out CV or the faster approximation called **generalized cross-validation (GCV)**. 
 
-# Fitting Splines
+## Fitting Splines
 
 Splines are piecewise cubic polynomials. To see how to fit them, let’s think about how to fit a global cubic polynomial. We would define four (because we need one for every derivative we penalise and one for the intercept) basis functions,
 
@@ -141,7 +141,7 @@ $$
 \hat{\beta} = (B^T B)^{-1} B^T y
 $$
 
-Since splines are piecewise cubics, things proceed similarly, but we need to take care wehn defining the basis functions. We have $$n$$ values of the input variable $$x$$, $$x_1 , x_2 , \dots, x_n$$. Assume that these are in increasing order, because it simplifies the notation. These $$n$$ “knots” define $$n + 1$$ pieces or segments: $$n - 1$$ of them between the knots, one from $$-\infty$$ to $$x_1$$, and one from $$x_n$$ to $$+\infty$$. A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from $$x_i$$ to $$x_{i+1}$$ would need the basis functions
+Since splines are piecewise cubics, things proceed similarly, but we need to take care wehn defining the basis functions. We have $$n$$ values of the input variable $$x$$, $$x_1 , x_2 , \dots, x_n$$. Assume that these are in increasing order, because it simplifies the notation. These $$n$$ “knots” define $$n + 1$$ pieces or segments: $$n - 1$$ of them between the knots, one from $$-\infty$$ to $$x_1$$, and one from $$x_n$$ to $$+\infty$$. A third-order polynomial on each segment would seem to need a constant, linear, quadratic, and cubic term per segment. So the segment running from $$x_i$$ to $$x_{i+1}$$ would need the basis functions:
 
 $$
 1(x_i,x_{i+1})(x)
