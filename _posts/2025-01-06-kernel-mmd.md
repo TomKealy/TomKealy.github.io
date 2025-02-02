@@ -1,6 +1,6 @@
 ---
 layout: default
-title:  Hypothesis Testing without assumptions
+title:  Kernel-MMD: Hypothesis Testing without assumptions
 subtitle: What to do if you can't assume anything about your distributions.
 date:   2025-01-15
 categories: hypothesis-testing
@@ -103,10 +103,10 @@ def mmd(x, y, sigma):
     return mmd
 ```
 
-Gretton et. al. recommend to set the $\sigma$ parameter to the median distance between points:
+{% cite gretton2012kernel %} recommends to set the $\sigma$ parameter to the median distance between points:
 
 $$
-\sigma = \frac{\mathrm{Median}\left(z_i - z_j)}{2}
+\sigma = \frac{\mathrm{Median}\left(z_i - z_j\right)}{2}
 $$
 
 where $Z$ is the combined sample of and $X$ and $Y$. We have also used the Gaussian Radial Basis as the choice of kernel.
