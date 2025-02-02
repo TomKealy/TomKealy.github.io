@@ -1,10 +1,12 @@
 ---
 layout: default
-title:  "Mixed Models"
+title:  Mixed Models
+subtitle: How to handle struture in your regressions
 date:   2021-01-01
 categories: optimisation
 ---
- Group Structure is something we can exploit to improve our estimates. We introduce and explain mixed models and how to fit them.
+
+Group Structure is something we can exploit to improve our estimates. We introduce and explain mixed models and how to fit them.
 
 Often, we have data which has a group structure. For example, in the dataset we use in this post, radon measurements were taken in ~900 houses in 85 counties. It's unreasonable to expect that radon levels do not vary by state as well as house, and so we will integrate this into our analysis. 
 

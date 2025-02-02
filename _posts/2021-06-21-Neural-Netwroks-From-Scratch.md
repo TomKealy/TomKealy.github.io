@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "Neural Networks from scratch."
+subtitle: NNs are easier than you think
 date:   2021-06-21
 categories: optimisation, curve-fitting, neural-networks
 ---

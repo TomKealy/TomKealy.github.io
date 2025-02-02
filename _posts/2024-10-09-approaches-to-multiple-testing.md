@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "A Grab Bag of Approaches to Frequentist Multiple Testing."
+subtitle: Pick your poison.
 date:   2024-10-09
 categories: hypothesis-testing, multiple-testing
 ---

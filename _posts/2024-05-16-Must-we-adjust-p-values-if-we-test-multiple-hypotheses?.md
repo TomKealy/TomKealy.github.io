@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "Must we adjust p-values if we test multiple hypotheses?"
+subtitle: Yes, yes you must 
 date:   2024-05-16
 categories: GAMs
 ---

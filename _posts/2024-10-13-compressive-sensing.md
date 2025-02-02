@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "An introduction to Compressive Sensing."
+subtitle: Short, fat matricesa are useful, actually.
 date:   2024-10-09
 categories: Compressive sensing.
 ---

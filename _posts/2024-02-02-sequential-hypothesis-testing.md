@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "Sequential Hypothesis Testing"
+subtitle: Hypothesis testing step-by-step.
 date:   2024-02-02
 categories: hypothesis-testing
 ---

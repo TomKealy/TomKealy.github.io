@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "AB testing Google Ads Bidding strategies"
+subtitle: Hypothesis testing with dependent samples.
 date:   2025-01-15
 categories: hypothesis-testing
 toc: true

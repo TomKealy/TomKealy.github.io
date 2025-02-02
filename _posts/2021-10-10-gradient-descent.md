@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "An introduction to Gradient Descent"
+subtitle: How to optimise basically any function.
 date:   2021-10-10
 categories: optimisation
 ---
