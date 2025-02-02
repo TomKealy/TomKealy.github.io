@@ -71,7 +71,7 @@ MathJax.Hub.Config({
             </div>
         </div>
         <div class='wrap article'>
-            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#data">Data</a></li><li><a href="#sequential-testing-by-betting-a-martingale-approach">Sequential Testing by Betting: A Martingale Approach</a><ul><li><a href="#a-general-two-sample-test">A General Two Sample test</a><ul><li><a href="#constructing-test-functions">Constructing test functions</a></li><li><a href="#betting-strategy">Betting strategy</a></li></ul></li><li><a href="#numerical-experiments">Numerical experiments</a></li></ul></li><li><a href="#sequential-testing-for-smart-bidding">Sequential Testing for Smart Bidding</a></li></ul>
+            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#data">Data</a></li><li><a href="#sequential-testing-by-betting-a-martingale-approach">Sequential Testing by Betting: A Martingale Approach</a><ul><li><a href="#a-general-two-sample-test">A General Two Sample test</a><ul><li><a href="#constructing-test-functions">Constructing test functions</a></li><li><a href="#betting-strategy">Betting strategy</a></li></ul></li></ul></li><li><a href="#sequential-testing-for-smart-bidding">Sequential Testing for Smart Bidding</a><ul><li><a href="#numerical-experiments">Numerical Experiments.</a></li></ul></li></ul>
             <h1 id="introduction">Introduction</h1>
 
 <p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
@@ -178,7 +178,7 @@ MathJax.Hub.Config({
 
 <p>{cite % shekhar2023nonparametric %} begin by choosing a distance measure on the space of probability distributions which admits a variational representation. Specifically the function must be part of a class of functions $\mathbb{G}$ which maxmises the following distance:</p>
 
-\[dG\left(P, Q\right) = sup_{g∈G} \midEP[g(X)] - EQ[g(Y)]\mid\]
+\[G\left(P, Q\right) = sup_{g∈G} \midEP[g(X)] - EQ[g(Y)]\mid\]
 
 <p>The function class $G$ should contain functions mapping to $\left[-1/2, 1/2\right]$.</p>
 
@@ -525,8 +525,6 @@ MathJax.Hub.Config({
     <span class="k">return</span> <span class="n">results</span>
 </code></pre></div></div>
 
-<h2 id="numerical-experiments">Numerical experiments</h2>
-
 <h1 id="sequential-testing-for-smart-bidding">Sequential Testing for Smart Bidding</h1>
 
 <p>For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following code:</p>
@@ -728,7 +726,9 @@ MathJax.Hub.Config({
         <span class="s">'wealth_history'</span><span class="p">:</span> <span class="n">test</span><span class="p">.</span><span class="n">wealth_history</span>
     <span class="p">}</span>
 </code></pre></div></div>
+<h2 id="numerical-experiments">Numerical Experiments.</h2>
 
+<p>I created a comparision</p>
 
         </div>
         

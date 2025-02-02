@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hypothesis Testing without assumptions</title>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta name='description' content='Gregory Gundersen is a PhD candidate at Princeton.'>
+    <meta name='keywords' content=''>
+    <meta name='author' content='Gregory Gundersen'>
+    
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/trac.css' rel='stylesheet'/>
+    <link href='/css/markdown.css' rel='stylesheet'/>
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    
+    <script type='text/x-mathjax-config'>
+MathJax.Hub.Config({
+  jax: ['input/TeX', 'output/HTML-CSS'],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+    extensions: ['color.js']
+  },
+  messageStyle: 'none',
+  'HTML-CSS': { preferredFont: 'TeX', availableFonts: ['STIX','TeX'] }
+});
+</script>
+
+<script src='//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML' type='text/javascript'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+</head>
+<body>
+    <div class='content'>
+        <div class='nav'>
+    <ul class='wrap'>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/blog'>Blog</a></li>
+        <li><a href='/feed.xml'>RSS</a></li>
+    </ul>
+</div>
+        <div class='front-matter'>
+            <div class='wrap'>
+                <h1>Hypothesis Testing without assumptions</h1>
+                <h4>What to do if you can't assume anything about your distributions.</h4>
+                <div class='bylines'>
+                    <div class='byline'>
+                        <h3>Published</h3>
+                        <p>15 January 2025</p>
+                    </div>
+                </div>
+                <div class='clear'></div>
+            </div>
+        </div>
+        <div class='wrap article'>
+            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#maximum-mean-discrepancy-mmd">Maximum Mean Discrepancy (MMD)</a><ul><li><a href="#special-case">Special Case</a></li><li><a href="#stronger-distances">Stronger Distances</a></li><li><a href="#kernel-trick">Kernel Trick</a></li><li><a href="#understanding-the-name">Understanding the Name</a></li><li><a href="#alternative-characterization">Alternative Characterization</a></li></ul></li></ul>
+            <h1 id="introduction">Introduction</h1>
+
+<p><em>The</em> basic problem in statistics is comparing two samples of measurements. The basic issue is that you want to know whether these measurements came from the same source, or from different sources. In statistical language, we are comparing the null distribution—that the measurements came from the same source—against the alternative hypothesis —that the measurements come from distinct sources.</p>
+
+<p>Very often statisticians assume some parametric form for the distributions. For example, normal distributions with known unknown means and the same variance. So we would be comparing:</p>
+
+\[H_0: \mu_1 = \mu_2\]
+
+<p>Against</p>
+
+\[H_0: \mu_1 \neq \mu_2\]
+
+<p>There are some downsides to this approach. Firstly, we are imposing an assumption on the data—that the measurements come from a distribution with a specific form—and we can never check the accuracy of that assumption. That is if we have gotten the correct parametric form the distributions. Secondly, the specific distributional form we assume is also unknowable. So we can never really know how wrong we are.</p>
+
+<p>The issue then is to find solutions to the following problem, without making assumptions about the data generating process of the measurements.</p>
+
+<p><em>Problem 1</em> Let $x$ and $y$ be random variables defined on some topological space $\mathcal{X}$, with respective probability measures $p$ and $q$. Given two sets of observations $X = \left{x_1, x_2, \ldots x_m\right}$ and $Y = \left{y_1, y_2, \ldots y_n\right}$ drawn i.i.d from $p$ and $q$ respectively, can we decide whether $p \neq q$?</p>
+
+<h1 id="maximum-mean-discrepancy-mmd">Maximum Mean Discrepancy (MMD)</h1>
+
+<p>In general, MMD is defined by the idea of representing distances between distributions as distances between mean embeddings of features. We can define the notion of distance between probability distirbutions with the following lemma (from <a class="citation" href="#dudley2018real">(Dudley, 2018)</a>).</p>
+
+<p><em>Lemma 1</em> Let $\left(\mathcal{X}, d\right)$ be a metric space, and let $p$ and $q$ be two probability measures defined on $\mathcal{X}$. Then $p = q$ if and only if $\mathcal{E}_x\left(f\left(x\right)\right) = \mathcal{E}_y\left(f\left(y\right)\right)$ for all $f \in C\left(\mathcal{X}\right)$ where $C\left(\mathcal{X}\right)$ is the collection of bounded, continuous functions on $\mathcal{X}$.</p>
+
+<p>The maximum mean discrepancy (MMD) is then defined based on a this class of functions:</p>
+
+<p><em>Definition 1</em> Let $mathcal{F}$ be a class of functions $f: \mathal{F} \rightarrow \mathcal{R}, and let $p, q, x, y, X, Y$ be defined as earlier. The MMD is then:</p>
+
+\[MMD(p,q) := \mathrm{sup}_{f \in \mathcal{F}} \left( \mathcal{E}_x[f(x)] - \mathcal{E}_y[f(y)] \right)\]
+
+<p>An empirical estimate of the MMD can be found by replacing the population expectations with their sample expectations based on the samples $X$ and $Y$ (although this is slightly biased):</p>
+
+\[\hat{MMD(p,q)} := \mathrm{sup}_{f \in \mathcal{F}} \left( \frac{1}{m}\sum_{i=1}^m f(x_i) - \frac{1}{n}\sum_{i=1}^n f(y_i) \right)\]
+
+<p>Although $C\left(\mathcal{X}\right)$ allows us to identify if $p = q$ the space has a</p>
+
+<p>$\phi:\mathcal{X} \rightarrow \mathcal{H}$, where $\mathcal{H}$ is some Hilbert space; this corresponds to a kernel by $k\left(x,y\right)=\left⟨\phi(x),\phi(y)\right⟩$. In general, the MMD is:</p>
+
+<p>As one example, we might have 𝒳=ℝ^d and φ(x)=x, corresponding to a linear kernel. In that case:</p>
+
+<p>MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = ‖𝔼[X~P][X] - 𝔼[Y~Q][Y]‖_ℝd = ‖μ_P - μ_Q‖_ℝd</p>
+
+<p>So this MMD is just the distance between the means of the two distributions. Matching distributions like this will match their means, though they might differ in their variance or in other ways.</p>
+
+<h2 id="special-case">Special Case</h2>
+
+<p>Your case is slightly different: we have 𝒳=ℝ^d and ℋ=ℝ^p, with φ(x)=A’x, where A is a d×p matrix. So we have:</p>
+
+<p>MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = ‖𝔼[X~P][A’X] - 𝔼[Y~Q][A’Y]‖_ℝp = ‖A’𝔼[X~P][X] - A’𝔼[Y~Q][Y]‖_ℝp = ‖A’(μ_P - μ_Q)‖_ℝp</p>
+
+<p>This MMD is the difference between two different projections of the mean. If p&lt;d or the mapping A’ otherwise isn’t invertible, then this MMD is weaker than the previous one: it doesn’t distinguish between some distributions that the previous one does.</p>
+
+<h2 id="stronger-distances">Stronger Distances</h2>
+
+<p>You can also construct stronger distances. For example, if 𝒳=ℝ and you use φ(x)=(x,x²) (giving a particular quadratic kernel), then the MMD becomes:</p>
+
+<p>√[(𝔼X-𝔼Y)² + (𝔼X²-𝔼Y²)²]</p>
+
+<p>And can distinguish not only distributions with different means but with different variances as well.</p>
+
+<h2 id="kernel-trick">Kernel Trick</h2>
+
+<p>And you can get much stronger than that: for general choices of kernel, you can use the kernel trick to compute the MMD:</p>
+
+<p>MMD²(P,Q) = ‖𝔼[X~P]φ(X) - 𝔼[Y~Q]φ(Y)‖² = 
+𝔼[X,X’~P]k(X,X’) + 𝔼[Y,Y’~Q]k(Y,Y’) - 2𝔼[X~P,Y~Q]k(X,Y)</p>
+
+<p>It’s then straightforward to estimate this with samples, for any kernel function k – even ones where φ is infinite-dimensional, like the Gaussian kernel (also called “squared exponential” or “exponentiated quadratic”):</p>
+
+<p>k(x,y) = exp(-1/(2σ²)‖x-y‖²)</p>
+
+<p>If your choice of k is “characteristic,” then the MMD becomes a proper metric on distributions: it’s zero if and only if the two distributions are the same. (This is unlike when you use, say, a linear kernel, where two distributions with the same mean have zero linear-kernel MMD.) If you’ve heard of a “universal” kernel, those are characteristic, but there are a few kernels that are characteristic but not universal.</p>
+
+<h2 id="understanding-the-name">Understanding the Name</h2>
+
+<p>Here’s an explanation of the name, which is also useful for understanding the MMD.</p>
+
+<p>For any kernel k:𝒳×𝒳→ℝ, there exists a feature map φ:𝒳→ℋ, where ℋ is a special Hilbert space called the reproducing kernel Hilbert space (RKHS) corresponding to k. This is a space of functions, f:𝒳→ℝ. These spaces satisfy a special key condition, called the reproducing property: ⟨f,φ(x)⟩=f(x) for any f∈ℋ.</p>
+
+<p>The simplest example is the linear kernel k(x,y)=x⋅y. This can be “implemented” with ℋ=ℝ^d and φ(x)=x. But the RKHS is instead the space of linear functions f_x(t)=x⋅t, and φ(x)=f_x. The reproducing property is ⟨f_w,φ(x)⟩=⟨w,x⟩_ℝd.</p>
+
+<p>In more complex settings, like a Gaussian kernel, f is a much more complicated function, but the reproducing property still holds.</p>
+
+<h2 id="alternative-characterization">Alternative Characterization</h2>
+
+<p>Now, we can give an alternative characterization of the MMD:</p>
+
+<p>MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = 
+sup{f∈ℋ:‖f‖≤1}⟨f,𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]⟩ = 
+sup{f∈ℋ:‖f‖≤1}[𝔼[X~P][f(X)] - 𝔼[Y~Q][f(Y)]]</p>
+
+<p>The second line is a general fact about norms in Hilbert spaces that follows immediately from Cauchy-Schwarz: sup{f:‖f‖≤1}⟨f,g⟩=‖g‖ is achieved by f=g/‖g‖.</p>
+
+<p>The fourth line depends on a technical condition known as Bochner integrability, but is true e.g. for bounded kernels or distributions with bounded support.</p>
+
+<p>This last line is why it’s called the “maximum mean discrepancy” – it’s the maximum, over test functions f in the unit ball of ℋ, of the mean difference between the two distributions. This is also a special case of an integral probability metric.</p>
+
+        </div>
+        
+    </div>
+</body>
+</html>
