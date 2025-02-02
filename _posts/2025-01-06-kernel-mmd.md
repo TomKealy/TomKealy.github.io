@@ -37,7 +37,7 @@ In general, MMD is defined by the idea of representing distances between distrib
 
 The maximum mean discrepancy (MMD) is then defined based on a this class of functions:
 
-*Definition 1* Let $mathcal{F}$ be a class of functions $f: \mathal{F} \rightarrow \mathcal{R}, and let $p, q, x, y, X, Y$ be defined as earlier. The MMD is then:
+*Definition 1* Let $\mathcal{F}$ be a class of functions $f: \mathcal{F} \rightarrow \mathcal{R}, and let $p, q, x, y, X, Y$ be defined as earlier. The MMD is then:
 
 $$
 MMD(p,q) := \mathrm{sup}_{f \in \mathcal{F}} \left( \mathcal{E}_x[f(x)] - \mathcal{E}_y[f(y)] \right)
