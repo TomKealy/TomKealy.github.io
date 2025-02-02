@@ -292,7 +292,7 @@ print(f"p-value: {result['p_value']:.6f}")
 
 Which gives
 
-``python
+```python
 Test Results:
 MMD statistic: 0.416771
 p-value: 0.003000
