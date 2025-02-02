@@ -27,7 +27,7 @@ There are some downsides to this approach. Firstly, we are imposing an assumptio
 
 The issue then is to find solutions to the following problem, without making assumptions about the data generating process of the measurements.
 
-*Problem 1* Let $x$ and $y$ be random variables defined on some topological space $\mathcal{X}$, with respective probability measures $p$ and $q$. Given two sets of observations $X = \left{x_1, x_2, \ldots, x_m \right}$ and $Y = \left{y_1, y_2, \ldots, y_n \right}$ drawn i.i.d from $p$ and $q$ respectively, can we decide whether $p \neq q$?
+*Problem 1* Let $x$ and $y$ be random variables defined on some topological space $\mathcal{X}$, with respective probability measures $p$ and $q$. Given two sets of observations $X = \left(x_1, x_2, \ldots, x_m \right)$ and $Y = \left(_1, y_2, \ldots, y_n \right)$ drawn i.i.d from $p$ and $q$ respectively, can we decide whether $p \neq q$?
 
 # Maximum Mean Discrepancy (MMD)
 
