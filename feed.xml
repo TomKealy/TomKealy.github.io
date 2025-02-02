@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-02T12:10:20+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing without assumptions</title><link href="http://gregorygundersen.com/blog/2025/01/15/kernel-mmd/" rel="alternate" type="text/html" title="Hypothesis Testing without assumptions" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/kernel-mmd</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/kernel-mmd/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-02T12:33:30+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing without assumptions</title><link href="http://gregorygundersen.com/blog/2025/01/15/kernel-mmd/" rel="alternate" type="text/html" title="Hypothesis Testing without assumptions" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/kernel-mmd</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/kernel-mmd/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p><em>The</em> basic problem in statistics is comparing two samples of measurements. The basic issue is that you want to know whether these measurements came from the same source, or from different sources. In statistical language, we are comparing the null distribution—that the measurements came from the same source—against the alternative hypothesis —that the measurements come from distinct sources.</p>
 
@@ -209,29 +209,65 @@
         <span class="s">'alternative'</span><span class="p">:</span> <span class="s">"two distributions are not equal"</span><span class="p">,</span>
         <span class="s">'method'</span><span class="p">:</span> <span class="s">"Kernel Two-sample Test with Maximum Mean Discrepancy"</span>
     <span class="p">}</span>
+</code></pre></div></div>
 
-<span class="c1"># Example usage
-</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="c1"># Generate example data
-</span>    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-    <span class="n">dat1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># group 1: 30 obs of mean 1
-</span>    <span class="n">dat2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># group 2: 25 obs of mean -1
-</span>    
-    <span class="c1"># Combine data and compute distance matrix
-</span>    <span class="n">combined_data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">dat1</span><span class="p">,</span> <span class="n">dat2</span><span class="p">])</span>
-    <span class="n">dist_matrix</span> <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">pdist</span><span class="p">(</span><span class="n">combined_data</span><span class="p">))</span>
-    
-    <span class="c1"># Build Gaussian kernel matrix
-</span>    <span class="n">kernel_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">dist_matrix</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-    
-    <span class="c1"># Create labels
-</span>    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">25</span><span class="p">)</span>
-    
-    <span class="c1"># Run the test
-</span>    <span class="n">result</span> <span class="o">=</span> <span class="n">mmd2test</span><span class="p">(</span><span class="n">kernel_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Test statistic:"</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s">'statistic'</span><span class="p">])</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"p-value:"</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s">'p_value'</span><span class="p">])</span>
-</code></pre></div></div>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<p>We can create an example to explain how to use the code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="c1"># Create Beta distributions and generate samples
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">).</span><span class="n">rvs</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">).</span><span class="n">rvs</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+
+<span class="c1"># Points for plotting the density curves
+</span><span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">density_x</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">).</span><span class="n">pdf</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> 
+<span class="n">density_y</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">).</span><span class="n">pdf</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+<span class="c1"># Plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s">'+'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">density_x</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">density_y</span><span class="p">)</span> 
+</code></pre></div></div>
+
+<p><img src="/assets/images/kernel-mmd/example_mmd_data.png" alt="Two distribution" title="Example MMD data" /></p>
+
+<p>Now we analyse the data:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Reshape the data to be 2D arrays
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Shape becomes (15, 1)
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Shape becomes (15, 1)
+</span>
+<span class="c1"># Combine data and compute distance matrix
+</span><span class="n">combined_data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+<span class="n">distances</span> <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">pdist</span><span class="p">(</span><span class="n">combined_data</span><span class="p">))</span>
+
+<span class="c1"># Compute median distance for kernel bandwidth
+</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Using median bandwidth: </span><span class="si">{</span><span class="n">sigma</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+<span class="c1"># Build Gaussian kernel matrix with scaled distances and small regularization
+</span><span class="n">kernel_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">distances</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">kernel_matrix</span> <span class="o">+=</span> <span class="mf">1e-15</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kernel_matrix</span><span class="p">))</span>  <span class="c1"># Small regularization
+</span>
+<span class="c1"># Create labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+<span class="c1"># Run the test
+</span><span class="n">result</span> <span class="o">=</span> <span class="n">mmd2test</span><span class="p">(</span><span class="n">kernel_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Test Results:"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"MMD statistic: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s">'statistic'</span><span class="p">][</span><span class="s">'MMD'</span><span class="p">]</span><span class="si">:</span><span class="p">.</span><span class="mi">6</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"p-value: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s">'p_value'</span><span class="p">]</span><span class="si">:</span><span class="p">.</span><span class="mi">6</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Which gives</p>
+
+<p><code class="language-plaintext highlighter-rouge">python
+Test Results:
+MMD statistic: 0.416771
+p-value: 0.003000
+</code>`</p>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
 
