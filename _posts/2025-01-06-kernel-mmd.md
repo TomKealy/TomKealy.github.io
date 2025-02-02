@@ -49,65 +49,213 @@ $$
 \hat{MMD(p,q)} := \mathrm{sup}_{f \in \mathcal{F}} \left( \frac{1}{m}\sum_{i=1}^m f(x_i) - \frac{1}{n}\sum_{i=1}^n f(y_i) \right)
 $$
 
-Although $C\left(\mathcal{X}\right)$ allows us to identify if $p = q$ the space has a 
+Although $C\left(\mathcal{X}\right)$ allows us to identify if $p = q$, the space is too rich. It is not computationally practical to work in this space. Instead we will work with a function class which can identify whether $p = q$ but is restrictive enough to provide useful estimates with finite samples.
 
-$\phi:\mathcal{X} \rightarrow \mathcal{H}$, where $\mathcal{H}$ is some Hilbert space; this corresponds to a kernel by $k\left(x,y\right)=\left⟨\phi(x),\phi(y)\right⟩$. In general, the MMD is:
+# Reproducing Kernel Hilbert Spaces
 
-As one example, we might have 𝒳=ℝ^d and φ(x)=x, corresponding to a linear kernel. In that case:
+A Reproducing Kernel Hilbert Space (RKHS) is a space $\mathcal{X}$ of functions, equipped with a norm (i.e. a [Hilbert space](https://en.wikipedia.org/wiki/Hilbert_space)). There is a function $\phi(x)$ which takes points in $\mathcal{X}$ to $\mathcal{R}$. We denote this function $ f(x) = \langle f, \phi(x) \rangle$. We can write $\phi(x) = k(x, \dot)$. In particular
 
-MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = ‖𝔼[X~P][X] - 𝔼[Y~Q][Y]‖_ℝd = ‖μ_P - μ_Q‖_ℝd
+$$
+k(x, y) = \langle \phi(x), \phi(y) \rangle
+$$
 
-So this MMD is just the distance between the means of the two distributions. Matching distributions like this will match their means, though they might differ in their variance or in other ways.
+Speaking informally, an RKHS is just a space where every point in the space is a linear combination of (positive-definite) kernels. This allows us to replace the inner product calculation in this space with the kernel evaluation. We can, in particular, extend the notion of a feature map to the embedding of a probabuility distribution. Let $ \mu_p \in \mathcal{H}$ be such that $\mathcal{E}_x[f] = \langle f, \mu_p \rangle$. We call this the _mean embedding_ of $p$. Then, the MMD may be expressed as the distance between mean embeddings in $\mathcal{H}$/
 
-## Special Case
+# Kernel MMD
 
-Your case is slightly different: we have 𝒳=ℝ^d and ℋ=ℝ^p, with φ(x)=A'x, where A is a d×p matrix. So we have:
+$\phi:\mathcal{X} \rightarrow \mathcal{H}$, where $\mathcal{H}$ is some Hilbert space; this corresponds to a kernel by $k\left(x,y\right)=\left⟨\phi(x),\phi(y)\right⟩$. The MMD is:
 
-MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = ‖𝔼[X~P][A'X] - 𝔼[Y~Q][A'Y]‖_ℝp = ‖A'𝔼[X~P][X] - A'𝔼[Y~Q][Y]‖_ℝp = ‖A'(μ_P - μ_Q)‖_ℝp
+$$
+MMD^2\left[p, q \right] = \left\lVert \mu_p - \mu_q \right\rVert^2
+$$
 
-This MMD is the difference between two different projections of the mean. If p<d or the mapping A' otherwise isn't invertible, then this MMD is weaker than the previous one: it doesn't distinguish between some distributions that the previous one does.
+And we can obtain the MMD in terms of the RKHS kernel functions:
 
-## Stronger Distances
+$$
+MMD^2\left[p, q \right] =  \mathcal{E}_{x, x'}[k(x, x')] - 2\mathcal{E}_{x, y}[k(x, y)] + \mathcal{E}_{y, y'}[k(y, y')]
+$$
 
-You can also construct stronger distances. For example, if 𝒳=ℝ and you use φ(x)=(x,x²) (giving a particular quadratic kernel), then the MMD becomes:
+This is relatively easy to compute (implmentation from [torchdrift]()https://torchdrift.org/notebooks/note_on_mmd.html)):
 
-√[(𝔼X-𝔼Y)² + (𝔼X²-𝔼Y²)²]
+```python
+import torch
 
-And can distinguish not only distributions with different means but with different variances as well.
+def mmd(x, y, sigma):
+    # compare kernel MMD paper and code:
+    # A. Gretton et al.: A kernel two-sample test, JMLR 13 (2012)
+    # http://www.gatsby.ucl.ac.uk/~gretton/mmd/mmd.htm
+    # x shape [n, d] y shape [m, d]
+    # n_perm number of bootstrap permutations to get p-value, pass none to not get p-value
+    n, d = x.shape
+    m, d2 = y.shape
+    assert d == d2
+    xy = torch.cat([x.detach(), y.detach()], dim=0)
+    dists = torch.cdist(xy, xy, p=2.0)
+    # we are a bit sloppy here as we just keep the diagonal and everything twice
+    # note that sigma should be squared in the RBF to match the Gretton et al heuristic
+    k = torch.exp((-1/(2*sigma**2)) * dists**2) + torch.eye(n+m)*1e-5
+    k_x = k[:n, :n]
+    k_y = k[n:, n:]
+    k_xy = k[:n, n:]
+    # The diagonals are always 1 (up to numerical error, this is (3) in Gretton et al.)
+    # note that their code uses the biased (and differently scaled mmd)
+    mmd = k_x.sum() / (n * (n - 1)) + k_y.sum() / (m * (m - 1)) - 2 * k_xy.sum() / (n * m)
+    return mmd
+```
 
-## Kernel Trick
+Gretton et. al. recommend to set the $\sigma$ parameter to the median distance between points:
 
-And you can get much stronger than that: for general choices of kernel, you can use the kernel trick to compute the MMD:
+$$
+\sigma = \frac{\mathrm{Median}\left(z_i - z_j)}{2}
+$$
 
-MMD²(P,Q) = ‖𝔼[X~P]φ(X) - 𝔼[Y~Q]φ(Y)‖² = 
-𝔼[X,X'~P]k(X,X') + 𝔼[Y,Y'~Q]k(Y,Y') - 2𝔼[X~P,Y~Q]k(X,Y)
+where $Z$ is the combined sample of and $X$ and $Y$. We have also used the Gaussian Radial Basis as the choice of kernel.
 
-It's then straightforward to estimate this with samples, for any kernel function k -- even ones where φ is infinite-dimensional, like the Gaussian kernel (also called "squared exponential" or "exponentiated quadratic"):
+We can extend this implementation to any kernel with the following code:
 
-k(x,y) = exp(-1/(2σ²)‖x-y‖²)
+```python
+import numpy as np
+from scipy.spatial.distance import pdist, squareform
+from scipy import linalg
+from typing import Union, Tuple, List
 
-If your choice of k is "characteristic," then the MMD becomes a proper metric on distributions: it's zero if and only if the two distributions are the same. (This is unlike when you use, say, a linear kernel, where two distributions with the same mean have zero linear-kernel MMD.) If you've heard of a "universal" kernel, those are characteristic, but there are a few kernels that are characteristic but not universal.
+def mmd_biased(XX: np.ndarray, YY: np.ndarray, XY: np.ndarray) -> float:
+    """
+    Compute biased MMD^2 statistic.
+    
+    Args:
+        XX: Kernel matrix for first sample
+        YY: Kernel matrix for second sample
+        XY: Cross kernel matrix between samples
+    
+    Returns:
+        float: Biased MMD^2 statistic
+    """
+    m = XX.shape[0]
+    n = YY.shape[0]
+    
+    return (np.sum(XX) / (m**2)) + (np.sum(YY) / (n**2)) - (2 / (m*n)) * np.sum(XY)
 
-## Understanding the Name
+def mmd_unbiased(XX: np.ndarray, YY: np.ndarray, XY: np.ndarray) -> float:
+    """
+    Compute unbiased MMD^2 statistic.
+    
+    Args:
+        XX: Kernel matrix for first sample
+        YY: Kernel matrix for second sample
+        XY: Cross kernel matrix between samples
+    
+    Returns:
+        float: Unbiased MMD^2 statistic
+    """
+    m = XX.shape[0]
+    n = YY.shape[0]
+    
+    term1 = (np.sum(XX) - np.trace(XX)) / (m * (m-1))
+    term2 = (np.sum(YY) - np.trace(YY)) / (n * (n-1))
+    term3 = (2 / (m*n)) * np.sum(XY)
+    
+    return term1 + term2 - term3
 
-Here's an explanation of the name, which is also useful for understanding the MMD.
+def mmd2test(K: np.ndarray, label: Union[List, np.ndarray], 
+             method: str = "b", mc_iter: int = 999) -> dict:
+    """
+    Kernel Two-sample Test with Maximum Mean Discrepancy.
+    
+    Maximum Mean Discrepancy (MMD) as a measure of discrepancy between samples
+    is employed as a test statistic for two-sample hypothesis test of equal 
+    distributions. Kernel matrix K is a symmetric square matrix that is positive
+    semidefinite.
+    
+    Args:
+        K: Kernel matrix (symmetric, positive semidefinite)
+        label: Label vector of class indices
+        method: Type of estimator to be used. "b" for biased and "u" for unbiased
+        mc_iter: Number of Monte Carlo resampling iterations
+    
+    Returns:
+        dict: Dictionary containing test results with keys:
+            - statistic: Test statistic
+            - p_value: p-value under H0
+            - alternative: Alternative hypothesis
+            - method: Name of the test
+    """
+    # Preprocessing
+    K = np.asarray(K)
+    if not (K.ndim == 2 and K.shape[0] == K.shape[1]):
+        raise ValueError("K should be a square matrix")
+    
+    if not np.allclose(K, K.T):
+        raise ValueError("K should be symmetric")
+    
+    # Check if K is positive semidefinite
+    min_eigenval = np.min(linalg.eigvalsh(K))
+    if min_eigenval < 0:
+        print(f"Warning: K may not be PD. Minimum eigenvalue is {min_eigenval}")
+    
+    # Process labels
+    label = np.asarray(label)
+    unique_labels = np.unique(label)
+    if len(unique_labels) != 2:
+        raise ValueError("label should contain exactly 2 classes")
+    
+    if len(label) != K.shape[0]:
+        raise ValueError("Length of label must match size of kernel matrix")
+    
+    # Compute statistic
+    id1 = np.where(label == unique_labels[0])[0]
+    id2 = np.where(label == unique_labels[1])[0]
+    m, n = len(id1), len(id2)
+    
+    if method.lower() == "b":
+        stat = mmd_biased(K[np.ix_(id1, id1)], K[np.ix_(id2, id2)], K[np.ix_(id1, id2)])
+    else:  # method == "u"
+        stat = mmd_unbiased(K[np.ix_(id1, id1)], K[np.ix_(id2, id2)], K[np.ix_(id1, id2)])
+    
+    # Monte Carlo iterations
+    iter_vals = np.zeros(mc_iter)
+    for i in range(mc_iter):
+        perm = np.random.permutation(m + n)
+        tmp_id1 = perm[:m]
+        tmp_id2 = perm[m:]
+        
+        if method.lower() == "b":
+            iter_vals[i] = mmd_biased(K[np.ix_(tmp_id1, tmp_id1)], 
+                                    K[np.ix_(tmp_id2, tmp_id2)], 
+                                    K[np.ix_(tmp_id1, tmp_id2)])
+        else:  # method == "u"
+            iter_vals[i] = mmd_unbiased(K[np.ix_(tmp_id1, tmp_id1)], 
+                                      K[np.ix_(tmp_id2, tmp_id2)], 
+                                      K[np.ix_(tmp_id1, tmp_id2)])
+    
+    p_value = (np.sum(iter_vals >= stat) + 1) / (mc_iter + 1)
+    
+    return {
+        'statistic': {'MMD': stat},
+        'p_value': p_value,
+        'alternative': "two distributions are not equal",
+        'method': "Kernel Two-sample Test with Maximum Mean Discrepancy"
+    }
 
-For any kernel k:𝒳×𝒳→ℝ, there exists a feature map φ:𝒳→ℋ, where ℋ is a special Hilbert space called the reproducing kernel Hilbert space (RKHS) corresponding to k. This is a space of functions, f:𝒳→ℝ. These spaces satisfy a special key condition, called the reproducing property: ⟨f,φ(x)⟩=f(x) for any f∈ℋ.
-
-The simplest example is the linear kernel k(x,y)=x⋅y. This can be "implemented" with ℋ=ℝ^d and φ(x)=x. But the RKHS is instead the space of linear functions f_x(t)=x⋅t, and φ(x)=f_x. The reproducing property is ⟨f_w,φ(x)⟩=⟨w,x⟩_ℝd.
-
-In more complex settings, like a Gaussian kernel, f is a much more complicated function, but the reproducing property still holds.
-
-## Alternative Characterization
-
-Now, we can give an alternative characterization of the MMD:
-
-MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = 
-sup{f∈ℋ:‖f‖≤1}⟨f,𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]⟩ = 
-sup{f∈ℋ:‖f‖≤1}[𝔼[X~P][f(X)] - 𝔼[Y~Q][f(Y)]]
-
-The second line is a general fact about norms in Hilbert spaces that follows immediately from Cauchy-Schwarz: sup{f:‖f‖≤1}⟨f,g⟩=‖g‖ is achieved by f=g/‖g‖.
-
-The fourth line depends on a technical condition known as Bochner integrability, but is true e.g. for bounded kernels or distributions with bounded support.
-
-This last line is why it's called the "maximum mean discrepancy" – it's the maximum, over test functions f in the unit ball of ℋ, of the mean difference between the two distributions. This is also a special case of an integral probability metric.
+# Example usage
+if __name__ == "__main__":
+    # Generate example data
+    np.random.seed(42)
+    dat1 = np.random.normal(1, 1, (30, 2))  # group 1: 30 obs of mean 1
+    dat2 = np.random.normal(-1, 1, (25, 2))  # group 2: 25 obs of mean -1
+    
+    # Combine data and compute distance matrix
+    combined_data = np.vstack([dat1, dat2])
+    dist_matrix = squareform(pdist(combined_data))
+    
+    # Build Gaussian kernel matrix
+    kernel_matrix = np.exp(-(dist_matrix**2))
+    
+    # Create labels
+    labels = np.array([1]*30 + [2]*25)
+    
+    # Run the test
+    result = mmd2test(kernel_matrix, labels)
+    print("Test statistic:", result['statistic'])
+    print("p-value:", result['p_value'])
+```
