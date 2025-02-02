@@ -101,7 +101,7 @@ Now we need to do two things:
 {cite % shekhar2023nonparametric %} begin by choosing a distance measure on the space of probability distributions which admits a variational representation. Specifically the function must be part of a class of functions $\mathbb{G}$ which maxmises the following distance:
 
 $$
-dG\left(P, Q\right) = sup_{g∈G} \midEP[g(X)] - EQ[g(Y)]\mid
+G\left(P, Q\right) = sup_{g∈G} \midEP[g(X)] - EQ[g(Y)]\mid
 $$
 
 The function class $G$ should contain functions mapping to $\left[-1/2, 1/2\right]$.
@@ -118,7 +118,7 @@ where $\|g\|_K$ denotes the RKHS norm of the function $g$. The mean map of a dis
 
 The kernal-mMMD functions are a computationally feasible test which to distinguish between two probability distributions $P_X$ and $P_Y$. Specifically, for the kernel-MMD metric, the witness function $h_*$ maximizes the difference between the expectations under $P_X$ and $P_Y$ providing the strongest signal for detecting differences between distributions. The goal of the sequential testing algorithm is to approximate the witness function well (measured in terms of regret).
 
- Witness functions transform the sequential testing problem into an online learning problem, where the goal is to learn increasingly better approximations of these optimal test functions. The witness functions guide how to construct the test statistics (wealth process) in a principled way. When testing simple hypotheses, the optimal test statistic is the likelihood ratio. For the nonparametric case, we do not hav ea likelihood ratio. Instead the witness function serves an analogous role by providing the maximum discrepancy between distributions.
+Witness functions transform the sequential testing problem into an online learning problem, where the goal is to learn increasingly better approximations of these optimal test functions. The witness functions guide how to construct the test statistics (wealth process) in a principled way. When testing simple hypotheses, the optimal test statistic is the likelihood ratio. For the nonparametric case, we do not hav ea likelihood ratio. Instead the witness function serves an analogous role by providing the maximum discrepancy between distributions.
 
 By using empirical estimates of witness functions that adapt to the observed data, the sequential tests can automatically adjust their behavior based on the difficulty of the testing problem. This leads to tests that use fewer samples when the distributions are very different and more samples when they are similar.
 
@@ -449,8 +449,6 @@ def run_sequential_mmd_test(X_stream: np.ndarray,
     return results
 ```
 
-## Numerical experiments
-
 # Sequential Testing for Smart Bidding
 
 For our problem, we are interested in calculating the relative ROI of two bidding strategies on Google Smart Bidding. So we can use the following code:
@@ -653,4 +651,6 @@ def run_roi_mmd_experiment(
         'wealth_history': test.wealth_history
     }
 ```
+## Numerical Experiments.
 
+I created a comparision
