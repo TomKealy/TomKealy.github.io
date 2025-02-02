@@ -1,4 +1,78 @@
-<h1 id="introduction">Introduction</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kernel-MMD-Hypothesis Testing without assumptions</title>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta name='description' content='Gregory Gundersen is a PhD candidate at Princeton.'>
+    <meta name='keywords' content=''>
+    <meta name='author' content='Gregory Gundersen'>
+    
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/trac.css' rel='stylesheet'/>
+    <link href='/css/markdown.css' rel='stylesheet'/>
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    
+    <script type='text/x-mathjax-config'>
+MathJax.Hub.Config({
+  jax: ['input/TeX', 'output/HTML-CSS'],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+    extensions: ['color.js']
+  },
+  messageStyle: 'none',
+  'HTML-CSS': { preferredFont: 'TeX', availableFonts: ['STIX','TeX'] }
+});
+</script>
+
+<script src='//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML' type='text/javascript'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+</head>
+<body>
+    <div class='content'>
+        <div class='nav'>
+    <ul class='wrap'>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/blog'>Blog</a></li>
+        <li><a href='/feed.xml'>RSS</a></li>
+    </ul>
+</div>
+        <div class='front-matter'>
+            <div class='wrap'>
+                <h1>Kernel-MMD-Hypothesis Testing without assumptions</h1>
+                <h4>What to do if you can't assume anything about your distributions.</h4>
+                <div class='bylines'>
+                    <div class='byline'>
+                        <h3>Published</h3>
+                        <p>15 January 2025</p>
+                    </div>
+                </div>
+                <div class='clear'></div>
+            </div>
+        </div>
+        <div class='wrap article'>
+            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#maximum-mean-discrepancy-mmd">Maximum Mean Discrepancy (MMD)</a></li><li><a href="#reproducing-kernel-hilbert-spaces">Reproducing Kernel Hilbert Spaces</a></li><li><a href="#kernel-mmd">Kernel MMD</a></li></ul>
+            <h1 id="introduction">Introduction</h1>
 
 <p><em>The</em> basic problem in statistics is comparing two samples of measurements. The basic issue is that you want to know whether these measurements came from the same source, or from different sources. In statistical language, we are comparing the null distribution—that the measurements came from the same source—against the alternative hypothesis —that the measurements come from distinct sources.</p>
 
@@ -267,3 +341,9 @@
 <span class="n">MMD</span> <span class="n">statistic</span><span class="p">:</span> <span class="mf">0.416771</span>
 <span class="n">p</span><span class="o">-</span><span class="n">value</span><span class="p">:</span> <span class="mf">0.003000</span>
 </code></pre></div></div>
+
+        </div>
+        
+    </div>
+</body>
+</html>
