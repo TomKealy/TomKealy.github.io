@@ -1,6 +1,6 @@
 ---
 layout: default
-title:  Kernel-MMD: Hypothesis Testing without assumptions
+title:  Kernel-MMD-Hypothesis Testing without assumptions
 subtitle: What to do if you can't assume anything about your distributions.
 date:   2025-01-15
 categories: hypothesis-testing
