@@ -23,11 +23,11 @@ $$
 H_0: \mu_1 \neq \mu_2
 $$
 
-There are some downsides to this approach. Firstly, we are imposing an assumption on the data—that the measurements come from a distribution with a specific form—and we can never check the accuracy of that assumption. That is if we have gotten the correct parametric form the distributions. Secondly, the specific distributional form we assume is also unknowable. So we can never really know how wrong we are. 
+There are some downsides to this approach. Firstly, we are imposing an assumption on the data—that the measurements come from a distribution with a specific form—and we can never check the accuracy of that assumption. That is if we have gotten the correct parametric form the distributions. Secondly, the specific distributional form we assume is also unknowable. So we can never really know how wrong we are.
 
-The issue then is to find solutions to the following problem, without making assumptions about the data generating process of the measurements. 
+The issue then is to find solutions to the following problem, without making assumptions about the data generating process of the measurements.
 
-*Problem 1* Let $x$ and $y$ be random variables defined on some topological space $\mathcal{X}$, with respective probability measures $p$ and $q$. Given two sets of observations $X = \left{x_1, x_2, \ldots x_m\right}$ and $Y = \left{y_1, y_2, \ldots y_n\right}$ drawn i.i.d from $p$ and $q$ respectively, can we decide whether $p \neq q$?
+*Problem 1* Let $x$ and $y$ be random variables defined on some topological space $\mathcal{X}$, with respective probability measures $p$ and $q$. Given two sets of observations $X = \left{x_1, x_2, \ldots, x_m \right}$ and $Y = \left{y_1, y_2, \ldots, y_n \right}$ drawn i.i.d from $p$ and $q$ respectively, can we decide whether $p \neq q$?
 
 # Maximum Mean Discrepancy (MMD)
 
@@ -75,7 +75,7 @@ $$
 MMD^2\left[p, q \right] =  \mathcal{E}_{x, x'}[k(x, x')] - 2\mathcal{E}_{x, y}[k(x, y)] + \mathcal{E}_{y, y'}[k(y, y')]
 $$
 
-This is relatively easy to compute (implmentation from [torchdrift]()https://torchdrift.org/notebooks/note_on_mmd.html)):
+This is relatively easy to compute (implmentation from [torchdrift](https://torchdrift.org/notebooks/note_on_mmd.html)):
 
 ```python
 import torch
