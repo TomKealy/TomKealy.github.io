@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-02T12:33:30+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Hypothesis Testing without assumptions</title><link href="http://gregorygundersen.com/blog/2025/01/15/kernel-mmd/" rel="alternate" type="text/html" title="Hypothesis Testing without assumptions" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/kernel-mmd</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/kernel-mmd/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-02T12:36:06+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html"></title><link href="http://gregorygundersen.com/blog/2025/02/02/2025-01-06-kernel-mmd/" rel="alternate" type="text/html" title="" /><published>2025-02-02T12:36:06+00:00</published><updated>2025-02-02T12:36:06+00:00</updated><id>http://gregorygundersen.com/blog/2025/02/02/2025-01-06-kernel-mmd</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/02/02/2025-01-06-kernel-mmd/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p><em>The</em> basic problem in statistics is comparing two samples of measurements. The basic issue is that you want to know whether these measurements came from the same source, or from different sources. In statistical language, we are comparing the null distribution—that the measurements came from the same source—against the alternative hypothesis —that the measurements come from distinct sources.</p>
 
@@ -79,9 +79,9 @@
     <span class="k">return</span> <span class="n">mmd</span>
 </code></pre></div></div>
 
-<p>Gretton et. al. recommend to set the $\sigma$ parameter to the median distance between points:</p>
+<p><a class="citation" href="#gretton2012kernel">(Gretton et al., 2012)</a> recommends to set the $\sigma$ parameter to the median distance between points:</p>
 
-\[\sigma = \frac{\mathrm{Median}\left(z_i - z_j)}{2}\]
+\[\sigma = \frac{\mathrm{Median}\left(z_i - z_j\right)}{2}\]
 
 <p>where $Z$ is the combined sample of and $X$ and $Y$. We have also used the Gaussian Radial Basis as the choice of kernel.</p>
 
@@ -267,7 +267,7 @@
 Test Results:
 MMD statistic: 0.416771
 p-value: 0.003000
-</code>`</p>]]></content><author><name></name></author><category term="hypothesis-testing" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
+</code>`</p>]]></content><author><name></name></author></entry><entry><title type="html">AB testing Google Ads Bidding strategies</title><link href="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/" rel="alternate" type="text/html" title="AB testing Google Ads Bidding strategies" /><published>2025-01-15T00:00:00+00:00</published><updated>2025-01-15T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/01/15/ab-testing-for-bidding-strategies/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>Google (and Meta, and Twitter) serves ads to users browsing the internet. For example, when you make a Google search, you will see sponsored content at the top of your search results. Similarly if you brose Instagram, some of the images you see will be products to buy. The ads you see when you are browsing the internet are paid for by companies who want you to buy their products. The companies bid, in automated auctions, for their ads to be served to you as you browse.</p>
 
