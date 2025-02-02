@@ -236,26 +236,64 @@ def mmd2test(K: np.ndarray, label: Union[List, np.ndarray],
         'alternative': "two distributions are not equal",
         'method': "Kernel Two-sample Test with Maximum Mean Discrepancy"
     }
+```
 
-# Example usage
-if __name__ == "__main__":
-    # Generate example data
-    np.random.seed(42)
-    dat1 = np.random.normal(1, 1, (30, 2))  # group 1: 30 obs of mean 1
-    dat2 = np.random.normal(-1, 1, (25, 2))  # group 2: 25 obs of mean -1
-    
-    # Combine data and compute distance matrix
-    combined_data = np.vstack([dat1, dat2])
-    dist_matrix = squareform(pdist(combined_data))
-    
-    # Build Gaussian kernel matrix
-    kernel_matrix = np.exp(-(dist_matrix**2))
-    
-    # Create labels
-    labels = np.array([1]*30 + [2]*25)
-    
-    # Run the test
-    result = mmd2test(kernel_matrix, labels)
-    print("Test statistic:", result['statistic'])
-    print("p-value:", result['p_value'])
+We can create an example to explain how to use the code:
+
+```python
+np.random.seed(42)
+
+# Create Beta distributions and generate samples
+x = stats.beta(2, 5).rvs(15)
+y = stats.beta(5, 5).rvs(15)
+
+# Points for plotting the density curves
+z = np.linspace(-0.5, 1.5, 100)
+density_x = stats.beta(2, 5).pdf(z) 
+density_y = stats.beta(5, 5).pdf(z)
+
+# Plot
+plt.scatter(x, np.zeros_like(x), marker='+')
+plt.plot(z, density_x)
+plt.plot(z, density_y) 
+```
+
+![Two distribution](/assets/images/kernel-mmd/example_mmd_data.png "Example MMD data")
+
+Now we analyse the data:
+
+```python
+# Reshape the data to be 2D arrays
+x = x.reshape(-1, 1)  # Shape becomes (15, 1)
+y = y.reshape(-1, 1)  # Shape becomes (15, 1)
+
+# Combine data and compute distance matrix
+combined_data = np.vstack([x, y])
+distances = squareform(pdist(combined_data))
+
+# Compute median distance for kernel bandwidth
+sigma = np.median(distances)
+print(f"Using median bandwidth: {sigma:.4f}")
+
+# Build Gaussian kernel matrix with scaled distances and small regularization
+kernel_matrix = np.exp(-distances**2 / (2 * sigma**2))
+kernel_matrix += 1e-15 * np.eye(len(kernel_matrix))  # Small regularization
+
+# Create labels
+labels = np.array([1]*len(x) + [2]*len(y))
+
+# Run the test
+result = mmd2test(kernel_matrix, labels)
+
+print("\nTest Results:")
+print(f"MMD statistic: {result['statistic']['MMD']:.6f}")
+print(f"p-value: {result['p_value']:.6f}")
+```
+
+Which gives
+
+``python
+Test Results:
+MMD statistic: 0.416771
+p-value: 0.003000
 ```
