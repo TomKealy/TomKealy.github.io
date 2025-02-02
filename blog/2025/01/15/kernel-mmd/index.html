@@ -88,7 +88,7 @@ MathJax.Hub.Config({
 
 <p>The issue then is to find solutions to the following problem, without making assumptions about the data generating process of the measurements.</p>
 
-<p><em>Problem 1</em> Let $x$ and $y$ be random variables defined on some topological space $\mathcal{X}$, with respective probability measures $p$ and $q$. Given two sets of observations $X = \left{x_1, x_2, \ldots x_m\right}$ and $Y = \left{y_1, y_2, \ldots y_n\right}$ drawn i.i.d from $p$ and $q$ respectively, can we decide whether $p \neq q$?</p>
+<p><em>Problem 1</em> Let $x$ and $y$ be random variables defined on some topological space $\mathcal{X}$, with respective probability measures $p$ and $q$. Given two sets of observations $X = \left{x_1, x_2, \ldots, x_m \right}$ and $Y = \left{y_1, y_2, \ldots, y_n \right}$ drawn i.i.d from $p$ and $q$ respectively, can we decide whether $p \neq q$?</p>
 
 <h1 id="maximum-mean-discrepancy-mmd">Maximum Mean Discrepancy (MMD)</h1>
 
@@ -126,7 +126,7 @@ MathJax.Hub.Config({
 
 \[MMD^2\left[p, q \right] =  \mathcal{E}_{x, x'}[k(x, x')] - 2\mathcal{E}_{x, y}[k(x, y)] + \mathcal{E}_{y, y'}[k(y, y')]\]
 
-<p>This is relatively easy to compute (implmentation from <a href="">torchdrift</a>https://torchdrift.org/notebooks/note_on_mmd.html)):</p>
+<p>This is relatively easy to compute (implmentation from <a href="https://torchdrift.org/notebooks/note_on_mmd.html">torchdrift</a>):</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
 
