@@ -71,7 +71,7 @@ MathJax.Hub.Config({
             </div>
         </div>
         <div class='wrap article'>
-            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#maximum-mean-discrepancy-mmd">Maximum Mean Discrepancy (MMD)</a><ul><li><a href="#special-case">Special Case</a></li><li><a href="#stronger-distances">Stronger Distances</a></li><li><a href="#kernel-trick">Kernel Trick</a></li><li><a href="#understanding-the-name">Understanding the Name</a></li><li><a href="#alternative-characterization">Alternative Characterization</a></li></ul></li></ul>
+            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#maximum-mean-discrepancy-mmd">Maximum Mean Discrepancy (MMD)</a></li><li><a href="#reproducing-kernel-hilbert-spaces">Reproducing Kernel Hilbert Spaces</a></li><li><a href="#kernel-mmd">Kernel MMD</a></li></ul>
             <h1 id="introduction">Introduction</h1>
 
 <p><em>The</em> basic problem in statistics is comparing two samples of measurements. The basic issue is that you want to know whether these measurements came from the same source, or from different sources. In statistical language, we are comparing the null distribution—that the measurements came from the same source—against the alternative hypothesis —that the measurements come from distinct sources.</p>
@@ -106,68 +106,206 @@ MathJax.Hub.Config({
 
 \[\hat{MMD(p,q)} := \mathrm{sup}_{f \in \mathcal{F}} \left( \frac{1}{m}\sum_{i=1}^m f(x_i) - \frac{1}{n}\sum_{i=1}^n f(y_i) \right)\]
 
-<p>Although $C\left(\mathcal{X}\right)$ allows us to identify if $p = q$ the space has a</p>
+<p>Although $C\left(\mathcal{X}\right)$ allows us to identify if $p = q$, the space is too rich. It is not computationally practical to work in this space. Instead we will work with a function class which can identify whether $p = q$ but is restrictive enough to provide useful estimates with finite samples.</p>
 
-<p>$\phi:\mathcal{X} \rightarrow \mathcal{H}$, where $\mathcal{H}$ is some Hilbert space; this corresponds to a kernel by $k\left(x,y\right)=\left⟨\phi(x),\phi(y)\right⟩$. In general, the MMD is:</p>
+<h1 id="reproducing-kernel-hilbert-spaces">Reproducing Kernel Hilbert Spaces</h1>
 
-<p>As one example, we might have 𝒳=ℝ^d and φ(x)=x, corresponding to a linear kernel. In that case:</p>
+<p>A Reproducing Kernel Hilbert Space (RKHS) is a space $\mathcal{X}$ of functions, equipped with a norm (i.e. a <a href="https://en.wikipedia.org/wiki/Hilbert_space">Hilbert space</a>). There is a function $\phi(x)$ which takes points in $\mathcal{X}$ to $\mathcal{R}$. We denote this function $ f(x) = \langle f, \phi(x) \rangle$. We can write $\phi(x) = k(x, \dot)$. In particular</p>
 
-<p>MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = ‖𝔼[X~P][X] - 𝔼[Y~Q][Y]‖_ℝd = ‖μ_P - μ_Q‖_ℝd</p>
+\[k(x, y) = \langle \phi(x), \phi(y) \rangle\]
 
-<p>So this MMD is just the distance between the means of the two distributions. Matching distributions like this will match their means, though they might differ in their variance or in other ways.</p>
+<p>Speaking informally, an RKHS is just a space where every point in the space is a linear combination of (positive-definite) kernels. This allows us to replace the inner product calculation in this space with the kernel evaluation. We can, in particular, extend the notion of a feature map to the embedding of a probabuility distribution. Let $ \mu_p \in \mathcal{H}$ be such that $\mathcal{E}<em>x[f] = \langle f, \mu_p \rangle$. We call this the _mean embedding</em> of $p$. Then, the MMD may be expressed as the distance between mean embeddings in $\mathcal{H}$/</p>
 
-<h2 id="special-case">Special Case</h2>
+<h1 id="kernel-mmd">Kernel MMD</h1>
 
-<p>Your case is slightly different: we have 𝒳=ℝ^d and ℋ=ℝ^p, with φ(x)=A’x, where A is a d×p matrix. So we have:</p>
+<p>$\phi:\mathcal{X} \rightarrow \mathcal{H}$, where $\mathcal{H}$ is some Hilbert space; this corresponds to a kernel by $k\left(x,y\right)=\left⟨\phi(x),\phi(y)\right⟩$. The MMD is:</p>
 
-<p>MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = ‖𝔼[X~P][A’X] - 𝔼[Y~Q][A’Y]‖_ℝp = ‖A’𝔼[X~P][X] - A’𝔼[Y~Q][Y]‖_ℝp = ‖A’(μ_P - μ_Q)‖_ℝp</p>
+\[MMD^2\left[p, q \right] = \left\lVert \mu_p - \mu_q \right\rVert^2\]
 
-<p>This MMD is the difference between two different projections of the mean. If p&lt;d or the mapping A’ otherwise isn’t invertible, then this MMD is weaker than the previous one: it doesn’t distinguish between some distributions that the previous one does.</p>
+<p>And we can obtain the MMD in terms of the RKHS kernel functions:</p>
 
-<h2 id="stronger-distances">Stronger Distances</h2>
+\[MMD^2\left[p, q \right] =  \mathcal{E}_{x, x'}[k(x, x')] - 2\mathcal{E}_{x, y}[k(x, y)] + \mathcal{E}_{y, y'}[k(y, y')]\]
 
-<p>You can also construct stronger distances. For example, if 𝒳=ℝ and you use φ(x)=(x,x²) (giving a particular quadratic kernel), then the MMD becomes:</p>
+<p>This is relatively easy to compute (implmentation from <a href="">torchdrift</a>https://torchdrift.org/notebooks/note_on_mmd.html)):</p>
 
-<p>√[(𝔼X-𝔼Y)² + (𝔼X²-𝔼Y²)²]</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
 
-<p>And can distinguish not only distributions with different means but with different variances as well.</p>
+<span class="k">def</span> <span class="nf">mmd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+    <span class="c1"># compare kernel MMD paper and code:
+</span>    <span class="c1"># A. Gretton et al.: A kernel two-sample test, JMLR 13 (2012)
+</span>    <span class="c1"># http://www.gatsby.ucl.ac.uk/~gretton/mmd/mmd.htm
+</span>    <span class="c1"># x shape [n, d] y shape [m, d]
+</span>    <span class="c1"># n_perm number of bootstrap permutations to get p-value, pass none to not get p-value
+</span>    <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="n">shape</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">y</span><span class="p">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">d</span> <span class="o">==</span> <span class="n">d2</span>
+    <span class="n">xy</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x</span><span class="p">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">y</span><span class="p">.</span><span class="n">detach</span><span class="p">()],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">dists</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cdist</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="c1"># we are a bit sloppy here as we just keep the diagonal and everything twice
+</span>    <span class="c1"># note that sigma should be squared in the RBF to match the Gretton et al heuristic
+</span>    <span class="n">k</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">exp</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">dists</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="n">m</span><span class="p">)</span><span class="o">*</span><span class="mf">1e-5</span>
+    <span class="n">k_x</span> <span class="o">=</span> <span class="n">k</span><span class="p">[:</span><span class="n">n</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">]</span>
+    <span class="n">k_y</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="n">n</span><span class="p">:,</span> <span class="n">n</span><span class="p">:]</span>
+    <span class="n">k_xy</span> <span class="o">=</span> <span class="n">k</span><span class="p">[:</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">:]</span>
+    <span class="c1"># The diagonals are always 1 (up to numerical error, this is (3) in Gretton et al.)
+</span>    <span class="c1"># note that their code uses the biased (and differently scaled mmd)
+</span>    <span class="n">mmd</span> <span class="o">=</span> <span class="n">k_x</span><span class="p">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">k_y</span><span class="p">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">k_xy</span><span class="p">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mmd</span>
+</code></pre></div></div>
 
-<h2 id="kernel-trick">Kernel Trick</h2>
+<p>Gretton et. al. recommend to set the $\sigma$ parameter to the median distance between points:</p>
 
-<p>And you can get much stronger than that: for general choices of kernel, you can use the kernel trick to compute the MMD:</p>
+\[\sigma = \frac{\mathrm{Median}\left(z_i - z_j)}{2}\]
 
-<p>MMD²(P,Q) = ‖𝔼[X~P]φ(X) - 𝔼[Y~Q]φ(Y)‖² = 
-𝔼[X,X’~P]k(X,X’) + 𝔼[Y,Y’~Q]k(Y,Y’) - 2𝔼[X~P,Y~Q]k(X,Y)</p>
+<p>where $Z$ is the combined sample of and $X$ and $Y$. We have also used the Gaussian Radial Basis as the choice of kernel.</p>
 
-<p>It’s then straightforward to estimate this with samples, for any kernel function k – even ones where φ is infinite-dimensional, like the Gaussian kernel (also called “squared exponential” or “exponentiated quadratic”):</p>
+<p>We can extend this implementation to any kernel with the following code:</p>
 
-<p>k(x,y) = exp(-1/(2σ²)‖x-y‖²)</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
 
-<p>If your choice of k is “characteristic,” then the MMD becomes a proper metric on distributions: it’s zero if and only if the two distributions are the same. (This is unlike when you use, say, a linear kernel, where two distributions with the same mean have zero linear-kernel MMD.) If you’ve heard of a “universal” kernel, those are characteristic, but there are a few kernels that are characteristic but not universal.</p>
+<span class="k">def</span> <span class="nf">mmd_biased</span><span class="p">(</span><span class="n">XX</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">YY</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">XY</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="s">"""
+    Compute biased MMD^2 statistic.
+    
+    Args:
+        XX: Kernel matrix for first sample
+        YY: Kernel matrix for second sample
+        XY: Cross kernel matrix between samples
+    
+    Returns:
+        float: Biased MMD^2 statistic
+    """</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">XX</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">YY</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">XX</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">YY</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">n</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">XY</span><span class="p">)</span>
 
-<h2 id="understanding-the-name">Understanding the Name</h2>
+<span class="k">def</span> <span class="nf">mmd_unbiased</span><span class="p">(</span><span class="n">XX</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">YY</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">XY</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="s">"""
+    Compute unbiased MMD^2 statistic.
+    
+    Args:
+        XX: Kernel matrix for first sample
+        YY: Kernel matrix for second sample
+        XY: Cross kernel matrix between samples
+    
+    Returns:
+        float: Unbiased MMD^2 statistic
+    """</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">XX</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">YY</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">XX</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">trace</span><span class="p">(</span><span class="n">XX</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">term2</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">YY</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">trace</span><span class="p">(</span><span class="n">YY</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">term3</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">n</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">XY</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">term1</span> <span class="o">+</span> <span class="n">term2</span> <span class="o">-</span> <span class="n">term3</span>
 
-<p>Here’s an explanation of the name, which is also useful for understanding the MMD.</p>
+<span class="k">def</span> <span class="nf">mmd2test</span><span class="p">(</span><span class="n">K</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">],</span> 
+             <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">"b"</span><span class="p">,</span> <span class="n">mc_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">999</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="s">"""
+    Kernel Two-sample Test with Maximum Mean Discrepancy.
+    
+    Maximum Mean Discrepancy (MMD) as a measure of discrepancy between samples
+    is employed as a test statistic for two-sample hypothesis test of equal 
+    distributions. Kernel matrix K is a symmetric square matrix that is positive
+    semidefinite.
+    
+    Args:
+        K: Kernel matrix (symmetric, positive semidefinite)
+        label: Label vector of class indices
+        method: Type of estimator to be used. "b" for biased and "u" for unbiased
+        mc_iter: Number of Monte Carlo resampling iterations
+    
+    Returns:
+        dict: Dictionary containing test results with keys:
+            - statistic: Test statistic
+            - p_value: p-value under H0
+            - alternative: Alternative hypothesis
+            - method: Name of the test
+    """</span>
+    <span class="c1"># Preprocessing
+</span>    <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">K</span><span class="p">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">K</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">K</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"K should be a square matrix"</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="p">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">K</span><span class="p">.</span><span class="n">T</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"K should be symmetric"</span><span class="p">)</span>
+    
+    <span class="c1"># Check if K is positive semidefinite
+</span>    <span class="n">min_eigenval</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">min</span><span class="p">(</span><span class="n">linalg</span><span class="p">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">K</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">min_eigenval</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Warning: K may not be PD. Minimum eigenvalue is </span><span class="si">{</span><span class="n">min_eigenval</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    
+    <span class="c1"># Process labels
+</span>    <span class="n">label</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">unique_labels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"label should contain exactly 2 classes"</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">!=</span> <span class="n">K</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"Length of label must match size of kernel matrix"</span><span class="p">)</span>
+    
+    <span class="c1"># Compute statistic
+</span>    <span class="n">id1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">label</span> <span class="o">==</span> <span class="n">unique_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">id2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">label</span> <span class="o">==</span> <span class="n">unique_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">id1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">id2</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">method</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">"b"</span><span class="p">:</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">mmd_biased</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id1</span><span class="p">)],</span> <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">id2</span><span class="p">,</span> <span class="n">id2</span><span class="p">)],</span> <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">)])</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># method == "u"
+</span>        <span class="n">stat</span> <span class="o">=</span> <span class="n">mmd_unbiased</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id1</span><span class="p">)],</span> <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">id2</span><span class="p">,</span> <span class="n">id2</span><span class="p">)],</span> <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">)])</span>
+    
+    <span class="c1"># Monte Carlo iterations
+</span>    <span class="n">iter_vals</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mc_iter</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mc_iter</span><span class="p">):</span>
+        <span class="n">perm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">tmp_id1</span> <span class="o">=</span> <span class="n">perm</span><span class="p">[:</span><span class="n">m</span><span class="p">]</span>
+        <span class="n">tmp_id2</span> <span class="o">=</span> <span class="n">perm</span><span class="p">[</span><span class="n">m</span><span class="p">:]</span>
+        
+        <span class="k">if</span> <span class="n">method</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">"b"</span><span class="p">:</span>
+            <span class="n">iter_vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmd_biased</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">tmp_id1</span><span class="p">,</span> <span class="n">tmp_id1</span><span class="p">)],</span> 
+                                    <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">tmp_id2</span><span class="p">,</span> <span class="n">tmp_id2</span><span class="p">)],</span> 
+                                    <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">tmp_id1</span><span class="p">,</span> <span class="n">tmp_id2</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># method == "u"
+</span>            <span class="n">iter_vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmd_unbiased</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">tmp_id1</span><span class="p">,</span> <span class="n">tmp_id1</span><span class="p">)],</span> 
+                                      <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">tmp_id2</span><span class="p">,</span> <span class="n">tmp_id2</span><span class="p">)],</span> 
+                                      <span class="n">K</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">tmp_id1</span><span class="p">,</span> <span class="n">tmp_id2</span><span class="p">)])</span>
+    
+    <span class="n">p_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">iter_vals</span> <span class="o">&gt;=</span> <span class="n">stat</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">mc_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s">'statistic'</span><span class="p">:</span> <span class="p">{</span><span class="s">'MMD'</span><span class="p">:</span> <span class="n">stat</span><span class="p">},</span>
+        <span class="s">'p_value'</span><span class="p">:</span> <span class="n">p_value</span><span class="p">,</span>
+        <span class="s">'alternative'</span><span class="p">:</span> <span class="s">"two distributions are not equal"</span><span class="p">,</span>
+        <span class="s">'method'</span><span class="p">:</span> <span class="s">"Kernel Two-sample Test with Maximum Mean Discrepancy"</span>
+    <span class="p">}</span>
 
-<p>For any kernel k:𝒳×𝒳→ℝ, there exists a feature map φ:𝒳→ℋ, where ℋ is a special Hilbert space called the reproducing kernel Hilbert space (RKHS) corresponding to k. This is a space of functions, f:𝒳→ℝ. These spaces satisfy a special key condition, called the reproducing property: ⟨f,φ(x)⟩=f(x) for any f∈ℋ.</p>
-
-<p>The simplest example is the linear kernel k(x,y)=x⋅y. This can be “implemented” with ℋ=ℝ^d and φ(x)=x. But the RKHS is instead the space of linear functions f_x(t)=x⋅t, and φ(x)=f_x. The reproducing property is ⟨f_w,φ(x)⟩=⟨w,x⟩_ℝd.</p>
-
-<p>In more complex settings, like a Gaussian kernel, f is a much more complicated function, but the reproducing property still holds.</p>
-
-<h2 id="alternative-characterization">Alternative Characterization</h2>
-
-<p>Now, we can give an alternative characterization of the MMD:</p>
-
-<p>MMD(P,Q) = ‖𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]‖ = 
-sup{f∈ℋ:‖f‖≤1}⟨f,𝔼[X~P][φ(X)] - 𝔼[Y~Q][φ(Y)]⟩ = 
-sup{f∈ℋ:‖f‖≤1}[𝔼[X~P][f(X)] - 𝔼[Y~Q][f(Y)]]</p>
-
-<p>The second line is a general fact about norms in Hilbert spaces that follows immediately from Cauchy-Schwarz: sup{f:‖f‖≤1}⟨f,g⟩=‖g‖ is achieved by f=g/‖g‖.</p>
-
-<p>The fourth line depends on a technical condition known as Bochner integrability, but is true e.g. for bounded kernels or distributions with bounded support.</p>
-
-<p>This last line is why it’s called the “maximum mean discrepancy” – it’s the maximum, over test functions f in the unit ball of ℋ, of the mean difference between the two distributions. This is also a special case of an integral probability metric.</p>
+<span class="c1"># Example usage
+</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="c1"># Generate example data
+</span>    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+    <span class="n">dat1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># group 1: 30 obs of mean 1
+</span>    <span class="n">dat2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># group 2: 25 obs of mean -1
+</span>    
+    <span class="c1"># Combine data and compute distance matrix
+</span>    <span class="n">combined_data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">dat1</span><span class="p">,</span> <span class="n">dat2</span><span class="p">])</span>
+    <span class="n">dist_matrix</span> <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">pdist</span><span class="p">(</span><span class="n">combined_data</span><span class="p">))</span>
+    
+    <span class="c1"># Build Gaussian kernel matrix
+</span>    <span class="n">kernel_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">dist_matrix</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    
+    <span class="c1"># Create labels
+</span>    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">25</span><span class="p">)</span>
+    
+    <span class="c1"># Run the test
+</span>    <span class="n">result</span> <span class="o">=</span> <span class="n">mmd2test</span><span class="p">(</span><span class="n">kernel_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Test statistic:"</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s">'statistic'</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"p-value:"</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s">'p_value'</span><span class="p">])</span>
+</code></pre></div></div>
 
         </div>
         
