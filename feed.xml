@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-16T13:08:26+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Way too much about linear regression.</title><link href="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/" rel="alternate" type="text/html" title="Way too much about linear regression." /><published>2025-02-02T00:00:00+00:00</published><updated>2025-02-02T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-16T13:11:48+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Way too much about linear regression.</title><link href="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/" rel="alternate" type="text/html" title="Way too much about linear regression." /><published>2025-02-02T00:00:00+00:00</published><updated>2025-02-02T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/"><![CDATA[<h1 id="introduction">Introduction</h1>
 <p>There are a lot of ways to understand (multiple) linear regression, but it takes a lot of work to integrate them all together. This guide attempts to do that. It starts off deriving the solution to the linear regression problem—how linear regression is the maximum likelihood solution for ordinary least squares—and then moves on to the Frisch-Waugh-Lovell theorem as a tool to understand how the perspectives all hang together.</p>
 
 <h1 id="an-algebraic-perspective">An algebraic perspective.</h1>
@@ -60,7 +60,7 @@
 
 <p>Now, the regression coefficient quantifies the expected increase in $y$, when $x$ increases by 1. We thus need to ‘correct’ the covariance between $x$ and $y$ for the scale of $x$. We can do that by simply dividing:</p>
 
-\[\frac{\text{cov}(x,y)}{\text{var}(x)}\]
+\[\frac{\text{Cov}(x,y)}{\text{Car}(x)}\]
 
 <h1 id="projections">Projections</h1>
 
@@ -70,16 +70,28 @@
 
 <p>That’s not at all that helpful. Instead we want to find the projection matrix for a given $v$. To begin, we can take some point in $n$-dimensional space, $x$, and the vector line $v$ along which we want to project $x$. The goal is the following:</p>
 
-<p>$\text{argmin}_c \sqrt{\sum_i(\bar{x}_i-x)^2} = \text{argmin}_c \sum_i(\bar{x}_i-x)^2 = \text{argmin}_c \sum_i(cv_i-x)^2$</p>
+\[\begin{eqnarray}
+\text{argmin}_c \sqrt{\sum_i(\bar{x}_i-x)^2} &amp;=&amp; \text{argmin}_c \sum_i(\bar{x}_i-x)^2 \\
+&amp;=&amp; \text{argmin}_c \sum_i(cv_i-x)^2
+\end{eqnarray}\]
 
-<p>This rearrangement follows since the square root is a monotonic transformation, such that the optimal choice of c is the same across both argmin’s. Since any potential ¯x along the line drawn by v is some scalar multiplication of that line (cv), we can express the function to be minimised with respect to c, and then differentiate:</p>
+<p>This rearrangement follows since the square root is a monotonic transformation, such that the optimal choice of $c$ is the same in both minimisations. Since any potential $x^*$ along the line drawn by $v$ is some scalar multiplication of that line $cv$, we can express the function to be minimised with respect to $c$, and then differentiate:</p>
 
-<p>$\frac{d}{dc}\sum_i(cv_i-x)^2 = \sum_i 2v_i(cv_i-x) = 2(\sum_i cv_i^2 - \sum_i v_ix) = 2(cv’v-v’x) \Rightarrow 0$</p>
+\[\begin{eqnarray}
+\frac{d}{dc}\sum_i(cv_i-x)^2 &amp;=&amp; \sum_i 2v_i(cv_i-x) \\
+&amp;=&amp; 2(\sum_i cv_i^2 - \sum_i v_ix) \\
+$=$ 2(cv'v-v'x) \\
+&amp;\Rightarrow&amp; 0
+\end{eqnarray}\]
 
-<p>$2(cv’v-v’x) = 0$
-$cv’v-v’x = 0$
-$cv’v = v’x$
-$c = (v’v)^{-1}v’x$</p>
+<p>So</p>
+
+\[\begin{eqnarray}
+2(cv'v-v'x) = 0
+&amp;\Rightarrow&amp; cv'v-v'x = 0
+&amp;\Rightarrow&amp; cv'v = v'x
+&amp;\Rightarrow&amp; c = (v'v)^{-1}v'x$
+\end{eqnarray}\]
 
 <p>So we end up with:</p>
 
