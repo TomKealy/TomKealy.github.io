@@ -110,8 +110,8 @@ $$
 \begin{eqnarray}
 \frac{d}{dc}\sum_i(cv_i-x)^2 &=& \sum_i 2v_i(cv_i-x) \\
 &=& 2(\sum_i cv_i^2 - \sum_i v_ix) \\
-$=$ 2(cv'v-v'x) \\
-&\Rightarrow& 0
+&=& 2(cv'v-v'x) \\
+&=& 0
 \end{eqnarray}
 $$
 
@@ -119,10 +119,10 @@ So
 
 $$
 \begin{eqnarray}
-2(cv'v-v'x) = 0
-&\Rightarrow& cv'v-v'x = 0
-&\Rightarrow& cv'v = v'x
-&\Rightarrow& c = (v'v)^{-1}v'x$
+2(cv'v-v'x) = 0 \\
+&\Rightarrow& cv'v-v'x = 0 \\
+&\Rightarrow& cv'v = v'x \\
+&\Rightarrow& c = (v'v)^{-1}v'x$ \\
 \end{eqnarray}
 $$
 
