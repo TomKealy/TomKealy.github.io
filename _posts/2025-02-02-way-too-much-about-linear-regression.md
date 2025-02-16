@@ -72,7 +72,7 @@ A linear regression coefficient tells us: If predictor variable $x$ increases by
 The answer to this question depends in large part on the scales on which $x$ and $y$ are measured. E.g. $x$ is a measure of length, imagine measuring in millimeters or centimeters; the variance of measurements in millimeters will be 10^2 times the variance of the same measurements in centimeters; the covariance will be multiplied by 10. Note, $\text{Cov}(x,y)$ is determined by three things:
 
 1. the linear association between $x$ and $y$.
-2. the scale of $x$$.
+2. the scale of $x$.
 3. the scale of $y$.
 
 Because of 2 and 3, the covariance is an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of $x$ and $y$. The correlation coefficient, however, gives us a standardized measure of association: It is 'corrected' for the scales on which $x$ and $y$ are measured.
