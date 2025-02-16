@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-16T13:17:49+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Way too much about linear regression.</title><link href="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/" rel="alternate" type="text/html" title="Way too much about linear regression." /><published>2025-02-02T00:00:00+00:00</published><updated>2025-02-02T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-16T13:19:39+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Way too much about linear regression.</title><link href="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/" rel="alternate" type="text/html" title="Way too much about linear regression." /><published>2025-02-02T00:00:00+00:00</published><updated>2025-02-02T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/"><![CDATA[<h1 id="introduction">Introduction</h1>
 <p>There are a lot of ways to understand (multiple) linear regression, but it takes a lot of work to integrate them all together. This guide attempts to do that. It starts off deriving the solution to the linear regression problem—how linear regression is the maximum likelihood solution for ordinary least squares—and then moves on to the Frisch-Waugh-Lovell theorem as a tool to understand how the perspectives all hang together.</p>
 
 <h1 id="an-algebraic-perspective">An algebraic perspective.</h1>
@@ -155,7 +155,9 @@ X^TXβ &amp;=&amp; X^Ty\\
 
 <p>While this might seem abstract, it helps explain why linear regression works the way it does - it’s finding the best possible approximation of Y that can be created by combining your predictor variables, where “best” means “closest in terms of Euclidean distance.”</p>
 
-<p><img src="/assets/images//LinearProjections/linear_projections.png" alt="Two views of linear regression" title="The two views of linear regression" /></p>
+<p>##
+<img src="/assets/images//LinearProjections/linear_projections.png" alt="Two views of linear regression" title="The two views of linear regression" />
+##</p>
 
 <h1 id="frisch-waugh-lovell">Frisch-Waugh-Lovell</h1>
 
