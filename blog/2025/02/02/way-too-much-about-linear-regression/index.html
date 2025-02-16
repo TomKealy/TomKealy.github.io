@@ -162,14 +162,14 @@ MathJax.Hub.Config({
 
 \[\begin{eqnarray}
 2(cv'v-v'x) = 0 \\
-&amp;\Rightarrow&amp; cv'v-v'x = 0 \\
-&amp;\Rightarrow&amp; cv'v = v'x \\
-&amp;\Rightarrow&amp; c = (v'v)^{-1}v'x$ \\
+&amp;\Rightarrow&amp; cv^Tv-v^Tx = 0 \\
+&amp;\Rightarrow&amp; cvTv = v^Tx \\
+&amp;\Rightarrow&amp; c = (v^Tv)^{-1}v^Tx$ \\
 \end{eqnarray}\]
 
 <p>So we end up with:</p>
 
-<p>$P_v = v(v’v)^{-1}v’$</p>
+<p>$P_v = v(v^Tv)^{-1}v^T$</p>
 
 <p>Which looks suspiciously similar to the formula for the optimal linear regression coefficients!</p>
 
