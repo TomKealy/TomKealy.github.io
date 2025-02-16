@@ -86,7 +86,7 @@ The correlation coefficient tells us: If $x$ increases by $\sqrt{\text{var}(x)}$
 Now, the regression coefficient quantifies the expected increase in $y$, when $x$ increases by 1. We thus need to 'correct' the covariance between $x$ and $y$ for the scale of $x$. We can do that by simply dividing:
 
 $$
-\frac{\text{cov}(x,y)}{\text{var}(x)}
+\frac{\text{Cov}(x,y)}{\text{Car}(x)}
 $$
 
 # Projections
@@ -97,16 +97,34 @@ A projection matrix $P$ is any matrix with property $P^2=P$. For vector $v$ in s
 
 That's not at all that helpful. Instead we want to find the projection matrix for a given $v$. To begin, we can take some point in $n$-dimensional space, $x$, and the vector line $v$ along which we want to project $x$. The goal is the following:
 
-$\text{argmin}_c \sqrt{\sum_i(\bar{x}_i-x)^2} = \text{argmin}_c \sum_i(\bar{x}_i-x)^2 = \text{argmin}_c \sum_i(cv_i-x)^2$
+$$
+\begin{eqnarray}
+\text{argmin}_c \sqrt{\sum_i(\bar{x}_i-x)^2} &=& \text{argmin}_c \sum_i(\bar{x}_i-x)^2 \\
+&=& \text{argmin}_c \sum_i(cv_i-x)^2
+\end{eqnarray}
+$$
 
-This rearrangement follows since the square root is a monotonic transformation, such that the optimal choice of c is the same across both argmin’s. Since any potential ¯x along the line drawn by v is some scalar multiplication of that line (cv), we can express the function to be minimised with respect to c, and then differentiate:
+This rearrangement follows since the square root is a monotonic transformation, such that the optimal choice of $c$ is the same in both minimisations. Since any potential $x^*$ along the line drawn by $v$ is some scalar multiplication of that line $cv$, we can express the function to be minimised with respect to $c$, and then differentiate:
 
-$\frac{d}{dc}\sum_i(cv_i-x)^2 = \sum_i 2v_i(cv_i-x) = 2(\sum_i cv_i^2 - \sum_i v_ix) = 2(cv'v-v'x) \Rightarrow 0$
+$$
+\begin{eqnarray}
+\frac{d}{dc}\sum_i(cv_i-x)^2 &=& \sum_i 2v_i(cv_i-x) \\
+&=& 2(\sum_i cv_i^2 - \sum_i v_ix) \\
+$=$ 2(cv'v-v'x) \\
+&\Rightarrow& 0
+\end{eqnarray}
+$$
 
-$2(cv'v-v'x) = 0$
-$cv'v-v'x = 0$
-$cv'v = v'x$
-$c = (v'v)^{-1}v'x$
+So
+
+$$
+\begin{eqnarray}
+2(cv'v-v'x) = 0
+&\Rightarrow& cv'v-v'x = 0
+&\Rightarrow& cv'v = v'x
+&\Rightarrow& c = (v'v)^{-1}v'x$
+\end{eqnarray}
+$$
 
 So we end up with:
 
