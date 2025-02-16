@@ -85,11 +85,11 @@ $$
 
 # Projections
 
-A projection matrix $P$ is any matrix with property $P^2=P$. For vector $v$ in space and point $x$, projection $Px$ returns closest point $\bar{x}$ along $v$. 
+A projection matrix $P$ is any matrix with property $P^2=P$. For vector $v$ in space and point $x$, projection $Px$ returns closest point $\bar{x}$ along $v$.
 
 ## How do I find a projection matrix for a given $v$?
 
-That's not at all that helpful. Instead we want to find the projection matrix for a given $v#. To begin, we can take some point in $n$-dimensional space, $x$, and the vector line $v$ along which we want to project $x$. The goal is the following:
+That's not at all that helpful. Instead we want to find the projection matrix for a given $v$. To begin, we can take some point in $n$-dimensional space, $x$, and the vector line $v$ along which we want to project $x$. The goal is the following:
 
 $\text{argmin}_c \sqrt{\sum_i(\bar{x}_i-x)^2} = \text{argmin}_c \sum_i(\bar{x}_i-x)^2 = \text{argmin}_c \sum_i(cv_i-x)^2$
 
@@ -113,19 +113,19 @@ Which looks suspiciously similar to the formula for the optimal linear regressio
 Suppose we have a vector of outcomes $y \in \mathcal{R}^n$, and some $p$-dimensional matrix $X$ of predictors. We write the linear regression model as:
 
 $$
-y=X^T\beta+ϵ
+y=X^T\beta+\varepsilon
 $$ 
-where β is a vector of coefficients, and ϵ is additive Gaussian white noise. Linear regression minimises the sum of the squared residuals:
+where $\beta$ is a vector of coefficients, and $\varepsilon$ is additive Gaussian white noise. Linear regression minimises the sum of the squared residuals:
 
 $$
 \hat{y}=argmin_{\beta}(y−Xβ)′(y−Xβ)
 $$
   
-Differentiating with respect to and solving: 
+Differentiating with respect to and solving:
 
 $$
 \begin{eqnarray}
-\frac{d}{d\beta}(y−Xβ)^T(y−Xβ) &=& −2X(y−Xβ) \\ 
+\frac{d}{d\beta}(y−Xβ)^T(y−Xβ) &=& −2X(y−Xβ) \\
 &=& 2X^TXβ−2X^Ty \\
 &=& 0 \\
 &\rightarrow \\
@@ -133,11 +133,13 @@ X^TXβ &=& X^Ty\\
 \beta &=&(X^TX)^{−1}X^Ty.
 \end{eqnarray}
 $$
+
 To get our prediction of $y$, i.e. $\hat{y}$ , we multiply our $\beta$ coefficient by the matrix $X$:
 
 $$
 \hat{y} = X\beta = X(X^TX)^{-1}X^Ty.
 $$
+
 The OLS derivation of $\hat{y}$ is very similar to $P=X(X^TX)^{-1}X$, the orthogonal prediction matrix. The two differ only in that that $\hat{y}$ includes the original outcome vector $y$. But, $Py = X(X^TX)^{-1}X^Ty=\hat{y}$! Hence the predicted values from a linear regression simply are an orthogonal projection of $y$ onto the space defined by $X$
 
 ## Geometric interpretation
@@ -156,7 +158,7 @@ if we had 100 houses in our dataset:
 
 In this dual space linear regression becomes a geometric problem where:
 
-- Your outcome variable Y is a vector pointing somewhere in this observation-space
+- Your outcome variable $y$ is a vector pointing somewhere in this observation-space
 - Your predictor variables (including a constant term) are also vectors
 - The combinations of your predictor vectors create a "span" or "column space" - imagine this like a flat surface in the observation-space
 - Linear regression finds the point on this surface that's closest to your Y vector
@@ -165,7 +167,6 @@ In this dual space linear regression becomes a geometric problem where:
 Linear regression is mathematically identical to an "orthogonal projection" - you're literally projecting your Y vector onto the surface defined by your predictors in the most direct (perpendicular) way possible.
 
 While this might seem abstract, it helps explain why linear regression works the way it does - it's finding the best possible approximation of Y that can be created by combining your predictor variables, where "best" means "closest in terms of Euclidean distance."
-
 
 ![Two views of linear regression](/assets/images//LinearProjections/linear_projections.png "The two views of linear regression")
 
@@ -188,14 +189,16 @@ The Frisch-Waugh-Lovell theorem says that these procedures are the same thing. I
 Formally, FWL states that each predictor’s coefficient in a multivariate regression explains that variance of $y$ not explained by both the other $k-1$ predictors’ relationship with the outcome and their relationship with that predictor, i.e. the independent effect of $x_j$.
 
 The [proof](https://bookdown.org/ts_robinson1994/10EconometricTheorems/frisch.html) is pretty boring and uses a the properties of projection matrices.
+
 # Putting it all together
 
 We had two questions earliner:
 
-1. The \frac{1}{N} \text{ Factor: Variance is typically calculated with a } \frac{1}{N} \text{ (or } \frac{1}{N-1}\text{) factor, while } X'X \text{ doesn't include this normalization. Why does our formula use } \text{Var}(x)\text{?}
+1. The $\frac{1}{N}$ Factor: Variance is typically calculated with a $\frac{1}{N}$ or $\frac{1}{N-1}$ factor, while $X^TX$ doesn't include this normalization. Why does the statistical formula use $\text{Var}(x)$?
 
-2. Mean Centering: Variance is calculated using centered values: \text{Var}(X) = \frac{1}{N} \sum(x-\bar{x})^2\text{, not just } \frac{1}{N} \sum x^2\text{. Where does this mean-centering come from?}
-The first question has a satisfying answer: covariance also includes a 1/N factor! These factors cancel out in the ratio Cov(x,y)/Var(x), making it a convenient way to express the relationship.
+2. Mean Centering: Variance is calculated using centered values: $\text{Var}(X) = \frac{1}{N} \sum(x-\bar{x})^2$ not just $\frac{1}{N} \sum x^2$. Where does this mean-centering come from?
+
+The first question has a satisfying answer: covariance also includes a $\frac{1}/{N}$ factor! These factors cancel out in the ratio $ \frac{\text{Cov}(x,y)}{\text{Var}(x)}$, making it a convenient way to express the relationship.
 
 The second question leads us to a deeper understanding of regression's underlying mechanics.
 
@@ -204,28 +207,34 @@ The second question leads us to a deeper understanding of regression's underlyin
 The mean-centering in variance calculations isn't arbitrary - it's a consequence of how OLS handles the constant term. OLS orthogonalizes effects with respect to each column vector in X.
 
 To understand why orthogonalization matters, consider a simple example:
-y = 3 + 4x + 5z
 
-If we set x=1 and z=1, our predicted y is 12. Increasing z to 2 increases our prediction by exactly 5. This shows that ∂y/∂z = 5, demonstrating the orthogonality of our coefficients. (If the variables weren't orthogonal, changing one variable would affect the contribution of others.)
-The Constant Term and Orthogonalization
+$$
+y = 3 + 4x + 5z
+$$
+
+If we set $x=1$ and $z=1$, our predicted $y$ is 12. Increasing $z$ to 2 increases our prediction by exactly 5. This shows that $∂y/∂z = 5$, demonstrating the orthogonality of our coefficients. (If the variables weren't orthogonal, changing one variable would affect the contribution of others.)
 
 In simple regression, we have two columns:
 
 * A constant vector (all 1's)
-* Our independent variable x
+* Our independent variable $x$
 
 The coefficient $\beta$ must be orthogonalized with respect to the constant term. But what does orthogonality mean in this context?
 
-\text{Two vectors are orthogonal if and only if their dot product is 0. For a constant vector } c=[1,1,1...] \text{ and our } x \text{ vector } [x_1,x_2,x_3...]\text{, their dot product is:}
+Two vectors are orthogonal if and only if their dot product is 0. For a constant vector $c=[1,1,1...]$ and our $x$ $[x_1,x_2,x_3...]$ their dot product is:
 
-x_1 + x_2 + x_3 ...
+$$
+x_1 + x_2 + x_3 ... = \sum_{i}^N x_j
+$$
 
-\text{To make this sum zero, we subtract the mean }(\bar{x})\text{ from each element:}
+To make this sum zero, we subtract the mean $\bar{x}$ from each element:
 
-(x_1 - \bar{x}) + (x_2 - \bar{x}) + ... = (x_1 + x_2 + ...) - \bar{x} * N = 0
+$$
+(x_1 - \bar{x}) + (x_2 - \bar{x}) + ... = (x_1 + x_2 + ...) - N \bar{x} * N = 0
+$$
 
-\text{This reveals why we use centered values in variance calculations: centering a vector is equivalent to orthogonalizing it with respect to a constant term.}
+This reveals why we use centered values in variance calculations: centering a vector is equivalent to orthogonalizing it with respect to a constant term.
 
-\text{Now we can see how }(X'X)^{-1}\text{ relates to }\frac{1}{\text{Var}(x)}\text{. The mean-centering in variance calculations isn't just a statistical convention - it's a fundamental consequence of how regression handles the constant term through orthogonalization.}
+Now we can see how $X^TX^{-1} relates to $\frac{1}{\text{Var}(x)}$. The mean-centering in variance calculations isn't just a statistical convention - it's a fundamental consequence of how regression handles the constant term through orthogonalization.
 
-\text{This helps explain why }\beta = \frac{\text{Cov}(x,y)}{\text{Var}(x)}\text{ works, and provides insight into the geometric foundations of linear regression.}
+This helps explain why $\beta = \frac{\text{Cov}(x,y)}{\text{Var}(x)}$ works, and provides insight into the geometric foundations of linear regression.
