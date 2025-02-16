@@ -24,7 +24,7 @@ $$ y = X^T\beta + Z^T\eta + \varepsilon $$
 
 where
 
-$$ \varepsilon \sim N\left(0, \sigma\right) $$ 
+$$ \varepsilon \sim N\left(0, \sigma\right) $$
 
 and 
 

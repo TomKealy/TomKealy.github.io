@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "Bayesian Sequential Hypothesis Testing"
+subtitle: Frequentist algorithms are often Bayesian.
 date:   2024-02-04
 categories: hypothesis-testing
 ---

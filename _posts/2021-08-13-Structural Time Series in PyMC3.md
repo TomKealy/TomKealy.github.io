@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "Structural Time Series in PyMC!"
+subtitle: Same ideas, different framework.
 date:   2021-08-13
 categories: time-series
 ---

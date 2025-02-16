@@ -1,6 +1,7 @@
 ---
 layout: default
 title:  "Time Series with GAMs"
+subtitle: Time series without time.
 date:   2021-08-13
 categories: curve-fitting, GAMs
 ---
