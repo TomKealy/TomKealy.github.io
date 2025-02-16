@@ -59,48 +59,29 @@ If you squint, you can make algebraic sense of the solution: pre-multiplying by 
 
 # A statistical persective.
 
-In simple linear regression (with one independent variable and a constant term), you can do a little bit of different algebra to show that the coefficient $\beta$ can be expressed as:
-
+\text{In simple linear regression (with one independent variable and a constant term), you can do a little bit of different algebra to show that the coefficient }\beta\text{ can be expressed as:}
 $$
-\beta = \frac{Cov(X, Y)}{Var(X)}
+\beta = \frac{\text{Cov}(X, Y)}{\text{Var}(X)}
 $$
+\text{This makes some more intuitive sense!}
 
-This makes some more intuitive sense!
+\text{A linear regression coefficient tells us: If predictor variable }x\text{ increases by 1, what is the expected increase in outcome variable }y\text{?}
 
-A linear regression coefficient tells us: If predictor variable 𝑥 increases by 1, what is the expected increase in outcome variable 𝑦?
+\text{The answer to this question depends in large part on the scales on which }x\text{ and }y\text{ are measured. E.g., if }x\text{ is a measure of length, imagine measuring in millimeters or centimeters; the variance of measurements in millimeters will be }10^2\text{ times the variance of the same measurements in centimeters; the covariance will be multiplied by 10. Note, }\text{cov}(x,y)\text{ is determined by three things:}
 
-The answer to this question depends in large part on the scales on which 𝑥 and 𝑦 are measured. E.g., if 𝑥 is a measure of length, imagine measuring in millimeters or centimeters; the variance of measurements in millimeters will be 102 times the variance of the same measurements in centimeters; the covariance will be multiplied by 10. Note, 𝑐𝑜𝑣(𝑥,𝑦)
+\text{1. the linear association between }x\text{ and }y\text{;}
+\text{2. the scale of }x\text{;}
+\text{3. the scale of }y\text{.}
 
-is determined by three things:
+\text{Because of 2) and 3), I would call the covariance an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of }x\text{ and }y\text{. The correlation coefficient, however, gives us a standardized measure of association: It is 'corrected' for the scales on which }x\text{ and }y\text{ are measured:}
 
-    the linear association between 𝑥
+\text{cor}(x,y) = \frac{\text{cov}(x,y)}{\sqrt{\text{var}(x)\cdot\text{var}(y)}}
 
-and 𝑦
-;
-the scale of 𝑥
-;
-the scale of 𝑦
+\text{The correlation coefficient tells us: If }x\text{ increases by }\sqrt{\text{var}(x)}\text{, how many }\sqrt{\text{var}(y)}\text{'s will outcome }y\text{ increase? Thus, with a correlation coefficient of 1, an increase of 1 SD in }x\text{ is associated with an increase of 1 SD in }y\text{.}
 
-    .
+\text{Now, the regression coefficient quantifies the expected increase in }y\text{, when }x\text{ increases by 1. We thus need to 'correct' the covariance between }x\text{ and }y\text{ for the scale of }x\text{. We can do that by simply dividing:}
 
-Because of 2) and 3), I would call the covariance an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of 𝑥
-and 𝑦. The correlation coefficient, however, gives us a standardized measure of association: It is 'corrected' for the scales on which 𝑥 and 𝑦
-
-are measured:
-
-𝑐𝑜𝑟(𝑥,𝑦)=𝑐𝑜𝑣(𝑥,𝑦)𝑣𝑎𝑟(𝑥)⋅𝑣𝑎𝑟(𝑦)‾‾‾‾‾‾‾‾‾‾‾‾‾‾√
-
-The correlation coefficient tells us: If 𝑥
-increases by 𝑣𝑎𝑟(𝑥)‾‾‾‾‾‾√, how many 𝑣𝑎𝑟(𝑦)‾‾‾‾‾‾√s will outcome 𝑦 increase? Thus, with a correlation coefficient of 1, an increase of 1 SD in 𝑥 is associated with an increase of 1 SD in 𝑦
-
-.
-
-Now, the regression coefficient quantifies the expected increase in 𝑦
-, when 𝑥 increases by 1. We thus need to 'correct' the covariance between 𝑥 and 𝑦 for the scale of 𝑥
-
-. We can do that by simply dividing:
-
-𝑐𝑜𝑣(𝑥,𝑦)𝑣𝑎𝑟(𝑥)
+\frac{\text{cov}(x,y)}{\text{var}(x)}
 
 # Projections
 
