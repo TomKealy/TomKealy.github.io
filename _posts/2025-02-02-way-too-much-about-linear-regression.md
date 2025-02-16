@@ -152,7 +152,7 @@ $$
 \frac{d}{d\beta}(y−Xβ)^T(y−Xβ) &=& −2X(y−Xβ) \\
 &=& 2X^TXβ−2X^Ty \\
 &=& 0 \\
-&\rightarrow \\
+&\rightarrow& \\
 X^TXβ &=& X^Ty\\
 \beta &=&(X^TX)^{−1}X^Ty.
 \end{eqnarray}
