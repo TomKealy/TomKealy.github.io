@@ -110,27 +110,31 @@ MathJax.Hub.Config({
 
 <h1 id="a-statistical-persective">A statistical persective.</h1>
 
-<p>\text{In simple linear regression (with one independent variable and a constant term), you can do a little bit of different algebra to show that the coefficient }\beta\text{ can be expressed as:}
-\(\beta = \frac{\text{Cov}(X, Y)}{\text{Var}(X)}\)
-\text{This makes some more intuitive sense!}</p>
+<p>In simple linear regression (with one independent variable and a constant term), you can do a little bit of different algebra to show that the coefficient $\beta$ can be expressed as:</p>
 
-<p>\text{A linear regression coefficient tells us: If predictor variable }x\text{ increases by 1, what is the expected increase in outcome variable }y\text{?}</p>
+\[\beta = \frac{\text{Cov}(X, Y)}{\text{Var}(X)}\]
 
-<p>\text{The answer to this question depends in large part on the scales on which }x\text{ and }y\text{ are measured. E.g., if }x\text{ is a measure of length, imagine measuring in millimeters or centimeters; the variance of measurements in millimeters will be }10^2\text{ times the variance of the same measurements in centimeters; the covariance will be multiplied by 10. Note, }\text{cov}(x,y)\text{ is determined by three things:}</p>
+<p>This makes some more intuitive sense!</p>
 
-<p>\text{1. the linear association between }x\text{ and }y\text{;}
-\text{2. the scale of }x\text{;}
-\text{3. the scale of }y\text{.}</p>
+<p>A linear regression coefficient tells us: If predictor variable $x$ increases by 1, what is the expected increase in outcome variable $y$?</p>
 
-<p>\text{Because of 2) and 3), I would call the covariance an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of }x\text{ and }y\text{. The correlation coefficient, however, gives us a standardized measure of association: It is ‘corrected’ for the scales on which }x\text{ and }y\text{ are measured:}</p>
+<p>The answer to this question depends in large part on the scales on which $x$ and $y$ are measured. E.g. $x$ is a measure of length, imagine measuring in millimeters or centimeters; the variance of measurements in millimeters will be 10^2 times the variance of the same measurements in centimeters; the covariance will be multiplied by 10. Note, $\text{Cov}(x,y)$ is determined by three things:</p>
 
-<p>\text{cor}(x,y) = \frac{\text{cov}(x,y)}{\sqrt{\text{var}(x)\cdot\text{var}(y)}}</p>
+<ol>
+  <li>the linear association between $x$ and $y$.</li>
+  <li>the scale of $x$$.</li>
+  <li>the scale of $y$.</li>
+</ol>
 
-<p>\text{The correlation coefficient tells us: If }x\text{ increases by }\sqrt{\text{var}(x)}\text{, how many }\sqrt{\text{var}(y)}\text{‘s will outcome }y\text{ increase? Thus, with a correlation coefficient of 1, an increase of 1 SD in }x\text{ is associated with an increase of 1 SD in }y\text{.}</p>
+<p>Because of 2 and 3, the covariance is an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of $x$ and $y$$. The correlation coefficient, however, gives us a standardized measure of association: It is ‘corrected’ for the scales on which $x$ and $y$ are measured.</p>
 
-<p>\text{Now, the regression coefficient quantifies the expected increase in }y\text{, when }x\text{ increases by 1. We thus need to ‘correct’ the covariance between }x\text{ and }y\text{ for the scale of }x\text{. We can do that by simply dividing:}</p>
+\[\text{Cor}(x,y) = \frac{\textCcov}(x,y)}{\sqrt{\text{Var}(x)\cdot\text{Var}(y)}}\]
 
-<p>\frac{\text{cov}(x,y)}{\text{var}(x)}</p>
+<p>The correlation coefficient tells us: If $x$ increases by $\sqrt{\text{var}(x)}$ how many $\sqrt{\text{var}(y)}${‘s will outcome $y$$ increase? Thus, with a correlation coefficient of 1, an increase of 1 SD in $x$ $ is associated with an increase of 1 SD in $y$.</p>
+
+<p>Now, the regression coefficient quantifies the expected increase in $y$, when $x\(increases by 1. We thus need to 'correct' the covariance between $x\) and $y\(for the scale of $x\). We can do that by simply dividing:</p>
+
+\[\frac{\text{cov}(x,y)}{\text{var}(x)}\]
 
 <h1 id="projections">Projections</h1>
 
