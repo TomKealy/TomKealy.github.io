@@ -195,6 +195,7 @@ Linear regression is mathematically identical to an "orthogonal projection" - yo
 While this might seem abstract, it helps explain why linear regression works the way it does - it's finding the best possible approximation of Y that can be created by combining your predictor variables, where "best" means "closest in terms of Euclidean distance."
 
 ![Two views of linear regression](/assets/images//LinearProjections/linear_projections.png "The two views of linear regression")
+*Figure 1: Two views of linear regression. (a) Traditional view: Each point represents an observation. (b) Vector view: Each axis represents an observation.*
 
 # Frisch-Waugh-Lovell
 
