@@ -107,23 +107,23 @@ $$
 This rearrangement follows since the square root is a monotonic transformation, such that the optimal choice of $c$ is the same in both minimisations. Since any potential $x^*$ along the line drawn by $v$ is some scalar multiplication of that line $cv$, we can express the function to be minimised with respect to $c$, and then differentiate:
 
 $$
-\begin{eqnarray}
-\frac{d}{dc}\sum_i(cv_i-x)^2 &=& \sum_i 2v_i(cv_i-x) \\
-&=& 2(\sum_i cv_i^2 - \sum_i v_ix) \\
-&=& 2(cv'v-v'x) \\
-&=& 0
-\end{eqnarray}
+\begin{align}
+\frac{d}{dc}\sum_i(cv_i-x)^2 &= \sum_i 2v_i(cv_i-x) \\
+&= 2(\sum_i cv_i^2 - \sum_i v_ix) \\
+&= 2(cv'v-v'x) \\
+&= 0
+\end{align}
 $$
 
 So
 
 $$
-\begin{eqnarray}
+\begin{align}
 2(cv'v-v'x) = 0 \\
-&\Rightarrow& cv^Tv-v^Tx = 0 \\
-&\Rightarrow& cvTv = v^Tx \\
-&\Rightarrow& c = (v^Tv)^{-1}v^Tx$ \\
-\end{eqnarray}
+&\Rightarrow cv^Tv-v^Tx = 0 \\
+&\Rightarrow cvTv = v^Tx \\
+&\Rightarrow c = (v^Tv)^{-1}v^Tx \\
+\end{align}
 $$
 
 So we end up with:
