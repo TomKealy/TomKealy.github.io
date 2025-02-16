@@ -71,7 +71,7 @@ MathJax.Hub.Config({
             </div>
         </div>
         <div class='wrap article'>
-            <ul><li><a href="#introduction">Introduction</a><ul><li><a href="#the-maths-unfortunately">The maths, unfortunately</a><ul><li><a href="#example">Example</a></li></ul></li><li><a href="#stopping-times-and-the-optional-stopping-theorem">Stopping times, and the Optional Stopping theorem</a><ul><li><a href="#optional-stopping-theorem">Optional Stopping Theorem</a></li></ul></li></ul></li></ul>
+            <ul><li><a href="#introduction">Introduction</a><ul><li><a href="#the-maths-unfortunately">The maths, unfortunately</a><ul><li><a href="#example">Example</a></li></ul></li><li><a href="#stopping-times-and-the-optional-stopping-theorem">Stopping times, and the Optional Stopping theorem</a><ul><li><a href="#optional-stopping-theorem">Optional Stopping Theorem</a></li></ul></li></ul></li><li><a href="#not-all-martingales-and-markov-chains">Not all Martingales and Markov Chains</a></li></ul>
             <h1 id="introduction">Introduction</h1>
 
 <p>Martingales are elegant and powerful tools to study sequences of dependent random variables. It is originated from gambling, where a gambler can adjust the bet according to the previous results.</p>
@@ -164,6 +164,29 @@ MathJax.Hub.Config({
 <p>These boundedness assumptions are actually very important. Without them the theorem would not be true.</p>
 
 <p>For a counterexample, recall that if $X_0 = 0$ and $X_n$ goes up or down by 1 at each time step (each with probability .5) then $X_0, X_1, X_2, \dots$ is a martingale. If we let $T$ be the first $n$ for which $X_n = 100$, then $T$ is a finite number with probability one. (That is, with probability one $X_n$ reaches T eventually.) But then $X_T$ is always 100, which means that $E\left[X_T\right]  \neq X_0$.</p>
+
+<h1 id="not-all-martingales-and-markov-chains">Not all Martingales and Markov Chains</h1>
+
+<p>\text{Markov chains have a finite memory, Martingales can have an infinite one.}</p>
+
+<p>\text{Pick a random value for }X_0\text{. Let the sequence of random variables }{\epsilon_n,n&gt;0}\text{ be i.i.d. with mean}=E[\epsilon_n]=0\text{ and independent of }X_0\text{.}</p>
+
+<p>\text{The process governed by }X_{n+1}=X_n+\epsilon_{n+1}X_0</p>
+
+<p>\text{ is a martingale as}
+E[X_{n+1}|X_0,\ldots,X_n]=E[X_n|X_0,\ldots,X_n]+E[\epsilon_{n+1}X_0|X_0,\ldots,X_n]=X_n+E[\epsilon_{n+1}|X_0,\ldots,X_n]E[X_0|X_0,\ldots,X_n]=X_n+E[\epsilon_{n+1}]X_0=X_n+0X_0=X_n</p>
+
+<p>\text{Here, it is key that }\epsilon_n\text{ is independent of the }{X_i,0\leq i\leq n}\text{.}</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>\text{is not Markov as it is clear that }\text{Pr}[X_n+\epsilon_{n+1}X_0</td>
+      <td>X_n]\neq\text{Pr}[X_n+\epsilon_{n+1}X_0</td>
+      <td>X_0,\ldots,X_n]\text{. To determine }X_{n+1}\text{ not only the value of }X_n\text{ but the entire path to it (at which value did the path start at }X_0\text{) is needed.}</td>
+    </tr>
+  </tbody>
+</table>
 
         </div>
         

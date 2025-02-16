@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-16T12:38:16+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Way too much about linear regression.</title><link href="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/" rel="alternate" type="text/html" title="Way too much about linear regression." /><published>2025-02-02T00:00:00+00:00</published><updated>2025-02-02T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://gregorygundersen.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://gregorygundersen.com/" rel="alternate" type="text/html" /><updated>2025-02-16T12:39:42+00:00</updated><id>http://gregorygundersen.com/feed.xml</id><entry><title type="html">Way too much about linear regression.</title><link href="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/" rel="alternate" type="text/html" title="Way too much about linear regression." /><published>2025-02-02T00:00:00+00:00</published><updated>2025-02-02T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression</id><content type="html" xml:base="http://gregorygundersen.com/blog/2025/02/02/way-too-much-about-linear-regression/"><![CDATA[<h1 id="introduction">Introduction</h1>
 <p>There are a lot of ways to understand (multiple) linear regression, but it takes a lot of work to integrate them all together. This guide attempts to do that. It starts off deriving the solution to the linear regression problem—how linear regression is the maximum likelihood solution for ordinary least squares—and then moves on to the Frisch-Waugh-Lovell theorem as a tool to understand how the perspectives all hang together.</p>
 
 <h1 id="an-algebraic-perspective">An algebraic perspective.</h1>
@@ -1756,7 +1756,30 @@ Evidence favours P over Q</p>
 
 <p>These boundedness assumptions are actually very important. Without them the theorem would not be true.</p>
 
-<p>For a counterexample, recall that if $X_0 = 0$ and $X_n$ goes up or down by 1 at each time step (each with probability .5) then $X_0, X_1, X_2, \dots$ is a martingale. If we let $T$ be the first $n$ for which $X_n = 100$, then $T$ is a finite number with probability one. (That is, with probability one $X_n$ reaches T eventually.) But then $X_T$ is always 100, which means that $E\left[X_T\right]  \neq X_0$.</p>]]></content><author><name></name></author><category term="time-series" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">A Grab Bag of Approaches to Frequentist Multiple Testing.</title><link href="http://gregorygundersen.com/blog/2024/10/09/approaches-to-multiple-testing/" rel="alternate" type="text/html" title="A Grab Bag of Approaches to Frequentist Multiple Testing." /><published>2024-10-09T00:00:00+00:00</published><updated>2024-10-09T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2024/10/09/approaches-to-multiple-testing</id><content type="html" xml:base="http://gregorygundersen.com/blog/2024/10/09/approaches-to-multiple-testing/"><![CDATA[<p>We show how to handle more than one hypothesis at a time.</p>
+<p>For a counterexample, recall that if $X_0 = 0$ and $X_n$ goes up or down by 1 at each time step (each with probability .5) then $X_0, X_1, X_2, \dots$ is a martingale. If we let $T$ be the first $n$ for which $X_n = 100$, then $T$ is a finite number with probability one. (That is, with probability one $X_n$ reaches T eventually.) But then $X_T$ is always 100, which means that $E\left[X_T\right]  \neq X_0$.</p>
+
+<h1 id="not-all-martingales-and-markov-chains">Not all Martingales and Markov Chains</h1>
+
+<p>\text{Markov chains have a finite memory, Martingales can have an infinite one.}</p>
+
+<p>\text{Pick a random value for }X_0\text{. Let the sequence of random variables }{\epsilon_n,n&gt;0}\text{ be i.i.d. with mean}=E[\epsilon_n]=0\text{ and independent of }X_0\text{.}</p>
+
+<p>\text{The process governed by }X_{n+1}=X_n+\epsilon_{n+1}X_0</p>
+
+<p>\text{ is a martingale as}
+E[X_{n+1}|X_0,\ldots,X_n]=E[X_n|X_0,\ldots,X_n]+E[\epsilon_{n+1}X_0|X_0,\ldots,X_n]=X_n+E[\epsilon_{n+1}|X_0,\ldots,X_n]E[X_0|X_0,\ldots,X_n]=X_n+E[\epsilon_{n+1}]X_0=X_n+0X_0=X_n</p>
+
+<p>\text{Here, it is key that }\epsilon_n\text{ is independent of the }{X_i,0\leq i\leq n}\text{.}</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>\text{is not Markov as it is clear that }\text{Pr}[X_n+\epsilon_{n+1}X_0</td>
+      <td>X_n]\neq\text{Pr}[X_n+\epsilon_{n+1}X_0</td>
+      <td>X_0,\ldots,X_n]\text{. To determine }X_{n+1}\text{ not only the value of }X_n\text{ but the entire path to it (at which value did the path start at }X_0\text{) is needed.}</td>
+    </tr>
+  </tbody>
+</table>]]></content><author><name></name></author><category term="time-series" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">A Grab Bag of Approaches to Frequentist Multiple Testing.</title><link href="http://gregorygundersen.com/blog/2024/10/09/approaches-to-multiple-testing/" rel="alternate" type="text/html" title="A Grab Bag of Approaches to Frequentist Multiple Testing." /><published>2024-10-09T00:00:00+00:00</published><updated>2024-10-09T00:00:00+00:00</updated><id>http://gregorygundersen.com/blog/2024/10/09/approaches-to-multiple-testing</id><content type="html" xml:base="http://gregorygundersen.com/blog/2024/10/09/approaches-to-multiple-testing/"><![CDATA[<p>We show how to handle more than one hypothesis at a time.</p>
 
 <h2 id="introduction">Introduction</h2>
 
