@@ -120,15 +120,15 @@ So
 $$
 \begin{eqnarray}
 2(cv'v-v'x) = 0 \\
-&\Rightarrow& cv'v-v'x = 0 \\
-&\Rightarrow& cv'v = v'x \\
-&\Rightarrow& c = (v'v)^{-1}v'x$ \\
+&\Rightarrow& cv^Tv-v^Tx = 0 \\
+&\Rightarrow& cvTv = v^Tx \\
+&\Rightarrow& c = (v^Tv)^{-1}v^Tx$ \\
 \end{eqnarray}
 $$
 
 So we end up with:
 
-$P_v = v(v'v)^{-1}v'$
+$P_v = v(v^Tv)^{-1}v^T$
 
 Which looks suspiciously similar to the formula for the optimal linear regression coefficients!
 
