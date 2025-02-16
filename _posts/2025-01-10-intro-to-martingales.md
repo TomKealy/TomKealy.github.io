@@ -95,3 +95,18 @@ The optional stopping theorem says that the expected value of a martingale at a 
 These boundedness assumptions are actually very important. Without them the theorem would not be true. 
 
 For a counterexample, recall that if $X_0 = 0$ and $X_n$ goes up or down by 1 at each time step (each with probability .5) then $X_0, X_1, X_2, \dots$ is a martingale. If we let $T$ be the first $n$ for which $X_n = 100$, then $T$ is a finite number with probability one. (That is, with probability one $X_n$ reaches T eventually.) But then $X_T$ is always 100, which means that $E\left[X_T\right]  \neq X_0$.
+
+# Not all Martingales and Markov Chains
+
+\text{Markov chains have a finite memory, Martingales can have an infinite one.}
+
+\text{Pick a random value for }X_0\text{. Let the sequence of random variables }\{\epsilon_n,n>0\}\text{ be i.i.d. with mean}=E[\epsilon_n]=0\text{ and independent of }X_0\text{.}
+
+\text{The process governed by }X_{n+1}=X_n+\epsilon_{n+1}X_0
+
+\text{ is a martingale as}
+E[X_{n+1}|X_0,\ldots,X_n]=E[X_n|X_0,\ldots,X_n]+E[\epsilon_{n+1}X_0|X_0,\ldots,X_n]=X_n+E[\epsilon_{n+1}|X_0,\ldots,X_n]E[X_0|X_0,\ldots,X_n]=X_n+E[\epsilon_{n+1}]X_0=X_n+0X_0=X_n
+
+\text{Here, it is key that }\epsilon_n\text{ is independent of the }\{X_i,0\leq i\leq n\}\text{.}
+
+\text{is not Markov as it is clear that }\text{Pr}[X_n+\epsilon_{n+1}X_0|X_n]\neq\text{Pr}[X_n+\epsilon_{n+1}X_0|X_0,\ldots,X_n]\text{. To determine }X_{n+1}\text{ not only the value of }X_n\text{ but the entire path to it (at which value did the path start at }X_0\text{) is needed.}
