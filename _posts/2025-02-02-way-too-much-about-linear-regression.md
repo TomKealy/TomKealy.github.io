@@ -119,7 +119,7 @@ So
 
 $$
 \begin{align}
-2(cv'v-v'x) = 0 \\
+2(cv'v-v'x) &= 0 \\
 &\Rightarrow cv^Tv-v^Tx = 0 \\
 &\Rightarrow cvTv = v^Tx \\
 &\Rightarrow c = (v^Tv)^{-1}v^Tx \\
