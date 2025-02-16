@@ -128,7 +128,9 @@ $$
 
 So we end up with:
 
-$P_v = v(v^Tv)^{-1}v^T$
+$$
+P_v = v(v^Tv)^{-1}v^T
+$$
 
 Which looks suspiciously similar to the formula for the optimal linear regression coefficients!
 
