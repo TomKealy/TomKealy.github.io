@@ -151,21 +151,21 @@ MathJax.Hub.Config({
 
 <p>This rearrangement follows since the square root is a monotonic transformation, such that the optimal choice of $c$ is the same in both minimisations. Since any potential $x^*$ along the line drawn by $v$ is some scalar multiplication of that line $cv$, we can express the function to be minimised with respect to $c$, and then differentiate:</p>
 
-\[\begin{eqnarray}
-\frac{d}{dc}\sum_i(cv_i-x)^2 &amp;=&amp; \sum_i 2v_i(cv_i-x) \\
-&amp;=&amp; 2(\sum_i cv_i^2 - \sum_i v_ix) \\
-&amp;=&amp; 2(cv'v-v'x) \\
-&amp;=&amp; 0
-\end{eqnarray}\]
+\[\begin{align}
+\frac{d}{dc}\sum_i(cv_i-x)^2 &amp;= \sum_i 2v_i(cv_i-x) \\
+&amp;= 2(\sum_i cv_i^2 - \sum_i v_ix) \\
+&amp;= 2(cv'v-v'x) \\
+&amp;= 0
+\end{align}\]
 
 <p>So</p>
 
-\[\begin{eqnarray}
+\[\begin{align}
 2(cv'v-v'x) = 0 \\
-&amp;\Rightarrow&amp; cv^Tv-v^Tx = 0 \\
-&amp;\Rightarrow&amp; cvTv = v^Tx \\
-&amp;\Rightarrow&amp; c = (v^Tv)^{-1}v^Tx$ \\
-\end{eqnarray}\]
+&amp;\Rightarrow cv^Tv-v^Tx = 0 \\
+&amp;\Rightarrow cvTv = v^Tx \\
+&amp;\Rightarrow c = (v^Tv)^{-1}v^Tx \\
+\end{align}\]
 
 <p>So we end up with:</p>
 
