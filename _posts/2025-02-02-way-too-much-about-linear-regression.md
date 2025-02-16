@@ -78,7 +78,7 @@ The answer to this question depends in large part on the scales on which $x$ and
 Because of 2 and 3, the covariance is an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of $x$ and $y$. The correlation coefficient, however, gives us a standardized measure of association: It is 'corrected' for the scales on which $x$ and $y$ are measured.
 
 $$
-\text{Cor}(x,y) = \frac{\textCcov}(x,y)}{\sqrt{\text{Var}(x)\cdot\text{Var}(y)}}
+\text{Cor}(x,y) = \frac{\text{Cov}(x,y)}{\sqrt{\text{Var}(x)\cdot\text{Var}(y)}}
 $$
 
 The correlation coefficient tells us: If $x$ increases by $\sqrt{\text{var}(x)}$ how many $\sqrt{\text{var}(y)}${'s will outcome $y$$ increase? Thus, with a correlation coefficient of 1, an increase of 1 SD in $x$ $ is associated with an increase of 1 SD in $y$.
