@@ -98,10 +98,10 @@ A projection matrix $P$ is any matrix with property $P^2=P$. For vector $v$ in s
 That's not at all that helpful. Instead we want to find the projection matrix for a given $v$. To begin, we can take some point in $n$-dimensional space, $x$, and the vector line $v$ along which we want to project $x$. The goal is the following:
 
 $$
-\begin{eqnarray}
-\text{argmin}_c \sqrt{\sum_i(\bar{x}_i-x)^2} &=& \text{argmin}_c \sum_i(\bar{x}_i-x)^2 \\
-&=& \text{argmin}_c \sum_i(cv_i-x)^2
-\end{eqnarray}
+\begin{align}
+\text{argmin}_c \sqrt{\sum_i(\bar{x}_i-x)^2} &= \text{argmin}_c \sum_i(\bar{x}_i-x)^2 \\
+&= \text{argmin}_c \sum_i(cv_i-x)^2
+\end{align}
 $$
 
 This rearrangement follows since the square root is a monotonic transformation, such that the optimal choice of $c$ is the same in both minimisations. Since any potential $x^*$ along the line drawn by $v$ is some scalar multiplication of that line $cv$, we can express the function to be minimised with respect to $c$, and then differentiate:
