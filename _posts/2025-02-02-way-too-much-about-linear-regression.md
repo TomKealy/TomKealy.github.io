@@ -75,7 +75,7 @@ The answer to this question depends in large part on the scales on which $x$ and
 2. the scale of $x$$.
 3. the scale of $y$.
 
-Because of 2 and 3, the covariance is an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of $x$ and $y$$. The correlation coefficient, however, gives us a standardized measure of association: It is 'corrected' for the scales on which $x$ and $y$ are measured.
+Because of 2 and 3, the covariance is an unstandardized measure of association. Its value is difficult to interpret, because what would be a large and what would be a small value depends on the scales of $x$ and $y$. The correlation coefficient, however, gives us a standardized measure of association: It is 'corrected' for the scales on which $x$ and $y$ are measured.
 
 $$
 \text{Cor}(x,y) = \frac{\textCcov}(x,y)}{\sqrt{\text{Var}(x)\cdot\text{Var}(y)}}
