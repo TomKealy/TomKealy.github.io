@@ -150,14 +150,14 @@ $$
 Differentiating with respect to and solving:
 
 $$
-\begin{eqnarray}
-\frac{d}{d\beta}(y−Xβ)^T(y−Xβ) &=& −2X(y−Xβ) \\
-&=& 2X^TXβ−2X^Ty \\
-&=& 0 \\
-&\rightarrow& \\
-X^TXβ &=& X^Ty\\
-\beta &=&(X^TX)^{−1}X^Ty.
-\end{eqnarray}
+\begin{align}
+\frac{d}{d\beta}(y−Xβ)^T(y−Xβ) &= −2X(y−Xβ) \\
+&= 2X^TXβ−2X^Ty \\
+&= 0 \\
+&\rightarrow \\
+X^TXβ &= X^Ty\\
+\beta &=(X^TX)^{−1}X^Ty.
+\end{align}
 $$
 
 To get our prediction of $y$, i.e. $\hat{y}$ , we multiply our $\beta$ coefficient by the matrix $X$:
