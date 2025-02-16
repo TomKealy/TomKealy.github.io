@@ -83,7 +83,7 @@ $$
 
 The correlation coefficient tells us: If $x$ increases by $\sqrt{\text{var}(x)}$ how many $\sqrt{\text{var}(y)}${'s will outcome $y$$ increase? Thus, with a correlation coefficient of 1, an increase of 1 SD in $x$ $ is associated with an increase of 1 SD in $y$.
 
-Now, the regression coefficient quantifies the expected increase in $y$, when $x$$ increases by 1. We thus need to 'correct' the covariance between $x$$ and $y$$for the scale of $x$$. We can do that by simply dividing:
+Now, the regression coefficient quantifies the expected increase in $y$, when $x$ increases by 1. We thus need to 'correct' the covariance between $x$ and $y$ for the scale of $x$. We can do that by simply dividing:
 
 $$
 \frac{\text{cov}(x,y)}{\text{var}(x)}
