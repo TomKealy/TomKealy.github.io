@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Is this Simpson's Paradox?</title>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta name='description' content='Gregory Gundersen is a PhD candidate at Princeton.'>
+    <meta name='keywords' content=''>
+    <meta name='author' content='Gregory Gundersen'>
+    
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/trac.css' rel='stylesheet'/>
+    <link href='/css/markdown.css' rel='stylesheet'/>
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    
+    <script type='text/x-mathjax-config'>
+MathJax.Hub.Config({
+  jax: ['input/TeX', 'output/HTML-CSS'],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+    extensions: ['color.js']
+  },
+  messageStyle: 'none',
+  'HTML-CSS': { preferredFont: 'TeX', availableFonts: ['STIX','TeX'] }
+});
+</script>
+
+<script src='//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML' type='text/javascript'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+</head>
+<body>
+    <div class='content'>
+        <div class='nav'>
+    <ul class='wrap'>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/blog'>Blog</a></li>
+        <li><a href='/feed.xml'>RSS</a></li>
+    </ul>
+</div>
+        <div class='front-matter'>
+            <div class='wrap'>
+                <h1>Is this Simpson's Paradox?</h1>
+                <h4>A common misdiagnosis in A/B test results, and how to tell the difference.</h4>
+                <div class='bylines'>
+                    <div class='byline'>
+                        <h3>Published</h3>
+                        <p>13 June 2025</p>
+                    </div>
+                </div>
+                <div class='clear'></div>
+            </div>
+        </div>
+        <div class='wrap article'>
+            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#the-scenario">The scenario</a></li><li><a href="#what-simpsons-paradox-actually-is">What Simpson’s Paradox actually is</a></li><li><a href="#whats-actually-happening-in-our-ab-test">What’s actually happening in our A/B test</a></li><li><a href="#why-it-still-matters">Why it still matters</a></li><li><a href="#references">References</a></li></ul>
+            <h1 id="introduction">Introduction</h1>
+
+<p>You’re running an A/B test. The overall results look good — the test group is outperforming control. Then you break the results down by device type and something strange appears: Desktop users are going in the <em>opposite</em> direction.</p>
+
+<p>Your first instinct is Simpson’s Paradox. But is it?</p>
+
+<h1 id="the-scenario">The scenario</h1>
+
+<p>Imagine you’re analysing an A/B test with 300,000 users. Split by device, the data looks like this:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Segment</th>
+      <th>Group</th>
+      <th>Allocated</th>
+      <th>Converted</th>
+      <th>Rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Mobile</td>
+      <td>Control</td>
+      <td>200,000</td>
+      <td>10,000</td>
+      <td>5.00%</td>
+    </tr>
+    <tr>
+      <td>Mobile</td>
+      <td>Test</td>
+      <td>200,000</td>
+      <td>10,775</td>
+      <td>5.39%</td>
+    </tr>
+    <tr>
+      <td>Desktop</td>
+      <td>Control</td>
+      <td>50,000</td>
+      <td>2,500</td>
+      <td>5.00%</td>
+    </tr>
+    <tr>
+      <td>Desktop</td>
+      <td>Test</td>
+      <td>50,000</td>
+      <td>2,350</td>
+      <td>4.70%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The Mobile segment shows a <strong>+7.24%</strong> improvement. The Desktop segment shows a <strong>-5.04%</strong> decline. And overall?</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Group</th>
+      <th>Allocated</th>
+      <th>Converted</th>
+      <th>Rate</th>
+      <th>Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Control</td>
+      <td>250,000</td>
+      <td>12,500</td>
+      <td>5.00%</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Test</td>
+      <td>250,000</td>
+      <td>13,125</td>
+      <td>5.25%</td>
+      <td>+4.76%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The overall result follows Mobile — the larger segment — while Desktop quietly goes the other way. Paradox, right?</p>
+
+<p>Not quite.</p>
+
+<h1 id="what-simpsons-paradox-actually-is">What Simpson’s Paradox actually is</h1>
+
+<p>Simpson’s Paradox occurs when a trend present in <em>every</em> subgroup <em>reverses</em> when the groups are combined. The canonical example comes from a 1986 medical study comparing two treatments for kidney stones<sup id="fnref:1"><a href="#fn:1" class="footnote" rel="footnote" role="doc-noteref">1</a></sup>:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Segment</th>
+      <th>Treatment A</th>
+      <th>Treatment B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Small stones</td>
+      <td><strong>93%</strong> (81/87)</td>
+      <td>87% (234/270)</td>
+    </tr>
+    <tr>
+      <td>Large stones</td>
+      <td><strong>73%</strong> (192/263)</td>
+      <td>69% (55/80)</td>
+    </tr>
+    <tr>
+      <td>Overall</td>
+      <td>78% (273/350)</td>
+      <td><strong>83%</strong> (289/350)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Treatment A is better for small stones. Treatment A is better for large stones. And yet Treatment B appears better overall.</p>
+
+<p>This is Simpson’s Paradox. The reversal happens because Treatment B was applied disproportionately to small stones — the easier cases — which inflated its overall success rate. Stone size is a confounding variable that was invisible until you looked for it.</p>
+
+<h1 id="whats-actually-happening-in-our-ab-test">What’s actually happening in our A/B test</h1>
+
+<p>In the kidney stones example, <em>both</em> subgroups agree: Treatment A wins in small stones, Treatment A wins in large stones. The paradox is that the overall result contradicts both subgroups.</p>
+
+<p>In our A/B test, the subgroups <em>disagree with each other</em>: Mobile improves, Desktop declines. The overall result doesn’t contradict either subgroup — it simply reflects the majority. With 80% of users on Mobile, the overall conversion rate is dominated by Mobile’s performance. This is intuitive, not paradoxical.</p>
+
+<p>For it to be Simpson’s Paradox, you’d need to see Mobile <em>and</em> Desktop both decline individually, while the overall result showed an improvement — or vice versa. That’s not what we have here.</p>
+
+<h1 id="why-it-still-matters">Why it still matters</h1>
+
+<p>Misdiagnosing this as Simpson’s Paradox is easy, but the correct diagnosis doesn’t make the Desktop result any less real. A chi-squared test on the Desktop segment gives p = 0.03 — the underperformance there is statistically significant and unlikely to be noise.</p>
+
+<p>The overall positive result is genuine. So is the Desktop decline. Both can be true simultaneously, and both need to inform the decision about whether to ship the change. An improvement that helps 80% of users while harming the other 20% 
+is a very different outcome from a uniform improvement. Treating the overall number as the whole story would miss that.</p>
+
+<p>Simpson’s Paradox, when it genuinely occurs,signals a confounding variable that needs to be brought into the analysis. What we have here is something simpler but equally important: a treatment that works differently for different users.</p>
+
+<p>Stratifying your results isn’t just a way to catch paradoxes — it’s how you find out <em>who</em> your experiment is actually helping.</p>
+
+<h1 id="references">References</h1>
+<ol class="bibliography"></ol>
+
+<p>calculi by open surgery, percutaneous nephrostomy, and extracorporeal shockwave 
+lithotripsy. <em>BMJ</em>. 1986;292(6524):879–882.</p>
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1">
+      <p>Charig CR, Webb DR, Payne SR, Wickham JE. Comparison of treatment of renal <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+        </div>
+        
+        <div id='bibliography'>
+            <div class='wrap'>
+                <ol class="bibliography"></ol>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
