@@ -1,6 +1,6 @@
 ---
 layout: default
-title: The trauma plot is a problem play, and the problem is it's boring.
+title: So, you're creatively blocked?
 date:   2022-05-29
 categories: drama, writing
 ---
