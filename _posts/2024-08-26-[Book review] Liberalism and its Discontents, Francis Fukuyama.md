@@ -1,6 +1,6 @@
 ---
 layout: default
-title: [Book review] Liberalism and its Discontents, Francis Fukuyama
+title: "[Book review] Liberalism and its Discontents, Francis Fukuyama"
 subtitle: Like a prayer...
 date: 2024-08-26
 categories: books
