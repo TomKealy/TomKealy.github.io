@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Book Review: Evenings and Weekends, Oisín McKenna
+title: "Book Review: Evenings and Weekends, Oisín McKenna"
 subtitle: What's up the Queer Novel(TM)?
 date: 2024-08-18
 categories: books
