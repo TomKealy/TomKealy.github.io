@@ -1,6 +1,6 @@
 ---
 layout: default
-title:Some collected notes on how to what to look for in a therapist.
+title: Some collected notes on how to what to look for in a therapist.
 date:   2024-02-23
 categories: self-improvement
 ---
