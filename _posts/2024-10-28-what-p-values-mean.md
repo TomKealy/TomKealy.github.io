@@ -3,6 +3,7 @@ layout: default
 title: What p-values really mean
 subtitle: Most people get $p$-values wrong. This is how to understand and apply them correctly.
 categories: statistics, hypothesis testing
+date: 2024-10-28
 bibliography: references.bib
 ---
 
