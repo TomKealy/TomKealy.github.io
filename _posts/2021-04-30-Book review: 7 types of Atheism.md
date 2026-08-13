@@ -1,6 +1,6 @@
 ---
 layout: default
-title:  Book review: 7 types of Atheism.
+title:  "Book review: 7 types of Atheism."
 date:   2021-04-30
 categories: Book Reviews
 toc: true
