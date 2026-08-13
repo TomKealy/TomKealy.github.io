@@ -1,8 +1,8 @@
 ---
 layout: default
 title: How I made depression work for me.
-date:   2022-05-29
-categories: drama, writing
+date:   2023-08-16
+categories: mental-health
 ---
 
 In May 2020, I walked out of the psychiatric ward and into lockdown. 

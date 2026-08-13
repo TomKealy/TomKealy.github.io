@@ -1,13 +1,15 @@
 ---
 layout: default
-title: So, you're creatively blocked?
-date:   2022-05-29
+title: So, you're creatively blocked.
+date:   2022-10-04
 categories: creativity
 ---
 
 You’ve taken up a new creative pursuit, and it was fun at first. Maybe it was photography and you got a few good frames, frames you liked, in the first couple of weeks with your new camera. Then, inevitably, the fun dries up. Maybe you have some misapplied idea of ‘good’ photography, but making pictures just isn’t the same anymore. The spark has gone, and your camera sits on shelf in an out of the way room, forlorn, as you tell yourself you’re saving it for days when you can finally take good pictures. 
 
 Of course, that day doesn't come. And you feel bad. Bad about the camera, bad about the pictures your not taking, and bad that you miss whatever inner impulse led you to buy the camera in the first place.
+
+Thanks for reading Thomas’s Newsletter! Subscribe for free to receive new posts and support my work.
 
 Or maybe you’re an old hand at your craft. You’ve been around the block a few times, you know all the words to all the songs, but they’ve lost their meaning. You find that you’re just singing the tune, mouthing the words, but what they mean, what they mean to you now, just totally eludes you.
 
@@ -17,7 +19,7 @@ It happens to everyone, eventually. Their perfect run of good days comes to an e
 
 Here are a few things that have helped me in the past.
 
-Have you tried not being perfect?
+*Have you tried not being perfect?*
 
 It's tempting to think that to create the work we want to create we need to be radically different from who we currently are. Perfect in fact. The imagined work is so colossally beautiful that someone so limited and flawed and actually quite terrible could not have produced it.
 
@@ -29,7 +31,7 @@ Unfortunately all this doing means that we never get on with actually doing the 
 
 This feels terrible, so we resist it. When we do get some work done, instead of the beautiful child we birthed a monster knitted together from all the unclean parts of ourselves. We tell ourselves that we can’t do it, we were never made for art. We imagine that if only we were better people, what we create would be more luminous. 
 
-Are you trying not to bully yourself?
+*Are you trying not to bully yourself?*
 
 All artists, no matter which type, are beholden to their process. It’s a mysterious set of rituals, behaviours, and attitudes which, week on week, year on year, eventually produces work. It’s kind of mysterious, but also the sort of thing that artists love to talk about over drinks. Just like sex, everyone’s doing it differently, and everyone’s worried that they’re doing it wrong.
 
@@ -39,7 +41,7 @@ The rub is this: people who say this sort of thing constantly forget that being 
 
 You have to cultivate a capacity to gently sit in a chair and do nothing, or write.
 
-Have you tried doing the work, and it's all the work?
+*Have you tried doing the work, and it's all the work?*
 
 One way that we flee from the work we’re here to do, is by insisting that some things are outside the process. These things need to be resolved before we even start the work. And so, they cannot be resolved by the sort of methods that other, more mundane, problems can be solved.
 
@@ -57,7 +59,7 @@ As ever, Ursula le Guin said it better than I ever could:
 
 “I am going to be rather hard-nosed and say that if you have to find devices to coax yourself to stay focused on writing, perhaps you should not be writing what you’re writing. And if this lack of motivation is a constant problem, perhaps writing is not your forte. I mean, what is the problem? If writing bores you, that is pretty fatal. If that is not the case, but you find that it is hard going and it just doesn’t flow, well, what did you expect? It is work; art is work.”
 
-Have you accepted the place you create from?
+*Have you accepted the place you create from?*
 
 Because we love play, and the freedom and joy creative play brings, we think that we ought to be creating from a place of play. Freedom and joy seems like the natural emotional place for our best work to emerge from, except for the fact that you might not actually be able to work from that place.
 
@@ -69,7 +71,7 @@ So it’s good that I’ve reframed this impulse. Instead of anger, see it as pa
 
 Have you accepted the circumstances and moods you create under, and instead of throwing that power away, drawn it in to yourself? If not, maybe that’s what you need to do.
 
-Have you accepted your creations are all the same?
+*Have you accepted your creations are all the same?*
 
 Heidegger, a German philosopher in the C20th, said all philosophers have one major thought, and the rest is commentary. He was no exception, and over the course of 70 years and who-knows-how-many books he just repeated his observation that philosophy simply had reduced Being to presence. Over and over and over again, in increasingly more obscure ways.
 
@@ -78,5 +80,3 @@ David Mamet, the American Playwright, has written plays about men talking about 
 Bach reused the same themes in his music. What started off as a fugue, became a choral, and then a violin concerto. 
 
 There’s no shame in writing the same thing over and over again. As ever, what you need is to accept the deeper grooves life has left in you and then get to work. Anything else is just a way not to accept ourselves.
-
-

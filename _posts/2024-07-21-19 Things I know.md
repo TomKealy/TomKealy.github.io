@@ -1,8 +1,8 @@
 ---
 layout: default
 title: 19 Things I know.
-subtitle: And it fucking sucks.
-date:   I know less than Sasha
+subtitle: I know less than Sasha
+date:  2024-07-21 
 categories: writing
 ---
 

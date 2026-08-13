@@ -4,6 +4,7 @@ title:  You don't have to love yourself to live the life you want.
 date:   2022-03-16
 categories: travel
 ---
+
 When I was nineteen, a month into moving to London, I went out to gay bar, and then went home with another man. 
 
 Once we were naked he told me that I had to let him fuck me, and I didn’t know how to resist. 

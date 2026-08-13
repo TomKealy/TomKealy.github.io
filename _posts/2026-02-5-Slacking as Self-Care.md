@@ -34,7 +34,7 @@ Tasks which are Important but not Urgent do in your diary. You have to make a co
 
 For tasks which are Urgent but not Important you need to Delegate. These are usually tasks you don’t have the expertise for. think back office functions like taxes and payroll. These need to be done, but ideally not by you since they are a distraction from your values and long term goals. These tasks are where you need to expand your team and work collaboratively. Don’t underestimate the power of being nice to people who complete these tasks.
 
-Tasks which are neither Important or Urgent you should delete from your list. This is the most impactful lesson of the Eisenhower Matrix. I see a lot of professionals diligently prioritising their todo lists and then trying to do everything they wrote down. that’s a mistake: if something isn’t a priority, then you never do it. Simple as. There is only so much time we have in life, our attention is finite, so why waste effort on things which aren’t a priority?
+Tasks which are neither Important or Urgent you should delete from your list. This is the most impactful lesson of the Eisenhower Matrix. I see a lot of professionals diligently prioritising their todo lists and then trying to do everything they wrote down. that’s a mistake: if something isn’t a priority, then you never do it. Simple as. There is only so much time we have in life, our attention is finite, so why waste effort on things which aren’t a priority?s
 
 Smart people fail because their perfectionism convinces them that everything is important and urgent all at once. Every detail matters. Every task could have consequences. The framework is useless if you can’t see that most of your tasks aren’t actually priorities.
 
