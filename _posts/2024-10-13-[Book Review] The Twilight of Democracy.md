@@ -1,8 +1,8 @@
 ---
 layout: default
-title: [Book Review] The Twilight of Democracy.
+title: "[Book Review] The Twilight of Democracy."
 date:   2024-10-13
-categories: advice
+categories: books
 ---
 
 More than one therapist has noted that victims benefit from their victimhood. Sympathy is the likeliest payoff: as long as people think you’re not too hard done by, they will lend an ear, a hand, maybe even some money. Gaining from your victimhood is one reason to prolong the circumstances, which is why victimhood is perpetual. You simply have to find the resolve to walk away; this involves not just removing yourself from the situation, but from your own personal identification with it. Such a move is legitimately hard, fully saying goodbye to your old self terrifying. Many converts simply sublate their own psychological complexes into a new shape, so militant atheists can become the most doctrinaire Catholics. It’s a way of changing without having to change. Facing up to your failings, how you played into the situations you were in, and why you stayed. That’s the difficult part.
