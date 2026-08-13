@@ -1,6 +1,6 @@
 ---
 layout: default
-title:  Why RFK Jr. Might Be Right About the Wrong Thing
+title:  Useful is a better concept than true
 date:   2025-08-02
 toc: true
 ---
