@@ -1,76 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 <head>
-    <title>A Grab Bag of Approaches to Frequentist Multiple Testing.</title>
     <meta charset='UTF-8'>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
-    <meta name='description' content='Gregory Gundersen is a PhD candidate at Princeton.'>
-    <meta name='keywords' content=''>
-    <meta name='author' content='Gregory Gundersen'>
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>A Grab Bag of Approaches to Frequentist Multiple Testing. | Thomas Kealy</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="A Grab Bag of Approaches to Frequentist Multiple Testing." />
+<meta name="author" content="Thomas Kealy" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="We show how to handle more than one hypothesis at a time." />
+<meta name="twitter:description" property="og:description" content="We show how to handle more than one hypothesis at a time." />
+<link rel="canonical" href="https://tomkealy.github.io/blog/2024/10/09/approaches-to-multiple-testing/" />
+<meta property="og:url" content="https://tomkealy.github.io/blog/2024/10/09/approaches-to-multiple-testing/" />
+<meta property="og:site_name" content="Thomas Kealy" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-10-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-10-09T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="A Grab Bag of Approaches to Frequentist Multiple Testing." />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Thomas Kealy"},"dateModified":"2024-10-09T00:00:00+00:00","datePublished":"2024-10-09T00:00:00+00:00","description":"We show how to handle more than one hypothesis at a time.","headline":"A Grab Bag of Approaches to Frequentist Multiple Testing.","mainEntityOfPage":{"@type":"WebPage","@id":"https://tomkealy.github.io/blog/2024/10/09/approaches-to-multiple-testing/"},"url":"https://tomkealy.github.io/blog/2024/10/09/approaches-to-multiple-testing/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link type="application/atom+xml" rel="alternate" href="https://tomkealy.github.io/feed.xml" title="Thomas Kealy" />
     
+    
+    <link rel='preload' href='/fonts/fraunces-latin.woff2' as='font' type='font/woff2' crossorigin>
+    <link rel='icon' type='image/png' href='/favicon.png'>
     <link href='/css/blog.css' rel='stylesheet'/>
     <link href='/css/trac.css' rel='stylesheet'/>
     <link href='/css/markdown.css' rel='stylesheet'/>
+    <link href='/css/theme.css' rel='stylesheet'/>
     
-    <!-- KaTeX -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, {
-                delimiters: [
-                    {left: "$$", right: "$$", display: true},
-                    {left: "$", right: "$", display: false},
-                    {left: "\\[", right: "\\]", display: true},
-                    {left: "\\(", right: "\\)", display: false}
-                ],
-                throwOnError: false
-            });
+<!-- KaTeX: renders $...$, $$...$$, \(...\) and \[...\] in the browser -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "\\(", right: "\\)", display: false}
+            ],
+            throwOnError: false
         });
-    </script>
-    
-    <script type='text/x-mathjax-config'>
-MathJax.Hub.Config({
-  jax: ['input/TeX', 'output/HTML-CSS'],
-  tex2jax: {
-    inlineMath: [ ['$', '$'] ],
-    displayMath: [ ['$$', '$$']],
-    processEscapes: true,
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-    extensions: ['color.js']
-  },
-  messageStyle: 'none',
-  'HTML-CSS': { preferredFont: 'TeX', availableFonts: ['STIX','TeX'] }
-});
+    });
 </script>
 
-<script src='//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML' type='text/javascript'></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
 </head>
-<body>
+<body class='section-stats'>
     <div class='content'>
-        <div class='nav'>
-    <ul class='wrap'>
-        <li><a href='/'>Home</a></li>
-        <li><a href='/blog'>Blog</a></li>
-        <li><a href='/feed.xml'>RSS</a></li>
-    </ul>
-</div>
+        <header class='masthead'>
+    <div class='stripes' aria-hidden='true'><span></span><span></span><span></span><span></span></div>
+    <nav class='wrap masthead-inner' aria-label='Main'>
+        <a class='wordmark' href='/'>Tom Kealy</a>
+        <ul class='nav-links'>
+            <li class='nav-stats'><a href='/stats/'>Statistics</a></li>
+            <li class='nav-essays'><a href='/essays/'>Essays</a></li>
+            <li class='nav-about'><a href='/about/'>About</a></li>
+            <li class='nav-rss'><a href='/feed.xml'>RSS</a></li>
+        </ul>
+    </nav>
+</header>
+
         <div class='front-matter'>
             <div class='wrap'>
                 <h1>A Grab Bag of Approaches to Frequentist Multiple Testing.</h1>
                 <h4>Pick your poison.</h4>
+                
                 <div class='bylines'>
                     <div class='byline'>
                         <h3>Published</h3>
                         <p>09 October 2024</p>
                     </div>
                 </div>
+                
                 <div class='clear'></div>
             </div>
         </div>
         <div class='wrap article'>
+            
+
             <ul><li><a href="#introduction">Introduction</a></li><li><a href="#the-challenge-of-multiple-testing">The Challenge of Multiple Testing</a><ul><li><a href="#what-is-a-false-positive-and-why-is-it-important">What is a false positive and why is it important?</a><ul><li><a href="#what-is-the-family-wise-error-rate">What is the Family-wise error rate?</a></li></ul></li><li><a href="#family-wise-error-rate-fwer">Family Wise Error Rate (FWER)</a><ul><li><a href="#what-is-the-false-discovery-rate">What is the false discovery rate?</a></li></ul></li><li><a href="#false-discovery-rate-fdr">False Discovery Rate (FDR)</a></li><li><a href="#what-is-a-false-negative-and-why-is-it-important">What is a false negative and why is it important?</a></li><li><a href="#how-do-they-vary-by-the-number-of-comparisons">How do they vary by the number of comparisons?</a></li><li><a href="#how-can-we-prevent-this-from-happening">How can we prevent this from happening?</a><ul><li><a href="#methods-to-control-the-family-wise-error-rate">Methods to control the Family Wise Error Rate</a></li><li><a href="#methods-to-control-the-false-discovery-rate">Methods to control the False Discovery Rate</a></li></ul></li><li><a href="#must-we-apply-the-adjustments-equally">Must we apply the adjustments equally.</a></li></ul></li></ul>
             <p>We show how to handle more than one hypothesis at a time.</p>
 
@@ -150,6 +164,25 @@ This error is when we leave money on the table. Statistical tests are designed t
 <p>No. It’s not required that we apply adjustments equally. In fact the Bejamini-Hochberg algorithm explicitly does not apply equally to all metrics.</p>
 
 <p>A good example is to consider the following situation. You have 11 metrics you would like to compute p-values for in an experiment, with an overall alpha of 0.1. However, for one of them you wish to allocate an alpha of 0.5, and for the rest of them you want to allocate a p-value of 0.005 (0.05/10). This is a perfectly reasonable situation, as it keeps the overall alpha to 0.1 (the sum of all the individual alpha values). You could also extend this: your primary metric gets an alpha of 0.5, some set of secondary metrics gets an alpha of 0.3 (and the p-value thresholds are calculated via the Benjamini-Hochberg procedure) and even more tertiary metrics have an alpha of 0.2 (and the p-value thresholds are calculated via the Benjamini-Hochberg procedure). This tiering strategy is also appropriate. What wouldn’t be appropriate would be leaving the primary metric unadjusted, and still claiming the overall alpha is 0.1. In that case, the overall alpha would be inflated (possibly as high as 0.2).</p>
+
+            
+
+
+
+
+
+
+
+<nav class='post-nav'>
+    <div class='post-nav-older'>
+        <span class='post-nav-label'>Older</span><a href='/blog/2024/05/16/Must-we-adjust-p-values-if-we-test-multiple-hypotheses/'>Must we adjust p-values if we test multiple hypotheses?</a>
+    </div>
+    <div class='post-nav-newer'>
+        <span class='post-nav-label'>Newer</span><a href='/blog/2024/10/09/compressive-sensing/'>An introduction to Compressive Sensing.</a>
+    </div>
+    <p class='post-nav-all'><a href='/stats/'>All statistics</a></p>
+</nav>
+
 
         </div>
         

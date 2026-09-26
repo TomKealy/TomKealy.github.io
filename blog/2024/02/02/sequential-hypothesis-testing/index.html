@@ -1,76 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 <head>
-    <title>Sequential Hypothesis Testing</title>
     <meta charset='UTF-8'>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
-    <meta name='description' content='Gregory Gundersen is a PhD candidate at Princeton.'>
-    <meta name='keywords' content=''>
-    <meta name='author' content='Gregory Gundersen'>
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Sequential Hypothesis Testing | Thomas Kealy</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Sequential Hypothesis Testing" />
+<meta name="author" content="Thomas Kealy" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="We introduce the mSPRT and give a derivation from a Bayesian point of view." />
+<meta name="twitter:description" property="og:description" content="We introduce the mSPRT and give a derivation from a Bayesian point of view." />
+<link rel="canonical" href="https://tomkealy.github.io/blog/2024/02/02/sequential-hypothesis-testing/" />
+<meta property="og:url" content="https://tomkealy.github.io/blog/2024/02/02/sequential-hypothesis-testing/" />
+<meta property="og:site_name" content="Thomas Kealy" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-02-02T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-02-02T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Sequential Hypothesis Testing" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Thomas Kealy"},"dateModified":"2024-02-02T00:00:00+00:00","datePublished":"2024-02-02T00:00:00+00:00","description":"We introduce the mSPRT and give a derivation from a Bayesian point of view.","headline":"Sequential Hypothesis Testing","mainEntityOfPage":{"@type":"WebPage","@id":"https://tomkealy.github.io/blog/2024/02/02/sequential-hypothesis-testing/"},"url":"https://tomkealy.github.io/blog/2024/02/02/sequential-hypothesis-testing/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link type="application/atom+xml" rel="alternate" href="https://tomkealy.github.io/feed.xml" title="Thomas Kealy" />
     
+    
+    <link rel='preload' href='/fonts/fraunces-latin.woff2' as='font' type='font/woff2' crossorigin>
+    <link rel='icon' type='image/png' href='/favicon.png'>
     <link href='/css/blog.css' rel='stylesheet'/>
     <link href='/css/trac.css' rel='stylesheet'/>
     <link href='/css/markdown.css' rel='stylesheet'/>
+    <link href='/css/theme.css' rel='stylesheet'/>
     
-    <!-- KaTeX -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, {
-                delimiters: [
-                    {left: "$$", right: "$$", display: true},
-                    {left: "$", right: "$", display: false},
-                    {left: "\\[", right: "\\]", display: true},
-                    {left: "\\(", right: "\\)", display: false}
-                ],
-                throwOnError: false
-            });
+<!-- KaTeX: renders $...$, $$...$$, \(...\) and \[...\] in the browser -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "\\(", right: "\\)", display: false}
+            ],
+            throwOnError: false
         });
-    </script>
-    
-    <script type='text/x-mathjax-config'>
-MathJax.Hub.Config({
-  jax: ['input/TeX', 'output/HTML-CSS'],
-  tex2jax: {
-    inlineMath: [ ['$', '$'] ],
-    displayMath: [ ['$$', '$$']],
-    processEscapes: true,
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-    extensions: ['color.js']
-  },
-  messageStyle: 'none',
-  'HTML-CSS': { preferredFont: 'TeX', availableFonts: ['STIX','TeX'] }
-});
+    });
 </script>
 
-<script src='//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML' type='text/javascript'></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
 </head>
-<body>
+<body class='section-stats'>
     <div class='content'>
-        <div class='nav'>
-    <ul class='wrap'>
-        <li><a href='/'>Home</a></li>
-        <li><a href='/blog'>Blog</a></li>
-        <li><a href='/feed.xml'>RSS</a></li>
-    </ul>
-</div>
+        <header class='masthead'>
+    <div class='stripes' aria-hidden='true'><span></span><span></span><span></span><span></span></div>
+    <nav class='wrap masthead-inner' aria-label='Main'>
+        <a class='wordmark' href='/'>Tom Kealy</a>
+        <ul class='nav-links'>
+            <li class='nav-stats'><a href='/stats/'>Statistics</a></li>
+            <li class='nav-essays'><a href='/essays/'>Essays</a></li>
+            <li class='nav-about'><a href='/about/'>About</a></li>
+            <li class='nav-rss'><a href='/feed.xml'>RSS</a></li>
+        </ul>
+    </nav>
+</header>
+
         <div class='front-matter'>
             <div class='wrap'>
                 <h1>Sequential Hypothesis Testing</h1>
                 <h4>Hypothesis testing step-by-step.</h4>
+                
                 <div class='bylines'>
                     <div class='byline'>
                         <h3>Published</h3>
                         <p>02 February 2024</p>
                     </div>
                 </div>
+                
                 <div class='clear'></div>
             </div>
         </div>
         <div class='wrap article'>
+            
+
+
+
+<div class='series'>
+    <p class='series-label'>Part 1 of 5 in <strong>Sequential and anytime-valid testing</strong></p>
+    <ol>
+    
+        
+        <li class='series-current'>Sequential Hypothesis Testing</li>
+        
+    
+        
+        <li><a href='/blog/2024/02/04/bayesian-sequential-hypothesis-testing/'>Bayesian Sequential Hypothesis Testing</a></li>
+        
+    
+        
+        <li><a href='/blog/2025/01/10/intro-to-martingales/'>A short introduction to Martingales</a></li>
+        
+    
+        
+        <li><a href='/blog/2025/01/13/testing-by-betting/'>Hypothesis Testing by Betting</a></li>
+        
+    
+        
+        <li><a href='/blog/2025/05/29/sequential-testing/'>Sequential testing — making decisions before your experiment ends</a></li>
+        
+    
+    </ol>
+</div>
+
+
             <ul><li><a href="#sequential-testing">Sequential Testing</a><ul><li><a href="#sprt">SPRT</a><ul><li><a href="#example-iid-case">Example: IID case</a></li><li><a href="#example-exponential-distribution">Example: Exponential Distribution</a></li><li><a href="#example-binomial-distribution">Example: Binomial Distribution</a></li><li><a href="#1-likelihood-ratio-for-bernoulli-distribution">1. Likelihood Ratio for Bernoulli Distribution</a></li><li><a href="#2-log-likelihood-ratio">2. Log-Likelihood Ratio</a></li><li><a href="#3-cumulative-log-likelihood-for-n-observations">3. Cumulative Log-Likelihood for \(n\) Observations</a></li><li><a href="#4-stopping-rule">4. Stopping Rule</a></li><li><a href="#5-interpretation">5. Interpretation</a></li><li><a href="#example-normal-distribution">Example: Normal Distribution</a></li></ul></li><li><a href="#the-mixture-sequential-probability-ratio-test-msprt">The Mixture Sequential Probability Ratio Test (mSPRT)</a><ul><li><a href="#application-to-normal-data">Application to Normal Data</a></li></ul></li></ul></li></ul>
             <p>We introduce the mSPRT and give a derivation from a Bayesian point of view.</p>
 
@@ -404,6 +448,25 @@ S_n = \log \frac{\theta_1}{\theta_0} \sum_{i=1}^{n} x_i + \log \frac{1 - \theta_
 <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
+
+            
+
+
+
+
+
+
+
+<nav class='post-nav'>
+    <div class='post-nav-older'>
+        <span class='post-nav-label'>Older</span><a href='/blog/2022/07/03/conda-and-jupyter-notebook/'>Running Conda environments from Jupyter Notebook.</a>
+    </div>
+    <div class='post-nav-newer'>
+        <span class='post-nav-label'>Newer</span><a href='/blog/2024/02/04/bayesian-sequential-hypothesis-testing/'>Bayesian Sequential Hypothesis Testing</a>
+    </div>
+    <p class='post-nav-all'><a href='/stats/'>All statistics</a></p>
+</nav>
+
 
         </div>
         

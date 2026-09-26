@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>CUPED — making your A/B tests more sensitive | Thomas Kealy</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="CUPED — making your A/B tests more sensitive" />
+<meta name="author" content="Thomas Kealy" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Introduction" />
+<meta name="twitter:description" property="og:description" content="Introduction" />
+<link rel="canonical" href="https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/" />
+<meta property="og:url" content="https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/" />
+<meta property="og:site_name" content="Thomas Kealy" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-09-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-09-26T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="CUPED — making your A/B tests more sensitive" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Thomas Kealy"},"dateModified":"2026-09-26T00:00:00+00:00","datePublished":"2026-09-26T00:00:00+00:00","description":"Introduction","headline":"CUPED — making your A/B tests more sensitive","mainEntityOfPage":{"@type":"WebPage","@id":"https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/"},"url":"https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link type="application/atom+xml" rel="alternate" href="https://tomkealy.github.io/feed.xml" title="Thomas Kealy" />
+    
+    
+    <link rel='preload' href='/fonts/fraunces-latin.woff2' as='font' type='font/woff2' crossorigin>
+    <link rel='icon' type='image/png' href='/favicon.png'>
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/trac.css' rel='stylesheet'/>
+    <link href='/css/markdown.css' rel='stylesheet'/>
+    <link href='/css/theme.css' rel='stylesheet'/>
+    
+<!-- KaTeX: renders $...$, $$...$$, \(...\) and \[...\] in the browser -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "\\(", right: "\\)", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+</script>
+
+</head>
+<body class='section-stats'>
+    <div class='content'>
+        <header class='masthead'>
+    <div class='stripes' aria-hidden='true'><span></span><span></span><span></span><span></span></div>
+    <nav class='wrap masthead-inner' aria-label='Main'>
+        <a class='wordmark' href='/'>Tom Kealy</a>
+        <ul class='nav-links'>
+            <li class='nav-stats'><a href='/stats/'>Statistics</a></li>
+            <li class='nav-essays'><a href='/essays/'>Essays</a></li>
+            <li class='nav-about'><a href='/about/'>About</a></li>
+            <li class='nav-rss'><a href='/feed.xml'>RSS</a></li>
+        </ul>
+    </nav>
+</header>
+
+        <div class='front-matter'>
+            <div class='wrap'>
+                <h1>CUPED — making your A/B tests more sensitive</h1>
+                <h4>How pre-experiment data can help you detect smaller effects with fewer users.</h4>
+                
+                <div class='bylines'>
+                    <div class='byline'>
+                        <h3>Published</h3>
+                        <p>26 September 2026</p>
+                    </div>
+                </div>
+                
+                <div class='clear'></div>
+            </div>
+        </div>
+        <div class='wrap article'>
+            
+
+            <ul><li><a href="#introduction">Introduction</a></li><li><a href="#the-problem-with-variance">The problem with variance</a></li><li><a href="#the-intuition-behind-cuped">The intuition behind CUPED</a></li><li><a href="#how-much-variance-does-it-remove">How much variance does it remove?</a></li><li><a href="#choosing-your-covariate">Choosing your covariate</a></li><li><a href="#choosing-the-lookback-window">Choosing the lookback window</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#summary">Summary</a></li><li><a href="#references">References</a></li></ul>
+            <h1 id="introduction">Introduction</h1>
+
+<p>Every A/B test is a signal-to-noise problem. The signal is the effect of your intervention: the lift in conversion rate, the change in revenue per customer. The noise is everything else: the natural variation in how people behave, regardless of what you showed them.</p>
+
+<p>When noise is high relative to the signal, you need more data to be confident that what you’re seeing is real. This creates a familiar constraint: larger sample sizes mean longer experiments, and longer experiments mean slower decisions.</p>
+
+<p>CUPED — Controlled-experiment Using Pre-Experiment Data — is a technique for reducing noise without collecting more data (missing reference). The core idea is that a lot of the variation you observe during an experiment is predictable from how users were already behaving before it started. If you can subtract that predictable component, what’s left is a cleaner signal.</p>
+
+<h1 id="the-problem-with-variance">The problem with variance</h1>
+
+<p>To understand why variance matters, consider a simple example. Suppose you’re testing a new checkout flow and you expect it to increase revenue per customer by €0.50. Your users vary a lot — some spend €5 per order, some spend €150. That variation exists completely independently of your experiment.</p>
+
+<p>When you run a t-test on the results, you’re comparing the means of two groups. The wider the spread of values in each group, the harder it is to tell whether a difference in means is real or just noise. This is why experiments with high-variance metrics — revenue, order value, any metric with a long tail — tend to require large sample sizes.</p>
+
+<p>The formal measure of this is the standard error of your estimate, which scales with the standard deviation of your metric divided by the square root of your sample size:</p>
+
+\[SE = \frac{\sigma}{\sqrt{n}}\]
+
+<p>You can reduce the standard error two ways: increase \(n\) (more data) or decrease \(\sigma\) (less noise). CUPED is a way to do the second.</p>
+
+<h1 id="the-intuition-behind-cuped">The intuition behind CUPED</h1>
+
+<p>Consider a bookworm who buys several books every month regardless of any experiment. If they are in the test group, their high spending makes the test group look better than it is. If they are in the control group, the reverse. Either way, their habitual behaviour is noise — it obscures the true effect of whatever you’re testing.</p>
+
+<p>Before the experiment started, you already had data on how this person behaves. That history is a good predictor of how they’ll behave during the experiment, independent of the treatment. CUPED uses that pre-experiment history as a covariate — a piece of information that helps explain variation in the outcome — and adjusts the results accordingly.</p>
+
+<p>The adjusted estimator is:</p>
+
+\[\hat{Y}_{CUPED} = \bar{Y} - \theta(\bar{X} - \mathbb{E}[X])\]
+
+<p>Where:</p>
+
+<ul>
+  <li>\(\bar{Y}\) is the observed mean outcome during the experiment</li>
+  <li>\(X\) is the pre-experiment covariate (typically the same metric, measured
+before the experiment)</li>
+  <li>\(\mathbb{E}[X]\) is the expected value of \(X\) (in practice, its overall
+mean)</li>
+  <li>\(\theta\) is chosen to minimise variance, and works out to
+\(\frac{Cov(Y, X)}{Var(X)}\)</li>
+</ul>
+
+<p>The term \(\theta(\bar{X} - \mathbb{E}[X])\) removes the part of the outcome that was predictable from pre-experiment behaviour. What remains has lower variance.</p>
+
+<h1 id="how-much-variance-does-it-remove">How much variance does it remove?</h1>
+
+<p>The variance of the CUPED estimator is:</p>
+
+\[Var(\hat{Y}_{CUPED}) = Var(\bar{Y})(1 - \rho^2)\]
+
+<p>Where \(\rho\) is the correlation between the pre-experiment covariate and the experiment outcome. The higher the correlation, the more variance CUPED removes.</p>
+
+<p>This has a direct practical implication. If your pre- and post-experiment metrics are correlated at \(\rho = 0.7\), the variance reduction is \(1 - 0.7^2 = 51\%\). A 51% reduction in variance means you need roughly half as many users to achieve the same statistical power — or, equivalently, you can detect a smaller effect with the same number of users.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Correlation (\(\rho\))</th>
+      <th>Variance reduction</th>
+      <th>Sample size saving</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0.3</td>
+      <td>9%</td>
+      <td>~9%</td>
+    </tr>
+    <tr>
+      <td>0.5</td>
+      <td>25%</td>
+      <td>~25%</td>
+    </tr>
+    <tr>
+      <td>0.7</td>
+      <td>51%</td>
+      <td>~51%</td>
+    </tr>
+    <tr>
+      <td>0.9</td>
+      <td>19%</td>
+      <td>~81%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>At HelloFresh, revenue metrics often have relatively high week-to-week correlation for returning customers, which makes CUPED particularly effective.</p>
+
+<h1 id="choosing-your-covariate">Choosing your covariate</h1>
+
+<p>The covariate does not have to be the same metric you are measuring. Any variable that correlates with your outcome and was measured before the experiment can be used. In practice, the pre-experiment value of the same metric is almost always the best choice: it tends to have the highest correlation, and it is straightforward to justify.</p>
+
+<p>A few principles for covariate selection:</p>
+
+<p><strong>The covariate must be measured before the experiment starts.</strong> Using a variable measured during the experiment risks contamination — the covariate itself could be affected by the treatment, which would corrupt the adjustment.</p>
+
+<p><strong>Higher correlation means more variance reduction.</strong> If you have multiple candidate covariates, the one most correlated with your outcome metric will give the greatest benefit. You can also combine multiple covariates using regression adjustment, though the marginal gains beyond the single best covariate are usually small.</p>
+
+<p><strong>The covariate must be independent of the treatment assignment.</strong> Pre- experiment data satisfies this by definition, as long as it is collected before randomisation.</p>
+
+<h1 id="choosing-the-lookback-window">Choosing the lookback window</h1>
+
+<p>The lookback window — how far back you go to calculate the pre-experiment covariate — affects the correlation and therefore the variance reduction.</p>
+
+<p>A window that is too short may not reflect stable behaviour, particularly for metrics that are bursty or seasonal. A window that is too long may include periods where user behaviour was structurally different from the present, reducing the predictive power of the covariate.</p>
+
+<p>In practice, a lookback of the same duration as the experiment is a reasonable starting point. For subscription businesses or contexts with strong loyalty patterns, the average customer lifetime or the average repurchase cycle is a natural anchor. A window of four to eight weeks tends to capture stable purchasing behaviour without reaching back into seasonally different periods.</p>
+
+<h1 id="limitations">Limitations</h1>
+
+<p>CUPED requires pre-experiment data. For new users who have no prior history — a common case for acquisition experiments — no covariate is available, and CUPED cannot be applied. In these situations, stratified randomisation or other variance reduction techniques are more appropriate.</p>
+
+<p>The quality of the pre-experiment data matters. If the covariate is measured with error, or if the lookback period includes anomalies (a major promotional event, a platform outage), the adjustment can be noisy or biased. Garbage in, garbage out.</p>
+
+<p>Finally, CUPED assumes a linear relationship between the covariate and the outcome. In most practical cases this is a reasonable approximation, but where the relationship is strongly non-linear, more flexible adjustment methods — such as MLRATE or doubly robust estimators — may perform better.</p>
+
+<h1 id="summary">Summary</h1>
+
+<p>CUPED reduces the variance of your experiment estimates by removing the component of variation that is predictable from pre-experiment behaviour. The degree of variance reduction is determined by the correlation between your covariate and your outcome metric. In practical terms, this translates into either faster experiments (smaller required sample sizes) or more sensitive ones (ability to detect smaller effects).</p>
+
+<p>It is not a silver bullet — it requires pre-experiment data, is most effective for returning users, and depends on a linear relationship between covariate and outcome. But for metric-heavy experimentation platforms where reducing sample size requirements has real business value, it is one of the most impactful tools available.</p>
+
+<h1 id="references">References</h1>
+<ol class="bibliography"></ol>
+
+            
+
+
+
+
+
+
+
+<nav class='post-nav'>
+    <div class='post-nav-older'>
+        <span class='post-nav-label'>Older</span><a href='/blog/2025/06/13/stratification-ab-testing/'>Is this Simpson's Paradox?</a>
+    </div>
+    <div class='post-nav-newer'>
+        
+    </div>
+    <p class='post-nav-all'><a href='/stats/'>All statistics</a></p>
+</nav>
+
+
+        </div>
+        
+        <div id='bibliography'>
+            <div class='wrap'>
+                <ol class="bibliography"></ol>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

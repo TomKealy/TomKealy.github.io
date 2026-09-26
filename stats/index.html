@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Statistics | Thomas Kealy</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Statistics" />
+<meta name="author" content="Thomas Kealy" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Posts on hypothesis testing, experimentation, regression and time series." />
+<meta name="twitter:description" property="og:description" content="Posts on hypothesis testing, experimentation, regression and time series." />
+<link rel="canonical" href="https://tomkealy.github.io/stats/" />
+<meta property="og:url" content="https://tomkealy.github.io/stats/" />
+<meta property="og:site_name" content="Thomas Kealy" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Statistics" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Thomas Kealy"},"description":"Posts on hypothesis testing, experimentation, regression and time series.","headline":"Statistics","url":"https://tomkealy.github.io/stats/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link type="application/atom+xml" rel="alternate" href="https://tomkealy.github.io/feed.xml" title="Thomas Kealy" />
+    <link rel='preload' href='/fonts/fraunces-latin.woff2' as='font' type='font/woff2' crossorigin>
+    <link rel='icon' type='image/png' href='/favicon.png'>
+    <link href='/css/blog.css' rel='stylesheet'/>
+    <link href='/css/theme.css' rel='stylesheet'/>
+    <!-- KaTeX: renders $...$, $$...$$, \(...\) and \[...\] in the browser -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "\\(", right: "\\)", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+</script>
+
+</head>
+<body class='section-stats'>
+    <header class='masthead'>
+    <div class='stripes' aria-hidden='true'><span></span><span></span><span></span><span></span></div>
+    <nav class='wrap masthead-inner' aria-label='Main'>
+        <a class='wordmark' href='/'>Tom Kealy</a>
+        <ul class='nav-links'>
+            <li class='nav-stats'><a href='/stats/'>Statistics</a></li>
+            <li class='nav-essays'><a href='/essays/'>Essays</a></li>
+            <li class='nav-about'><a href='/about/'>About</a></li>
+            <li class='nav-rss'><a href='/feed.xml'>RSS</a></li>
+        </ul>
+    </nav>
+</header>
+
+    <div id='blog' class='wrap'>
+        
+<div id='intro'>
+    <p>Technical posts on A/B testing, hypothesis testing, regression, time series and related methods.</p>
+</div>
+
+<div class='section'>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2026/09/26/intro-to-cuped/">
+                CUPED — making your A/B tests more sensitive
+            </a>
+        </p>
+        <p class='post-date'>26 September 2026</p>
+        
+        <p class='post-subtitle'>How pre-experiment data can help you detect smaller effects with fewer users.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2025/06/13/stratification-ab-testing/">
+                Is this Simpson's Paradox?
+            </a>
+        </p>
+        <p class='post-date'>13 June 2025</p>
+        
+        <p class='post-subtitle'>A common misdiagnosis in A/B test results, and how to tell the difference.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2025/05/29/sequential-testing/">
+                Sequential testing — making decisions before your experiment ends
+            </a>
+        </p>
+        <p class='post-date'>29 May 2025</p>
+        
+        <p class='post-subtitle'>Why peeking at results inflates your false positive rate, and how sequential testing fixes it.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2025/02/02/way-too-much-about-linear-regression/">
+                Way too much about linear regression.
+            </a>
+        </p>
+        <p class='post-date'>02 February 2025</p>
+        
+        <p class='post-subtitle'>There's a lot of details</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2025/01/15/ab-testing-for-bidding-strategies/">
+                AB testing Google Ads Bidding strategies
+            </a>
+        </p>
+        <p class='post-date'>15 January 2025</p>
+        
+        <p class='post-subtitle'>Hypothesis testing with dependent samples.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2025/01/15/kernel-mmd/">
+                Kernel-MMD-Hypothesis Testing without assumptions
+            </a>
+        </p>
+        <p class='post-date'>15 January 2025</p>
+        
+        <p class='post-subtitle'>What to do if you can't assume anything about your distributions.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2025/01/13/testing-by-betting/">
+                Hypothesis Testing by Betting
+            </a>
+        </p>
+        <p class='post-date'>13 January 2025</p>
+        
+        <p class='post-subtitle'>A simpler alternative to $p$-values.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2025/01/10/intro-to-martingales/">
+                A short introduction to Martingales
+            </a>
+        </p>
+        <p class='post-date'>10 January 2025</p>
+        
+        <p class='post-subtitle'>One way to think about dependent random variables.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2024/11/19/how-wide-should-your-CI-be/">
+                How wide should your confidence interval be?
+            </a>
+        </p>
+        <p class='post-date'>19 November 2024</p>
+        
+        <p class='post-subtitle'>A short, hands-on, guide.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2024/10/28/what-p-values-mean/">
+                What p-values really mean
+            </a>
+        </p>
+        <p class='post-date'>28 October 2024</p>
+        
+        <p class='post-subtitle'>Most people get $p$-values wrong. This is how to understand and apply them correctly.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2024/10/09/compressive-sensing/">
+                An introduction to Compressive Sensing.
+            </a>
+        </p>
+        <p class='post-date'>09 October 2024</p>
+        
+        <p class='post-subtitle'>Short, fat matrices are useful, actually.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2024/10/09/approaches-to-multiple-testing/">
+                A Grab Bag of Approaches to Frequentist Multiple Testing.
+            </a>
+        </p>
+        <p class='post-date'>09 October 2024</p>
+        
+        <p class='post-subtitle'>Pick your poison.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2024/05/16/Must-we-adjust-p-values-if-we-test-multiple-hypotheses/">
+                Must we adjust p-values if we test multiple hypotheses?
+            </a>
+        </p>
+        <p class='post-date'>16 May 2024</p>
+        
+        <p class='post-subtitle'>Yes, yes you must</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2024/02/04/bayesian-sequential-hypothesis-testing/">
+                Bayesian Sequential Hypothesis Testing
+            </a>
+        </p>
+        <p class='post-date'>04 February 2024</p>
+        
+        <p class='post-subtitle'>Frequentist algorithms are often Bayesian.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2024/02/02/sequential-hypothesis-testing/">
+                Sequential Hypothesis Testing
+            </a>
+        </p>
+        <p class='post-date'>02 February 2024</p>
+        
+        <p class='post-subtitle'>Hypothesis testing step-by-step.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2022/07/03/conda-and-jupyter-notebook/">
+                Running Conda environments from Jupyter Notebook.
+            </a>
+        </p>
+        <p class='post-date'>03 July 2022</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/10/10/gradient-descent/">
+                An introduction to Gradient Descent
+            </a>
+        </p>
+        <p class='post-date'>10 October 2021</p>
+        
+        <p class='post-subtitle'>How to optimise basically any function.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/08/13/Time-Series-with-GAMS/">
+                Time Series with GAMs
+            </a>
+        </p>
+        <p class='post-date'>13 August 2021</p>
+        
+        <p class='post-subtitle'>Time series without time.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/08/13/Structural-Time-Series-in-PyMC3/">
+                Structural Time Series in PyMC!
+            </a>
+        </p>
+        <p class='post-date'>13 August 2021</p>
+        
+        <p class='post-subtitle'>Same ideas, different framework.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/08/10/The-Guts-Of-GAMs/">
+                Understanding the Guts of Generalized Additive Models (GAMs) with Hands-on Examples.
+            </a>
+        </p>
+        <p class='post-date'>10 August 2021</p>
+        
+        <p class='post-subtitle'>Generalised Additive Models look harder than they actually are.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/06/21/Neural-Netwroks-From-Scratch/">
+                Neural Networks from scratch.
+            </a>
+        </p>
+        <p class='post-date'>21 June 2021</p>
+        
+        <p class='post-subtitle'>NNs are easier than you think</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/06/07/bayesian-structural-time-series-in-pystan/">
+                Bayesian Structural Time Series in pystan.
+            </a>
+        </p>
+        <p class='post-date'>07 June 2021</p>
+        
+        <p class='post-subtitle'>Adding time varying components to time varying regression</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/03/05/More-Complex-Regularised-Linear-Regressions/">
+                More Complex (Linear) Regressions
+            </a>
+        </p>
+        <p class='post-date'>05 March 2021</p>
+        
+        <p class='post-subtitle'>We extend our ideas of how to do regression to a more complex class of functions.</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/03/02/Local-Linear-trend-models-for-time-series/">
+                Local Linear Trend models for time series
+            </a>
+        </p>
+        <p class='post-date'>02 March 2021</p>
+        
+        <p class='post-subtitle'>Simple time-varying regression</p>
+        
+    </div>
+    
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="/blog/2021/01/01/Mixed-Models/">
+                Mixed Models
+            </a>
+        </p>
+        <p class='post-date'>01 January 2021</p>
+        
+        <p class='post-subtitle'>How to handle struture in your regressions</p>
+        
+    </div>
+    
+</div>
+
+
+    </div>
+</body>
+</html>

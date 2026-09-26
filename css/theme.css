@@ -1,0 +1,193 @@
+/* ==========================================================================
+   Theme: 70s colour on Tufte paper.
+   Loaded after blog.css / markdown.css so it overrides them.
+   Palette: orange peel + blueberry (the two Nooma pieces), dusty pink,
+   tomato red (deliberately not cadmium). Paper is Tufte's #fffff8.
+   Orange and pink are for fills, borders and underlines only; they are too
+   light for text on this paper.
+   ========================================================================== */
+
+@font-face {
+  font-family: "ET Book";
+  src: url("/fonts/et-book-roman-line-figures.woff") format("woff");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "ET Book";
+  src: url("/fonts/et-book-display-italic-old-style-figures.woff") format("woff");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "ET Book";
+  src: url("/fonts/et-book-bold-line-figures.woff") format("woff");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("/fonts/fraunces-latin.woff2") format("woff2");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+
+:root {
+  --paper: #fffff8;
+  --ink: #23223b;          /* fountain-pen blue-black */
+  --ink-soft: #5d5b72;
+  --orange: #e4732c;       /* orange peel */
+  --blue: #3e4c8a;         /* blueberry */
+  --pink: #efa3b5;
+  --tomato: #c7432f;
+  --dot: rgba(35, 34, 59, 0.14);
+  --accent: var(--tomato); /* pages without a section */
+  --serif: "ET Book", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --display: "Fraunces", "Cooper Black", Georgia, serif;
+}
+.section-stats  { --accent: var(--blue); }
+.section-essays { --accent: var(--orange); }
+
+/* Leuchtturm dot grid, 5 mm pitch */
+html {
+  font-family: var(--serif);
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.4px);
+  background-size: 19px 19px;
+  line-height: 1.6;
+}
+body { background: transparent; color: var(--ink); }
+
+h1, h2, h3, h4, h5, h6,
+.front-matter h4,
+.front-matter .bylines .byline h3,
+.front-matter .bylines .byline p {
+  font-family: var(--display);
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  color: var(--ink);
+}
+
+a { color: var(--ink); text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:hover { color: var(--blue); }
+a:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 2px; }
+
+/* ---------- Masthead: the one loud thing ---------- */
+.masthead { margin-bottom: 10px; }
+.stripes span { display: block; height: 7px; }
+.stripes span:nth-child(1) { background: var(--orange); }
+.stripes span:nth-child(2) { background: var(--pink); }
+.stripes span:nth-child(3) { background: var(--tomato); }
+.stripes span:nth-child(4) { background: var(--blue); }
+
+.masthead-inner {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 8px 24px;
+  padding: 22px 16px 0; box-sizing: border-box;
+}
+.wordmark {
+  font-family: var(--display);
+  font-size: 34px; font-weight: 750; letter-spacing: -0.01em;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+  text-decoration: none; color: var(--ink);
+}
+.wordmark:hover { color: var(--tomato); }
+.nav-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.nav-links a {
+  font-family: var(--display); font-size: 17px; font-weight: 500;
+  font-variation-settings: "SOFT" 100;
+  text-decoration: none; color: var(--ink);
+  border-bottom: 3px solid var(--link-colour, var(--ink));
+  padding-bottom: 1px;
+}
+.nav-links a:hover { border-bottom-width: 6px; color: var(--ink); }
+.nav-stats  { --link-colour: var(--blue); }
+.nav-essays { --link-colour: var(--orange); }
+.nav-about  { --link-colour: var(--pink); }
+.nav-rss    { --link-colour: var(--tomato); }
+
+/* ---------- Listing pages (home, stats, essays) ---------- */
+#blog { margin-top: 40px; padding: 0 16px; box-sizing: border-box; }
+#blog #intro {
+  font-family: var(--serif); font-style: normal;
+  font-size: 22px; line-height: 1.45; margin-bottom: 36px;
+}
+#blog .section-heading {
+  font-family: var(--display); font-size: 30px; font-weight: 650;
+  text-transform: none; letter-spacing: 0; color: var(--ink);
+  border-bottom: none; margin: 48px 0 18px; padding: 0;
+  display: flex; align-items: center; gap: 12px;
+}
+#blog .section-heading::before {          /* bullet-journal signifier */
+  content: ""; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent); flex: none;
+}
+#blog .post-row { position: relative; padding-left: 26px; margin-bottom: 22px; }
+#blog .post-row::before {
+  content: ""; position: absolute; left: 3px; top: 9px;
+  width: 9px; height: 9px; border-radius: 50%; background: var(--accent);
+}
+#blog .post-title { display: block; margin: 0; font-size: 21px; line-height: 1.25; }
+#blog .post-title a {
+  font-family: var(--display); font-size: inherit; font-weight: 560; line-height: inherit;
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  text-decoration: none;
+}
+#blog .post-title a:hover { text-decoration: underline; text-decoration-color: var(--accent); }
+#blog .post-date {
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  text-transform: none; font-size: 16px; color: var(--ink-soft); margin: 2px 0 0;
+}
+#blog .post-subtitle { font-size: 17px; margin: 2px 0 0; color: var(--ink); }
+#blog .see-all { font-style: italic; font-size: 18px; margin: 4px 0 0 26px; }
+
+/* ---------- Post pages ---------- */
+.front-matter { border: none; padding: 36px 0 12px; }
+.front-matter .wrap {
+  border-left: 12px solid var(--accent);
+  padding-left: 22px; box-sizing: border-box;
+}
+.front-matter h1 {
+  font-size: 44px; line-height: 1.08; font-weight: 700; margin: 0 0 12px;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+}
+.front-matter h4 {
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-size: 21px; line-height: 1.35; margin: 0 0 14px;
+}
+.front-matter .bylines .byline h3 { display: none; }
+.front-matter .bylines .byline p {
+  font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink-soft);
+}
+
+.article { font-family: var(--serif); font-size: 20px; line-height: 1.6; color: var(--ink); margin-top: 36px; padding: 0 16px; box-sizing: border-box; }
+.article h1, .article h2 { font-size: 30px; font-weight: 650; border-bottom: none; padding-bottom: 0; padding-top: 0.6em; }
+.article h3 { font-size: 23px; font-weight: 600; }
+.article blockquote { color: var(--ink-soft); border-left: 4px solid var(--accent); font-style: italic; }
+.article hr { border-top: 2px solid var(--accent); }
+.article pre, .article code, .article div.highlight { background-color: var(--paper); }
+.article img { max-width: 100%; height: auto; background: var(--paper); }
+.article table { background: var(--paper); border-collapse: collapse; font-family: var(--serif); font-size: 17px; font-variant-numeric: tabular-nums; }
+.article th, .article td { padding: 4px 12px; border-bottom: 1px solid rgba(35, 34, 59, 0.2); text-align: left; }
+.article th { border-bottom: 2px solid var(--ink); font-weight: 700; }
+.markdown-body { font-family: var(--serif); color: var(--ink); }
+
+/* Series box and previous/next */
+.series {
+  border: none; border-left: 6px solid var(--accent); border-radius: 0;
+  background: var(--paper); padding: 10px 16px; font-size: 18px;
+}
+.series .series-label { font-style: italic; }
+.series .series-current { font-weight: 700; }
+.post-nav { border-top: 2px solid var(--accent); font-size: 18px; }
+.post-nav a { font-family: var(--display); font-weight: 520; text-decoration: none; font-variation-settings: "SOFT" 100; }
+.post-nav a:hover { text-decoration: underline; text-decoration-color: var(--accent); }
+.post-nav-label {
+  font-family: var(--serif); font-style: italic; text-transform: none;
+  font-size: 15px; color: var(--ink-soft); letter-spacing: 0;
+}
+.post-nav-all a { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 17px; text-decoration: underline; text-decoration-color: var(--accent); }
+
+@media (max-width: 600px) {
+  .wordmark { font-size: 28px; }
+  .front-matter h1 { font-size: 34px; }
+  .article { font-size: 18px; }
+  #blog #intro { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
