@@ -1,5 +1,7 @@
 ---
 layout: default
+series: sequential-testing
+section: stats
 title:  "A short introduction to Martingales"
 subtitle: One way to think about dependent random variables.
 date:   2025-01-10

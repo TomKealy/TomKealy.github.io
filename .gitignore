@@ -8,7 +8,6 @@ drafts/*
 # Bundler files
 .bundle/
 vendor/
-Gemfile.lock
 
 # System files
 .DS_Store

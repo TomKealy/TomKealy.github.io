@@ -242,4 +242,53 @@ hr {
   body {
     margin: 0 7px;
   }
+}/* Section headings on the home page */
+#blog .section-heading {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 6px;
+  margin-top: 40px;
 }
+#blog .see-all {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Series box at the top of a post */
+.series {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 20px 0 30px;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.02);
+}
+.series .series-label { margin: 0 0 6px; }
+.series ol { margin: 0; padding-left: 20px; }
+.series li { margin: 3px 0; }
+.series .series-current { font-weight: bold; }
+
+/* Previous / next links at the bottom of a post */
+.post-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 50px;
+  padding-top: 20px;
+  font-size: 15px;
+}
+.post-nav > div { flex: 1 1 45%; min-width: 200px; }
+.post-nav-newer { text-align: right; }
+.post-nav-label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 4px;
+}
+.post-nav-all { flex-basis: 100%; text-align: center; font-size: 13px; margin: 10px 0 30px; }

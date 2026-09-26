@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title:  Mixed Models
 subtitle: How to handle struture in your regressions
 date:   2021-01-01

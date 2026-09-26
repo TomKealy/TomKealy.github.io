@@ -1,0 +1,12 @@
+---
+layout: listing
+section: stats
+title: Statistics
+description: Posts on hypothesis testing, experimentation, regression and time series.
+permalink: /stats/
+---
+{% assign stats = site.posts | where: "section", "stats" %}
+<div id='intro'>
+    <p>Technical posts on A/B testing, hypothesis testing, regression, time series and related methods.</p>
+</div>
+{% include post-list.html posts=stats %}

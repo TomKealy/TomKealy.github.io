@@ -1,0 +1,4 @@
+# Series id (used in post front matter as `series: <id>`) -> display title
+madness-and-civilisation: "Reading Foucault's Madness and Civilisation"
+aristotle-politics: "Reading Aristotle's Politics"
+sequential-testing: "Sequential and anytime-valid testing"

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Energiewende or Energieselbsmord?
+title: Energiewende or Energieselbstmord?
 date:   2024-04-08
 categories: philosophy
 ---
@@ -11,14 +11,14 @@ Germans thought that renewable energy was a wise investment. In 2010 they announ
 
 However, the Energiewende has been mostly a failure. As of 2018 Germany was the fifth-largest consumer of oil in the world,  accounting for 34.3% of all energy use in 2018. Another 23.7% came from natural gas. In terms of reducing CO2 emissions Germany has comparatively done less well than international peers. In Ontario last year electricity emissions were 76g CO2/kWh,  the UK's were 200. France, next door to Germany, emitted 39 g CO2eq/kWh. And Germany’s? A whopping 400. All that installed capacity means nothing if you don’t use it.
 
-![Two distribution](/assets/images/Energiewende or Energieselbsmord?/fig1.webp)
+![Two distribution](/assets/images/energiewende/fig1.webp)
 Figure 1. German Energy output fell from a high of 600 TWh in 2016 to 500 TWh in 2023.
 
 Germany's energy aspirations have hit hard realities. Despite ambitious targets, new renewable projects are stymied by local opposition. The country has seen its energy production capacity plummet by 15% since 2016, despite being Europe's largest electricity market. The economic repercussions are stark—industrial output is dwindling. In some sectors, like chemical production, outputs are hitting lows not seen since ABBA was on the charts.
 
 
 
-![Two distribution](/assets/images/Energiewende or Energieselbsmord?/fig2.jpg)
+![Two distribution](/assets/images/energiewende/fig2.jpg)
 Figure 2. Industrial output fell again Dec, with a sharp drop in the energy-intensive sector (red line). Annual data now shows that German chemical production has plunged to a 28-year low.
 
 Germany’s dilemma is that its renewable energy sources are not enough to meet its energy demands. In fact  Germany imported over 63% of its energy in 2021, with a heavy reliance on Russian gas. This is not only geopolitically volatile, but actively against Germany’s political interests. Further, the country has delayed closing its coal plants until 2038. 

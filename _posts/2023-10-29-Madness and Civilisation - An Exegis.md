@@ -1,6 +1,7 @@
 ---
 layout: default
-title: Madness and Civilisation - An Exegis.
+series: madness-and-civilisation
+title: Madness and Civilisation - An Exegesis.
 subtitle: The Preface and Stultifera Navis
 date:   2023-10-29
 categories: philosophy

@@ -1,5 +1,7 @@
 ---
 layout: default
+series: sequential-testing
+section: stats
 title: Sequential testing — making decisions before your experiment ends
 subtitle: Why peeking at results inflates your false positive rate, and how sequential testing fixes it.
 categories: statistics, experimentation

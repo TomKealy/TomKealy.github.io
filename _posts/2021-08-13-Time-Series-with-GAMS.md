@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title:  "Time Series with GAMs"
 subtitle: Time series without time.
 date:   2021-08-13

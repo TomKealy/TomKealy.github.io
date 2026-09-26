@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title: More Complex (Linear) Regressions
 subtitle: We extend our ideas of how to do regression to a more complex class of functions.
 date:   2021-03-05

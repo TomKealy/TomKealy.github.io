@@ -9,8 +9,6 @@ You’ve taken up a new creative pursuit, and it was fun at first. Maybe it was 
 
 Of course, that day doesn't come. And you feel bad. Bad about the camera, bad about the pictures your not taking, and bad that you miss whatever inner impulse led you to buy the camera in the first place.
 
-Thanks for reading Thomas’s Newsletter! Subscribe for free to receive new posts and support my work.
-
 Or maybe you’re an old hand at your craft. You’ve been around the block a few times, you know all the words to all the songs, but they’ve lost their meaning. You find that you’re just singing the tune, mouthing the words, but what they mean, what they mean to you now, just totally eludes you.
 
 Congratulations, you’re creatively blocked. Join the club.

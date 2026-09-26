@@ -1,5 +1,7 @@
 ---
 layout: default
+series: sequential-testing
+section: stats
 title:  Hypothesis Testing by Betting
 subtitle: A simpler alternative to $p$-values.
 date:   2025-01-13

@@ -1,5 +1,6 @@
 ---
 layout: default
+series: aristotle-politics
 title:  Aristotle’s Politics, Book 1
 date:   2025-10-07
 ---

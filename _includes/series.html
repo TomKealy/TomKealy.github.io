@@ -1,0 +1,17 @@
+{% if page.series %}
+{% assign parts = site.posts | where: "series", page.series | sort: "date" %}
+{% assign series_title = site.data.series[page.series] | default: page.series %}
+{% for p in parts %}{% if p.url == page.url %}{% assign part_no = forloop.index %}{% endif %}{% endfor %}
+<div class='series'>
+    <p class='series-label'>Part {{ part_no }} of {{ parts.size }} in <strong>{{ series_title }}</strong></p>
+    <ol>
+    {% for p in parts %}
+        {% if p.url == page.url %}
+        <li class='series-current'>{{ p.title }}</li>
+        {% else %}
+        <li><a href='{{ p.url | relative_url }}'>{{ p.title }}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ol>
+</div>
+{% endif %}

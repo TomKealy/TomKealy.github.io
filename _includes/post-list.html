@@ -1,0 +1,16 @@
+{% comment %}Usage: {% include post-list.html posts=some_posts %}{% endcomment %}
+<div class='section'>
+    {% for post in include.posts %}
+    <div class='post-row'>
+        <p class='post-title'>
+            <a href="{{ post.url | relative_url }}">
+                {{ post.title }}
+            </a>
+        </p>
+        <p class='post-date'>{{ post.date | date_to_long_string }}</p>
+        {% if post.subtitle %}
+        <p class='post-subtitle'>{{ post.subtitle }}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>

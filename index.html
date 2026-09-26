@@ -1,60 +1,24 @@
 ---
-title: blog
+layout: listing
+title: Thomas Kealy
 ---
+{% assign stats = site.posts | where: "section", "stats" %}
+{% assign essays = site.posts | where: "section", "essays" %}
 
-<html>
-<head>
-    <title>Thomas Kealy</title>
-    <meta charset='UTF-8'>
-    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+<div id='intro'>
+    <p>I'm a data scientist in Berlin. I write about statistics and experimentation, and separately about politics, literature and how to live. <a href='/about/'>More about me.</a></p>
+</div>
 
-    <meta name='description' content='Thomas Kealy is a Data Scientist in Berlin.'>
-    <!-- A decent browser will parse this fine:
-         https://webmasters.stackexchange.com/questions/92744. -->
-    <meta name='keywords' content='
-        machine learning,
-        statistical machine learning,
-        bayesian inference,
-        statistics,
-        computational statistics,
-        linear algebra,
-        numerical linear algebra,
-        statistical software,
-        deep learning,
-        computer science
-    '>
-    <meta name='author' content='Gregory Gundersen'>
+<div class='section-stats'>
+<h2 class='section-heading'>Statistics</h2>
+{% assign recent_stats = stats | slice: 0, 5 %}
+{% include post-list.html posts=recent_stats %}
+<p class='see-all'><a href='/stats/'>See all {{ stats.size }} statistics posts</a></p>
+</div>
 
-    <link rel='shortcut icon' href='/favicon.png?v=e' />
-    <link href='/css/blog.css' rel='stylesheet'/>
-
-    {% include mathjax.html %}
-</head>
-<body>
-    {% include nav.html %}
-    <div id='blog' class='wrap'>
-        <div id='intro'>
-        </div>
-        <div id='posts' class='section'>
-            {% for post in site.posts %}
-            <div class='post-row'>
-                <p class='post-title'>
-                    <a href="{{ post.url }}">
-                        {% katexmm %}
-                        {{ post.title }}
-                        {% endkatexmm %}
-                    </a>
-                </p>
-                <p class='post-date'>{{ post.date | date_to_long_string }}</p>
-                </div>
-                <p class='post-subtitle'>
-                    {% katexmm %}
-                    {{ post.subtitle }}
-                    {% endkatexmm %}
-                </p>
-                <span class='hidden'>{{ forloop.index }}</span>
-        {% endfor %}
-        </div>
-    </div>
-</body>
-</html>
+<div class='section-essays'>
+<h2 class='section-heading'>Essays</h2>
+{% assign recent_essays = essays | slice: 0, 5 %}
+{% include post-list.html posts=recent_essays %}
+<p class='see-all'><a href='/essays/'>See all {{ essays.size }} essays</a></p>
+</div>

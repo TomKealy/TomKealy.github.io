@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title: Is this Simpson's Paradox?
 subtitle: A common misdiagnosis in A/B test results, and how to tell the difference.
 categories: statistics, experimentation

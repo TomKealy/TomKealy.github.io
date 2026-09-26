@@ -1,7 +1,8 @@
 ---
 layout: default
+section: stats
 title:  "An introduction to Compressive Sensing."
-subtitle: Short, fat matricesa are useful, actually.
+subtitle: Short, fat matrices are useful, actually.
 date:   2024-10-09
 categories: Compressive sensing.
 ---

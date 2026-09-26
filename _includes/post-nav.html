@@ -1,0 +1,18 @@
+{% comment %}Previous/next links, staying within the post's own section (stats or essays).{% endcomment %}
+{% if page.collection == "posts" %}
+{% assign in_section = site.posts | where: "section", page.section %}
+{% assign newer = nil %}{% assign older = nil %}
+{% for p in in_section %}{% if p.url == page.url %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
+{% if idx > 0 %}{% assign newer_idx = idx | minus: 1 %}{% assign newer = in_section[newer_idx] %}{% endif %}
+{% assign older_idx = idx | plus: 1 %}{% assign older = in_section[older_idx] %}
+{% if page.section == "stats" %}{% assign section_name = "statistics" %}{% assign section_url = "/stats/" %}{% else %}{% assign section_name = "essays" %}{% assign section_url = "/essays/" %}{% endif %}
+<nav class='post-nav'>
+    <div class='post-nav-older'>
+        {% if older %}<span class='post-nav-label'>Older</span><a href='{{ older.url | relative_url }}'>{{ older.title }}</a>{% endif %}
+    </div>
+    <div class='post-nav-newer'>
+        {% if newer %}<span class='post-nav-label'>Newer</span><a href='{{ newer.url | relative_url }}'>{{ newer.title }}</a>{% endif %}
+    </div>
+    <p class='post-nav-all'><a href='{{ section_url }}'>All {{ section_name }}</a></p>
+</nav>
+{% endif %}

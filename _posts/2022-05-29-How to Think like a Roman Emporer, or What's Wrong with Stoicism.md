@@ -1,6 +1,6 @@
 ---
 layout: default
-title: How to Think like a Roman Emporer, or What's Wrong with Stoicism.
+title: How to Think like a Roman Emperor, or What's Wrong with Stoicism.
 date:   2022-05-29
 categories: book-review
 ---

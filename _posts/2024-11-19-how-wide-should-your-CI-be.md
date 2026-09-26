@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title:  How wide should your confidence interval be?
 subtitle: A short, hands-on, guide.
 date: 2024-11-19

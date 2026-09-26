@@ -1,5 +1,6 @@
 ---
 layout: default
+series: aristotle-politics
 title:  Aristotle's Politics Books 2 & 3
 date:   2025-10-20
 ---

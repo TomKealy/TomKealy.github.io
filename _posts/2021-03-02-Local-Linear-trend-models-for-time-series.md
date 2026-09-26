@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title:  Local Linear Trend models for time series
 subtitle: Simple time-varying regression
 date:   2021-03-02

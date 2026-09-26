@@ -1,5 +1,7 @@
 ---
 layout: default
+series: sequential-testing
+section: stats
 title:  "Sequential Hypothesis Testing"
 subtitle: Hypothesis testing step-by-step.
 date:   2024-02-02

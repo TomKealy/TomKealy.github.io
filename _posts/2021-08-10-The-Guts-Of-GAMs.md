@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title:  "Understanding the Guts of Generalized Additive Models (GAMs) with Hands-on Examples."
 subtitle: Generalised Additive Models look harder than they actually are.
 date:   2021-08-10

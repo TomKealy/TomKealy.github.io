@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title: What p-values really mean
 subtitle: Most people get $p$-values wrong. This is how to understand and apply them correctly.
 categories: statistics, hypothesis testing

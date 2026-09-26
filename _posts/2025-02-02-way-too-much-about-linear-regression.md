@@ -1,5 +1,6 @@
 ---
 layout: default
+section: stats
 title:  Way too much about linear regression.
 subtitle: There's a lot of details
 date:   2025-02-02

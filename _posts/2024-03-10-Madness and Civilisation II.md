@@ -1,5 +1,6 @@
 ---
 layout: default
+series: madness-and-civilisation
 title: Madness and Civilisation II
 subtitle: The Great Confinement + The Insane
 date:   2024-03-10

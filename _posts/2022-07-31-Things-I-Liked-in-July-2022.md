@@ -9,8 +9,6 @@ categories: things-i-liked
 
 It’s difficult to think of any Fast and Furious film without the hard cuts and frenetic racing. And similarly no Tarkovsky would be complete without a haunting and meditative long take. This is a strategy to teach the audience how to watch the film. Every film has to invent a new visual language to tell its story, just like a writer has to carve out a foreign language in their mother tongue. A director could  just use standard film grammar, long established by Hollywood. Wide establishing shots, followed by mediums to set the scene, then close ups in a shot/reverse shot sequence as the actors say their lines. Of course, that would be boring.
 
-Thanks for reading Thomas’s Newsletter! Subscribe for free to receive new posts and support my work.
-
 I'm glad this film chose something different instead. This film is extravagant, over the top, schizophrenic (find the right word here). The camera is gymnastic: It pans and rotates, tracks from extreme wide to extreme close. The editing is frenetic, energetic, fun. It's totally a Baz Luhrmann film.
 
 And what could be more appropriate for the subject? When you think of Elvis you think of excess: Excessive talent, excessive charisma, excessive appetite.

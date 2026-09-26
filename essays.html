@@ -1,0 +1,12 @@
+---
+layout: listing
+section: essays
+title: Essays
+description: Essays on politics, literature, film, work and how to live.
+permalink: /essays/
+---
+{% assign essays = site.posts | where: "section", "essays" %}
+<div id='intro'>
+    <p>Essays on politics, books, drama, film, work and how to live.</p>
+</div>
+{% include post-list.html posts=essays %}

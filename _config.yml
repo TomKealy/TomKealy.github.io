@@ -1,21 +1,32 @@
+title: Thomas Kealy
+description: Thomas Kealy is a data scientist in Berlin, writing about statistics, experimentation, politics, literature and how to live.
+author: Thomas Kealy
+url: "https://tomkealy.github.io"
+lang: en_GB
+
 markdown: kramdown
 kramdown:
   math_engine: mathjax
-
-kramdown:
   parse_block_html: true
 
 highlighter: rouge
 permalink: /blog/:year/:month/:day/:title/
 environment: prod
-url: "http://gregorygundersen.com"
+
+# Every post is an essay unless its front matter says `section: stats`
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: default
+      section: essays
 
 plugins:
   - jekyll-scholar
   - jekyll-sitemap
   - jekyll-feed
   - jekyll-seo-tag
-  - jekyll-katex
 
 scholar:
   style: apa
