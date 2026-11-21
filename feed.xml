@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en_GB"><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://tomkealy.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tomkealy.github.io/" rel="alternate" type="text/html" hreflang="en_GB" /><updated>2026-09-26T19:51:24+00:00</updated><id>https://tomkealy.github.io/feed.xml</id><title type="html">Thomas Kealy</title><subtitle>Thomas Kealy is a data scientist in Berlin, writing about statistics, experimentation, politics, literature and how to live.</subtitle><author><name>Thomas Kealy</name></author><entry><title type="html">CUPED — making your A/B tests more sensitive</title><link href="https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/" rel="alternate" type="text/html" title="CUPED — making your A/B tests more sensitive" /><published>2026-09-26T00:00:00+00:00</published><updated>2026-09-26T00:00:00+00:00</updated><id>https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped</id><content type="html" xml:base="https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/"><![CDATA[<h1 id="introduction">Introduction</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en_GB"><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://tomkealy.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tomkealy.github.io/" rel="alternate" type="text/html" hreflang="en_GB" /><updated>2026-11-21T12:04:27+00:00</updated><id>https://tomkealy.github.io/feed.xml</id><title type="html">Thomas Kealy</title><subtitle>Thomas Kealy is a data scientist in Berlin, writing about statistics, experimentation, politics, literature and how to live.</subtitle><author><name>Thomas Kealy</name></author><entry><title type="html">CUPED — making your A/B tests more sensitive</title><link href="https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/" rel="alternate" type="text/html" title="CUPED — making your A/B tests more sensitive" /><published>2026-09-26T00:00:00+00:00</published><updated>2026-09-26T00:00:00+00:00</updated><id>https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped</id><content type="html" xml:base="https://tomkealy.github.io/blog/2026/09/26/intro-to-cuped/"><![CDATA[<h1 id="introduction">Introduction</h1>
 
 <p>Every A/B test is a signal-to-noise problem. The signal is the effect of your intervention: the lift in conversion rate, the change in revenue per customer. The noise is everything else: the natural variation in how people behave, regardless of what you showed them.</p>
 
@@ -121,7 +121,488 @@ mean)</li>
 <p>It is not a silver bullet — it requires pre-experiment data, is most effective for returning users, and depends on a linear relationship between covariate and outcome. But for metric-heavy experimentation platforms where reducing sample size requirements has real business value, it is one of the most impactful tools available.</p>
 
 <h1 id="references">References</h1>
-<ol class="bibliography"></ol>]]></content><author><name>Thomas Kealy</name></author><category term="statistics," /><category term="experimentation" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Slacking as Self-Care</title><link href="https://tomkealy.github.io/blog/2026/02/05/Slacking-as-Self-Care/" rel="alternate" type="text/html" title="Slacking as Self-Care" /><published>2026-02-05T00:00:00+00:00</published><updated>2026-02-05T00:00:00+00:00</updated><id>https://tomkealy.github.io/blog/2026/02/05/Slacking%20as%20Self-Care</id><content type="html" xml:base="https://tomkealy.github.io/blog/2026/02/05/Slacking-as-Self-Care/"><![CDATA[<p>So this one time I was at a job interview at a supermarket chain based out of Welwyn Garden City and I was asked “what would you say is your biggest flaw?” Or something like that. What sticks out in memory is how cheap the office was furnished for a company which amounted to a 1 pound in every eight spent in the UK. The excuse they gave was that everything they did was ‘for the customer’ and no frills were spent on staff. Anyway, I was canny enough to understand that you don’t say something like “I’m a cold-hearted bastard” or “I’m on medication for anxiety” or “I collapse under pressure.” I realised that you’re supposed to say something which is a strength and instead make it look like a flaw. So I said that I’m a perfectionist and that everything has to be correct and that I really couldn’t even sleep if I thought I’d done a bad job. The interviewer - someone from HR - smiled in a way which is now reminiscent of an expert hunter and we moved on.</p>
+<ol class="bibliography"></ol>]]></content><author><name>Thomas Kealy</name></author><category term="statistics," /><category term="experimentation" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Auditing a gender pay gap</title><link href="https://tomkealy.github.io/blog/2026/08/22/gender-pay-gap/" rel="alternate" type="text/html" title="Auditing a gender pay gap" /><published>2026-08-22T00:00:00+00:00</published><updated>2026-08-22T00:00:00+00:00</updated><id>https://tomkealy.github.io/blog/2026/08/22/gender-pay-gap</id><content type="html" xml:base="https://tomkealy.github.io/blog/2026/08/22/gender-pay-gap/"><![CDATA[<h1 id="introduction">Introduction</h1>
+
+<p>The EU Pay Transparency Directive (missing reference) requires employers with 100 or more staff to report pay gaps and, where the gap within a category of workers is 5% or more and can’t be justified, to carry out a joint pay assessment with workers’ representatives. Member states were meant to transpose it by 7 June 2026; Germany missed that deadline. Meanwhile, in October 2025 the German Federal Labour Court (BAG) ruled that a woman can establish a presumption of pay discrimination by pointing to a single male colleague doing equal work who is paid more, without reference to medians or group averages (missing reference).</p>
+
+<p>All of these rules turn on statistical questions, and all behave in ways worth understanding before anyone relies on them. To help practitioners estimate the gender pay gap in their organisation I have created a simulated dataset: <em>Hollowmere General Hospital</em> is a fictional English hospital with 1,800 staff in 37 professions: doctors in eight specialties, nurses and midwives, physiotherapists and radiographers, biomedical and clinical scientists, pharmacists, porters, cleaners, cooks, security officers, secretaries, and the finance, HR and IT people who run the day to day admin. These fictional people have fictional salaries, and those salaries are unequal. So we can audit the salaries by inspecting the salary list, and see if they discriminate agaist women in any way. The advantage of a fictional hospital is that we already know the truth: we built the gaps in, so we can see which methods find them and which ones mislead. The code that generates the hospital and every figure below is linked at the end.</p>
+
+<p>There is a legal reason to care about doing this well. The EU Pay Transparency Directive (missing reference) requires employers with 100 or more staff to report pay gaps. Where the gap within a category of workers is 5% or more and can’t be justified, the employer has to carry out a joint pay assessment with workers’ representatives. Member states were meant to transpose it by 7 June 2026; Germany missed that deadline. Germany’s existing Pay Transparency Act already lets employees ask how their pay compares with the median pay of the other gender doing comparable work, but only where there are at least six colleagues of the other gender (missing reference). And in October 2025 the German Federal Labour Court (BAG) ruled that a woman can establish a presumption of pay discrimination by pointing to a single male colleague doing equal work who is paid more (missing reference). All three rules turn on statistical questions, and all three behave in ways worth understanding before anyone relies on them.</p>
+
+<p>A note on language. I report every estimate with a <strong>95% confidence interval</strong>, the range of values consistent with the data at the 5% level. I call a result <strong>statistically significant</strong> when p &lt; 0.05: if there were no real difference, a difference at least this large would turn up less than one time in twenty. That also means that across many tests, about one in twenty of the comparisons where nothing is going on will come out significant anyway.</p>
+
+<h1 id="how-hollowmere-is-organised">How Hollowmere is organised</h1>
+
+<p>A hospital is a good test case because it has two very different pay systems under one roof, and they’re common to most public hospitals, whatever the country.</p>
+
+<p>Everyone except the doctors is on a banded structure. Each role is placed in a band, from Band 2 to Band 9 with Band 8 split into 8a–8d, by job evaluation: a scheme that scores every job on the same factors (knowledge, responsibility, effort, working conditions) regardless of profession. Within a band there are a few pay points; you move up one with each year in the band, and you move up a band by being appointed to a higher-banded post. Doctors are on a separate medical ladder: foundation doctor, core trainee, specialty registrar, then either specialty doctor or consultant, each with its own pay points.</p>
+
+<p>Each employee is described by:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Examples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Staff group</td>
+      <td>Medical; Nursing &amp; Midwifery; Allied Health; Healthcare Science; Estates &amp; Facilities; Administrative &amp; Clerical</td>
+    </tr>
+    <tr>
+      <td>Profession</td>
+      <td>Surgery; Adult nursing; Medical physics; Portering; Domestic services</td>
+    </tr>
+    <tr>
+      <td>Role</td>
+      <td>Staff nurse; Ward manager; Clinical scientist; Porter; Consultant</td>
+    </tr>
+    <tr>
+      <td>Grade</td>
+      <td>Band 2 … Band 9, or Foundation … Consultant</td>
+    </tr>
+    <tr>
+      <td>Pay point</td>
+      <td>Step within the grade</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The banded ladder matters for equal pay law, which covers work of equal value as well as the same work. A Band 2 porter, a Band 2 domestic (cleaner) and a Band 2 catering assistant have been judged by job evaluation to do work of equal value, which makes them legitimate comparators for one another.</p>
+
+<p>Here is what I built in:</p>
+
+<ul>
+  <li>Women and men work in different professions. Midwifery is 99% women and adult nursing 88%; portering is 15% and estates maintenance 5%. Doctors are half women.</li>
+  <li>Women are promoted less. At the same age and length of service, women sit lower on their profession’s ladder, and so do part-timers. Among doctors, training is time-served, but women are less likely to be appointed consultant and more likely to end up as specialty doctors.</li>
+  <li>Women work part-time far more often (33% of women against 7% of men).
+Men more often start on a higher pay point, the one place a pay scale leaves room for negotiation.</li>
+  <li>Pay outside the scale differs. Shift work brings unsocial-hours payments, and it’s concentrated in some professions; doctors do paid on-call, and women do less of it; consultants can receive discretionary excellence awards, and men receive them more often.</li>
+</ul>
+
+<p>I didn’t build in any other difference in base pay between women and men in the same job.</p>
+
+<h1 id="step-zero-the-data-is-a-mess">Step zero: The Data is a Mess</h1>
+
+<p>Before any statistics, there’s the payroll export. Real HR data entry is done by many people over many years, and these people make mistakes. We have to clean our data with a view to what we will do with the data at a later step. We also do not want to bias the downstream models when we clean the data.</p>
+
+<p>Some of what we met in real data:</p>
+
+<ul>
+  <li>grades recorded as <code class="language-plaintext highlighter-rouge">Band 5</code>, <code class="language-plaintext highlighter-rouge">5</code> and <code class="language-plaintext highlighter-rouge">B5</code> in the same column, and Band 8a as <code class="language-plaintext highlighter-rouge">8a</code>, <code class="language-plaintext highlighter-rouge">8A</code> or <code class="language-plaintext highlighter-rouge">8 a</code>;</li>
+  <li>decimal commas (<code class="language-plaintext highlighter-rouge">3,5</code> sick days) next to decimal points;</li>
+  <li>ages stored as Excel dates, so a 31-year-old appears as <code class="language-plaintext highlighter-rouge">1900-01-31</code>;</li>
+  <li>“not assessed” in the appraisal column written five different ways, typos included;</li>
+  <li>the same department spelled two ways, and recorded under both its old and its new name;</li>
+  <li>a pay-scale table that won’t join to the staff records, because one file writes <code class="language-plaintext highlighter-rouge">Band 5</code> and the other <code class="language-plaintext highlighter-rouge">5</code>.</li>
+</ul>
+
+<p>Three rules saved me repeatedly:</p>
+
+<ol>
+  <li>Never overwrite a raw column: every cleaned value goes into a new column, so you can always put the raw and clean values side by side and see what a rule did.</li>
+  <li>Produce a missingness report before any analysis: for every column, how much is missing, which raw values failed to parse, and whether missingness differs by gender. If women’s performance ratings are missing more often than men’s, a model that drops incomplete rows has a gender bias of its own.</li>
+  <li>Make the joins loud: when a band lookup fails for everyone, the pipeline should say so, and show the values on both sides, rather than quietly producing a report with no bands in it.</li>
+</ol>
+
+<p>The cleaning is non-destructive pandas; each rule is a small function like this one:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">flag_not_assessed</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="s">"""'not assessed / available' in any order, spacing or case, typos included."""</span>
+    <span class="n">txt</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">astype</span><span class="p">(</span><span class="s">"string"</span><span class="p">).</span><span class="nb">str</span><span class="p">.</span><span class="n">strip</span><span class="p">().</span><span class="nb">str</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">txt</span><span class="p">.</span><span class="nb">str</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s">"\bnot\b"</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="n">txt</span><span class="p">.</span><span class="nb">str</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s">"asses|avail"</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="o">~</span><span class="n">txt</span><span class="p">.</span><span class="nb">str</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s">"\d"</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>A single shell script runs the whole chain: raw export → cleaning → missingness report → Parquet → Quarto reports in R → HTML. When someone finds a data entry error, you fix the raw file and rerun one command.</p>
+
+<h1 id="the-raw-gap">The raw gap</h1>
+
+<p>Hollowmere’s women earn 20.2% less than its men on average, comparing full-time-equivalent base salary. The median gap is much smaller, 9.3%, because the mean is pulled up by a few hundred well-paid doctors (half of them men in a workforce that is 72% women).</p>
+
+<p>To come to these raw averages we had to make three decisions.</p>
+
+<ol>
+  <li>
+    <p><strong>Full-time equivalent.</strong> Comparing what payroll actually pays, the gap is 27.4%, because women are five times as likely to work part-time. Part-time pay is lower because the hours are lower, not the rate. So all the pay figures here are scaled to full time. Part-time work matters, but through promotion rather than through the monthly payslip.</p>
+  </li>
+  <li>
+    <p><strong>Which pay.</strong> Including unsocial-hours payments, on-call and awards, the gap is 20.6%. The directive is explicit that pay means every component, and the BAG applies equal pay to each component separately, so each one needs its own analysis. We’ll see below that the components are where most of the action is.</p>
+  </li>
+  <li>
+    <p><strong>Which average.</strong> There are three, and they answer different questions:</p>
+  </li>
+</ol>
+
+<ul>
+  <li>The <strong>mean</strong> adds up everyone’s salary and divides by the number of people. Every pound counts the same, so a few very high salaries pull it up a lot. Women’s mean is £35,252 and men’s £44,203: a gap of 20.2%.</li>
+  <li>The <strong>median</strong> is the salary of the person in the middle. It ignores how far the top is from the middle: 9.3%.</li>
+  <li>The <strong>geometric mean</strong> is what a regression on log pay compares. It works in percentage terms, so a £10,000 difference counts for much more at £25,000 than at £100,000. Women’s geometric mean is £32,986 and men’s £38,968: a gap of 15.4%.</li>
+</ul>
+
+<p>At Hollowmere the mean gap is the largest because of the doctors: a few hundred of the best-paid staff, half of them men, in a workforce that is 72% women. A small made-up example shows the mechanism:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Salaries</th>
+      <th>Mean</th>
+      <th>Geometric mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Men</td>
+      <td>£50k, £50k, £200k</td>
+      <td>£100k</td>
+      <td>£79k</td>
+    </tr>
+    <tr>
+      <td>Women</td>
+      <td>£50k, £50k, £50k</td>
+      <td>£50k</td>
+      <td>£50k</td>
+    </tr>
+    <tr>
+      <td>Gap</td>
+      <td> </td>
+      <td><strong>50%</strong></td>
+      <td><strong>37%</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Two of the three men earn exactly what the women earn; almost all of the mean gap comes from one very high earner. When the mean gap is much bigger than the geometric one, the gap is concentrated at the top. Report all three, and say which one each figure is.</p>
+
+<p>We also don’t just want to report the raw gap, we also want to know what causes that gap so we can do something appropriate to close it.</p>
+
+<p>Two pictures show most of the causes:</p>
+
+<p><img src="/assets/images/pay-gap-audit/fig1-professions.png" alt="Median pay against the share of women in each profession" /></p>
+
+<p><img src="/assets/images/pay-gap-audit/fig2-grades.png" alt="Share of women at each grade on both ladders" /></p>
+
+<p>Pay is set by profession and grade, and women and men are spread very differently across both. Doctors sit at the top of the pay range; the large nursing and support professions, mostly women, sit below them; but the lowest-paid professions include portering and security, which are mostly men. That’s why the correlation between a profession’s share of women and its median pay is only −0.1: segregation is about <em>which</em> jobs, not simply “women’s jobs are paid less”.</p>
+
+<p>Up the ladders, women thin out: they’re 83% of Band 5 but 60% of Bands 8a–9. On the medical side, women are 48% of doctors in training but only 34% of consultants, and 75% of specialty doctors, the non-training career grade that people move into when they don’t become consultants. These are the textbook mechanisms of the gender pay gap, <em>horizontal</em> and <em>vertical</em> segregation (missing reference), and an independent review of doctors’ pay in England found the same pattern (missing reference).</p>
+
+<h1 id="what-should-we-control-for">What should we control for?</h1>
+
+<p>The standard next move is to run a regression with “controls” and report what’s left as the adjusted or unexplained gap. The trouble is that which controls you add changes the question you’re answering. A causal diagram makes this explicit:</p>
+
+<p>Show Image</p>
+
+<p>Gender affects pay through several paths:</p>
+<ol>
+  <li>through which profession people end up in,</li>
+  <li>through their grade,</li>
+  <li>through part-time work holding back promotion,</li>
+  <li>and directly, through the dashed arrow: being paid differently for the same job at the same grade.</li>
+  <li>Age and length of service affect grade and pay but aren’t caused by gender, so they’re genuine confounders.</li>
+</ol>
+
+<p>Profession and grade are mediators: they sit on the path from gender to pay. Controlling for a mediator doesn’t remove bias; it removes part of the effect you’re measuring (missing reference). <em>If women are promoted less, then comparing women and men at the same grade hides the promotion gap by construction.</em></p>
+
+<p>So there isn’t one correct adjusted gap; there are several, and each answers a different question:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Compare women and men…</th>
+      <th>Question it answers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>overall</td>
+      <td>How much less do women take home?</td>
+    </tr>
+    <tr>
+      <td>in the same profession</td>
+      <td>How much of the gap is about <em>which</em> jobs women do?</td>
+    </tr>
+    <tr>
+      <td>in the same profession and grade</td>
+      <td>Are women paid less <em>for the same job at the same level</em>?</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The last one is the equal-pay question, the one the law is about. But a small value there doesn’t mean the organisation is fair: if women are kept out of the higher grades, the unfairness is in promotion, and the “adjusted gap” has quietly controlled it away.</p>
+
+<h1 id="sequential-models">Sequential models</h1>
+
+<p>Pay is skewed, so we model its logarithm:</p>
+
+\[\log w_i = \alpha + \beta F_i + X_i \gamma + \varepsilon_i\]
+
+<p>where \(F_i = 1\) for women and \(X_i\) holds the controls. The coefficient \(\beta\) is a difference in log points; the gap as a share of men’s pay is \(1 - e^{\beta}\). Adding controls one block at a time shows where the gap goes:</p>
+
+<p>I fix the sequence of models before looking at the results, so that nobody can pick the specification that gives the answer they want:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Controls</th>
+      <th>Gap</th>
+      <th>95% confidence interval</th>
+      <th>p</th>
+      <th>R²</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>No controls</td>
+      <td>–</td>
+      <td>15.4%</td>
+      <td>11.5% to 19.1%</td>
+      <td>&lt; 0.001</td>
+      <td>0.04</td>
+    </tr>
+    <tr>
+      <td><strong>Model 1: total effect</strong></td>
+      <td>age, length of service, hours, part-time</td>
+      <td>14.5%</td>
+      <td>10.6% to 18.3%</td>
+      <td>&lt; 0.001</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <td>Model 2</td>
+      <td>Model 1 + profession</td>
+      <td>5.7%</td>
+      <td>3.3% to 8.1%</td>
+      <td>&lt; 0.001</td>
+      <td>0.77</td>
+    </tr>
+    <tr>
+      <td><strong>Model 3: full model</strong></td>
+      <td>Model 2 + grade</td>
+      <td>0.4%</td>
+      <td>−0.1% to 1.0%</td>
+      <td>0.09</td>
+      <td>0.99</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="/assets/images/pay-gap-audit/fig4-sequential.png" alt="The estimated gap as controls are added" /></p>
+
+<p>Model 1 is the <strong>total effect</strong>: women and men of the same age and length of service, working the same hours. One caveat: the diagram says part-time work is itself partly a consequence of gender, so strictly Model 1 is the total effect <em>apart from</em> the part-time route. Model 3 is the <strong>direct effect</strong>: the same profession and grade as well. In the real analysis Model 3 also held constant management responsibility (the number of direct reports) and which part of the organisation people work in; Hollowmere has no data on the first, and its equivalent of the second, staff group, is already fixed by profession.</p>
+
+<p>The changes from one model to the next split the Model 1 gap of 14.5% into parts that add up exactly:</p>
+
+<ul>
+  <li><strong>8.8 percentage points from profession</strong> (95% confidence interval 5.5 to 12.2): women and men work in different professions.</li>
+  <li><strong>5.3 percentage points from grade</strong> (2.9 to 7.3): within a profession, women are at lower grades.</li>
+  <li><strong>0.4 percentage points unexplained</strong>: the gap between a woman and a man in the same profession and grade. It isn’t statistically significant.</li>
+</ul>
+
+<p>Roughly: three fifths of Hollowmere’s gap is which professions women work in, two fifths is that they’re promoted less within them, and at the same grade the pay scale pays them the same. That’s what I built in. The intervals for the two changes come from 500 bootstrap resamples of the staff, women and men resampled separately, because a difference between two models has no simple standard error.</p>
+
+<p>A warning about order. How much each control seems to explain depends on the order you add them. Add grade before profession, and grade gets more of the credit. That’s why the order should be agreed before the analysis, as a statement of the questions you’re asking: first <em>which jobs</em>, then <em>which level within the job</em>. Here the order is natural because the structure is nested. When controls don’t have a natural order, the Gelbach decomposition (missing reference) splits the change between blocks of controls in a way that doesn’t depend on the order.</p>
+
+<h1 id="robust-standard-errors-and-the-gap-grade-by-grade">Robust standard errors, and the gap grade by grade</h1>
+
+<p><strong>Heteroskedasticity.</strong> Ordinary least squares standard errors assume the noise around the model is the same for everyone. Hollowmere shows how badly that can fail: once grade and pay point are known, a banded salary is almost fully determined (the residual standard deviation is 0.005 in log pay), while doctors’ pay varies more (0.014). The Breusch–Pagan test (missing reference) rejects constant variance overwhelmingly (p &lt; 10⁻²⁰⁰). I use HC3 robust standard errors throughout (missing reference). They cost nothing when the variance is constant and protect you when it isn’t, so I use them by default rather than after a test. (HC3 breaks down for groups of one person, such as a role nobody else holds; there I fall back to HC1.)</p>
+
+<p><strong>Grade by grade.</strong> The overall within-grade gap of 0.2% could hide gaps in particular grades. Estimating it separately for each grade with enough women and men:</p>
+
+<p><img src="/assets/images/pay-gap-audit/fig5-by-grade.png" alt="The base-pay gap within each grade" /></p>
+
+<p>Every interval includes zero. The one deliberate difference in base pay, men more often starting on a higher pay point, washes out as people move up the points over the years. That’s a feature of short pay scales. The independent review of doctors’ pay in England made exactly this recommendation: fewer pay points and more job evaluation (missing reference).</p>
+
+<h1 id="pay-outside-the-scale">Pay outside the scale</h1>
+
+<p>Pay gaps in base pay is only one component of the general gender pay gap, and that pay gap is best controlled by a pay scale. Hollowmere’s consultants show what happens outside it. On base pay, female consultants earn the same as male consultants (a gap of −0.1%). But 40% of male consultants hold an excellence award against 25% of female consultants, so women receive 35% less in awards, and once awards and on-call are added the consultant gap is 3.6%. This is the pattern the review of English doctors’ pay found: gaps in total pay, including clinical excellence awards, allowances and paid additional work, larger than gaps in basic pay (missing reference).</p>
+
+<p>The lesson for an audit is to analyse each component separately. A result that there is ‘no gender pay gap’ on base salary says little about awards, bonuses or allowances, which are discretionary or unevenly distributed.</p>
+
+<h1 id="length-of-service-two-traps">Length of service: two traps</h1>
+
+<p>Does long service pay? It’s a natural question to ask, usually as “are long-serving staff falling behind new hires?”. The natural model adds length of service to the regression and reads off its coefficient.</p>
+
+<p>At Hollowmere:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Compare people…</th>
+      <th>Change in pay per year of service</th>
+      <th>95% confidence interval</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>of the same age, gender and hours, in the same profession</td>
+      <td>+0.81%</td>
+      <td>+0.65% to +0.97%</td>
+    </tr>
+    <tr>
+      <td>also in the same role and grade</td>
+      <td>+0.20%</td>
+      <td>+0.17% to +0.24%</td>
+    </tr>
+    <tr>
+      <td>the same, on total pay instead of base salary</td>
+      <td>+0.21%</td>
+      <td>+0.14% to +0.27%</td>
+    </tr>
+    <tr>
+      <td>the same, without holding age constant</td>
+      <td>+0.21%</td>
+      <td>+0.17% to +0.24%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Most of the reward for long service comes from moving up grades: 0.8% a year overall, but only 0.2% a year at the same grade, where it comes from the pay points. Nearly half of the banded staff (48%) are already on the top point of their band, where another year adds nothing. Both rows are correct; they answer different questions. There are two traps we have consider when we make these comparisons however.</p>
+
+<p><strong>Trap 1: holding grade constant selects people.</strong> Among staff at the same grade, the long-serving ones are disproportionately those who <em>weren’t</em> promoted: their contemporaries who were promoted have left the comparison. So “long service at the same grade” partly measures who stays at a grade. In an organisation with individually set pay, this can make long service look badly paid at the same level even when nobody’s pay is falling behind. The check is to fit the model <em>without</em> grade as well. If long service is rewarded overall but not at the same level, the story is about promotion, not about pay drifting. A cross-section can’t show promotions directly, though; for that you need people’s grade histories.</p>
+
+<p><strong>Trap 2: age and service together.</strong> Someone’s age is their age when they joined plus their years of service. So if a model includes both, the service figure compares two people <em>of the same age</em>, one of whom has an extra year of service. The only way that can happen is if they joined a year younger. That isn’t the question most people have in mind, which is “what happens to my pay if I stay another year?” Staying another year makes you a year older too. For young staff, the comparison barely exists in the data: no 25-year-old has 15 years’ service, so the model has to fill that gap by extrapolating. The simple check is to drop age and see whether the service figure moves. At Hollowmere it doesn’t (0.21% a year without age, 0.20% with it), but in other data it can.</p>
+
+<p>There’s a cohort side to this too. In a single year’s data, long service and “hired in an earlier year” are the same thing. So a weak service effect could mean service isn’t rewarded, or that recent hires came in on higher market rates. One snapshot can’t tell these apart. You need several years of data, or pay at hiring.</p>
+
+<p>A third check matters outside hospitals. <strong>Compare base salary with total pay.</strong> Components granted at a point in time, such as shares granted at the share price of the day, or awards, can make long-serving staff look better or worse paid for reasons that have nothing to do with how their salaries develop. At Hollowmere base and total pay give the same answer. In a company with share-based pay, they may not.</p>
+
+<h1 id="same-work-the-eu-directives-5-test">Same work: the EU Directive’s 5% test</h1>
+
+<p>The EU directive splits the workforce into categories of workers doing the same work or work of equal value, and asks whether women’s and men’s median pay in any category differs by 5% or more. We have to construct the comparison groups to apply this test. So we start with same or comparible work: a category is people with the same grade, profession and role. That gives Hollowmere 162 categories, 111 of which contain at least one woman and one man.</p>
+
+<p>In 12 of those 111, women earn at least 5% less than men on base pay (and in 11, men earn at least 5% less than women). Is 12 a lot?</p>
+
+<p>The categories are small (the median has five or six people), and in small groups averages are noisy. So we asked what the test would show if Hollowmere’s pay were gender-blind: shuffle the gender labels within each category, so that pay can’t depend on gender by construction, recompute the number of flagged categories, and repeat 1,000 times.</p>
+
+<p><img src="/assets/images/pay-gap-audit/fig6-directive-null.png" alt="Number of flagged roles under gender-blind pay, against Hollowmere's 3" /></p>
+
+<p>Under gender-blind pay, an average of 10.7 categories are flagged (95% range 6 to 16). Hollowmere’s 12 is entirely typical (p = 0.37). The same holds for total pay: 17 flagged against 15.2 expected by chance (p = 0.36). Every flag is what small groups and a few pay points produce on their own. That’s the right answer: we didn’t build in any same-work base-pay gap, and the test, read against chance, doesn’t find one.</p>
+
+<p>This doesn’t make the 5% rule wrong: the EU directive treats a 5% difference as a conversation starter, and requires the employer to justify the difference or fix it. But anyone reading a list of flagged categories should know how many to expect from noise. The permutation test is cheap, it needs no modelling assumptions, and gives the right yardstick: not “how many categories are over 5%?” but “how many more than chance?”</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span><span class="w">
+</span><span class="n">staff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">staff</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">mutate</span><span class="p">(</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">paste</span><span class="p">(</span><span class="n">grade</span><span class="p">,</span><span class="w"> </span><span class="n">profession</span><span class="p">,</span><span class="w"> </span><span class="n">role</span><span class="p">))</span><span class="w">
+</span><span class="c1"># categories where women's mean pay is at least 5% below men's</span><span class="w">
+</span><span class="n">n_flagged</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">|&gt;</span><span class="w">
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">category</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w">
+  </span><span class="n">filter</span><span class="p">(</span><span class="nf">any</span><span class="p">(</span><span class="n">female</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">),</span><span class="w"> </span><span class="nf">any</span><span class="p">(</span><span class="n">female</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">))</span><span class="w"> </span><span class="o">|&gt;</span><span class="w">
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">gap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">fte_base</span><span class="p">[</span><span class="n">female</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">])</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">fte_base</span><span class="p">[</span><span class="n">female</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">]))</span><span class="w"> </span><span class="o">|&gt;</span><span class="w">
+  </span><span class="n">with</span><span class="p">(</span><span class="nf">sum</span><span class="p">(</span><span class="n">gap</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0.05</span><span class="p">))</span><span class="w">
+
+</span><span class="n">observed</span><span class="w">   </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">n_flagged</span><span class="p">(</span><span class="n">staff</span><span class="p">)</span><span class="w">
+</span><span class="n">null_flags</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">replicate</span><span class="p">(</span><span class="m">1000</span><span class="p">,</span><span class="w"> </span><span class="n">staff</span><span class="w"> </span><span class="o">|&gt;</span><span class="w">
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">category</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">mutate</span><span class="p">(</span><span class="n">female</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sample</span><span class="p">(</span><span class="n">female</span><span class="p">))</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">ungroup</span><span class="p">()</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">n_flagged</span><span class="p">())</span><span class="w">
+</span><span class="n">mean</span><span class="p">(</span><span class="n">null_flags</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">observed</span><span class="p">)</span><span class="w">        </span><span class="c1"># permutation p-value</span><span class="w">
+</span></code></pre></div></div>
+
+<h1 id="equal-value-porters-and-cleaners">Equal value: porters and cleaners</h1>
+
+<p>The harder half of the directive is work of equal value. At Hollowmere, job evaluation has put porters, domestics, catering assistants, security officers, healthcare assistants and receptionists in Band 2, on the same base pay scale. They’re judged to do work of equal value. But they don’t take home the same pay:</p>
+
+<p><img src="/assets/images/pay-gap-audit/fig7-band2.png" alt="Band 2 pay by profession: base salary and unsocial-hours payments" /></p>
+
+<p>Base pay is identical, as it should be. The difference is unsocial-hours payments: porters and security officers, mostly men, work nights and weekends far more often than domestics and catering staff, mostly women. A porter takes home £25,917 on average, a domestic £24,502: domestics earn 5.5% less than porters, for work of equal value.</p>
+
+<p>Whether that’s discrimination is a legal question, not a statistical one: paying extra for night work is a legitimate reason, if access to night work isn’t itself gendered. But here’s the statistical point. If the equal-value category is the whole of Band 2, the gap between all women and all men is only 2.9%, below the threshold. That’s because healthcare assistants, 90% of them women, also work nights and earn unsocial-hours payments, which pulls the women’s average up. The gap between two specific jobs (5.5%) disappears into the gap between two genders across a band (2.9%). Under the directive, how you form the categories decides what you find, and the employer forms them.</p>
+
+<h1 id="three-tests-for-individuals">Three tests for individuals</h1>
+
+<p>The rules above look at groups. Equal pay claims are made by individuals, and there are three ways to frame one. Each compares a person with colleagues of the other gender in their category (same grade, profession and role):</p>
+
+<ul>
+  <li><strong>The Pay Transparency Act test</strong>: is the person paid more than 5% below the median pay of the other gender? Only where there are at least six of them (missing reference).</li>
+  <li><strong>The EU test</strong>: the same question with any number of colleagues of the other gender. The directive drops the minimum group size: workers can ask for the average pay of their category, broken down by gender, however small it is. Turning that into a 5%-below-the-median test for individuals is my construction, not the directive’s wording.</li>
+  <li><strong>The best-paid test</strong>: is the person paid less than the best-paid colleague of the other gender? This is the BAG’s pair comparison: one better-paid man doing equal work is enough to establish a presumption of discrimination, and the employer then has to show that the difference has objective, gender-neutral reasons (missing reference).</li>
+</ul>
+
+<p>I apply all three to women <em>and</em> to men, and compare each with the rate you’d expect under gender-blind pay (gender shuffled within categories, 300 times):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test</th>
+      <th>Women: can be compared</th>
+      <th>Women below</th>
+      <th>Gender-blind</th>
+      <th>Men: can be compared</th>
+      <th>Men below</th>
+      <th>Gender-blind</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pay Transparency Act (median, at least 6)</td>
+      <td>618</td>
+      <td>3.6%</td>
+      <td>2.2%</td>
+      <td>246</td>
+      <td>1.6%</td>
+      <td>4.2%</td>
+    </tr>
+    <tr>
+      <td>EU (median, at least 1)</td>
+      <td>1,143</td>
+      <td>7.8%</td>
+      <td>6.9%</td>
+      <td>443</td>
+      <td>7.7%</td>
+      <td>8.7%</td>
+    </tr>
+    <tr>
+      <td>Best-paid (at least 1)</td>
+      <td>1,143</td>
+      <td>51.4%</td>
+      <td>48.6%</td>
+      <td>443</td>
+      <td>47.9%</td>
+      <td>48.5%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>On the two median tests, women fall below a little more often than gender-blind pay would produce, and men a little less often. That’s the one difference I built into base pay: men more often start on a higher pay point. But the differences between women and men aren’t statistically significant on any of the three tests (p = 0.20, 1.0 and 0.22).</p>
+
+<p>Another thing we produced was a spreadsheet: for every person, the list of colleagues of the other gender in their category and their pay against the median and the best-paid one, so anyone can check a flag by hand.</p>
+
+<p><strong>Why the best-paid test flags half the hospital.</strong> How often will a better-paid colleague of the other gender exist? Under gender-blind pay there’s a neat answer, <em>if every salary is different</em>. Take a role with one woman and \(m\) men whose pay is <em>exchangeable</em>, meaning gender doesn’t affect it. Each of the \(m + 1\) people is equally likely to be the best paid, so the probability that the woman is <strong>not</strong> the best paid is</p>
+
+\[P(\text{a better-paid male comparator exists}) = \frac{m}{m+1}.\]
+
+<p>With one man, it’s 50%. With three, it’s 75%. With nine, it’s 90%. At Hollowmere, the formula predicts that 81% of women would have a better-paid male comparator. In fact only <strong>51%</strong> do, and gender-blind shuffles give 49%. The reason is ties:</p>
+
+<p><img src="/assets/images/pay-gap-audit/fig8-pairs.png" alt="Share of women paid less than the best-paid man in their role, by number of men" /></p>
+
+<p>On a pay scale with a few pay points, many people earn exactly the same: nearly half of Hollowmere’s banded staff (48%) are on the top point of their band. So 44% of women earn exactly what the best-paid man in their role earns. A woman paid the same as every man in her role has no comparator. The \(m/(m+1)\) formula is right for pay set individually; on a short, transparent scale, most of the exposure disappears.</p>
+
+<p>The best-paid test doesn’t detect discrimination: with individually negotiated salaries, most people in mixed teams will have a better-paid comparator of the other gender whether or not anything is wrong. But it does is move the burden of explanation. An employer with individually set pay will face that burden in most of its roles; an employer with a short, transparent pay scale will face it only where people genuinely differ, at the pay points and in the payments outside the scale. And because equal pay law covers work of equal value, in principle the comparator needn’t be in the same job: a domestic could point to a porter.</p>
+
+<h1 id="what-organisations-should-report">What organisations should report</h1>
+
+<ul>
+  <li><strong>Report the raw gap and the adjusted gaps, and say which question each answers.</strong> At Hollowmere, “women earn 20% less” and “women at the same grade are paid the same” are both true. The first is about which professions women work in and who gets promoted. The second is about equal pay for equal work.</li>
+  <li><strong>Say which average.</strong> Mean, median and geometric mean give 20%, 9% and 15% at Hollowmere. Each is right; none is <em>the</em> gap.</li>
+  <li><strong>Agree the models before the analysis.</strong> Which controls, in which order. The split of the gap between them depends on the order, so fix it as a statement of the questions you’re asking, not after seeing the results.</li>
+  <li><strong>Don’t let controls launder the problem.</strong> Grade is a mediator. A zero gap at the same grade with a large promotion gap is not a clean bill of health: look at promotion and appointment directly.</li>
+  <li><strong>Report confidence intervals, and read flags against gender-blind pay.</strong> With small categories, many 5% flags are noise. A permutation test tells you how many to expect.</li>
+  <li><strong>Check length of service three ways.</strong> With and without grade held constant, with and without age, and on base salary as well as total pay. A negative effect at the same level can be selection, not pay falling behind.</li>
+  <li><strong>Analyse every pay component separately.</strong> Awards, allowances and bonuses often carry larger gaps than base salary, and the law treats them separately.</li>
+  <li><strong>Look across jobs, not just within them.</strong> Equal-value comparisons, like porters and cleaners, find gaps that same-job comparisons can’t, and how the categories are drawn decides whether they show up.</li>
+  <li><strong>Structure protects.</strong> Short pay scales with few points, job evaluation and transparent rules for extra payments leave little room for gaps in the same job, and make the best-paid test much less threatening for an employer who can explain its pay.</li>
+  <li><strong>Spend the time on the data.</strong> Most of my errors, and most of the interesting findings, came from cleaning, joins and missing values, not from the models.</li>
+</ul>
+
+<h1 id="code">Code</h1>
+
+<p>The R script that builds Hollowmere and produces every figure and number in this post, hollowmere.R, is here. It also writes the synthetic staff file, so you can try your own analyses on it.</p>
+
+<p>References</p>
+
+<ol class="bibliography"></ol>]]></content><author><name>Thomas Kealy</name></author><category term="statistics," /><category term="causal-inference" /><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Slacking as Self-Care</title><link href="https://tomkealy.github.io/blog/2026/02/05/Slacking-as-Self-Care/" rel="alternate" type="text/html" title="Slacking as Self-Care" /><published>2026-02-05T00:00:00+00:00</published><updated>2026-02-05T00:00:00+00:00</updated><id>https://tomkealy.github.io/blog/2026/02/05/Slacking%20as%20Self-Care</id><content type="html" xml:base="https://tomkealy.github.io/blog/2026/02/05/Slacking-as-Self-Care/"><![CDATA[<p>So this one time I was at a job interview at a supermarket chain based out of Welwyn Garden City and I was asked “what would you say is your biggest flaw?” Or something like that. What sticks out in memory is how cheap the office was furnished for a company which amounted to a 1 pound in every eight spent in the UK. The excuse they gave was that everything they did was ‘for the customer’ and no frills were spent on staff. Anyway, I was canny enough to understand that you don’t say something like “I’m a cold-hearted bastard” or “I’m on medication for anxiety” or “I collapse under pressure.” I realised that you’re supposed to say something which is a strength and instead make it look like a flaw. So I said that I’m a perfectionist and that everything has to be correct and that I really couldn’t even sleep if I thought I’d done a bad job. The interviewer - someone from HR - smiled in a way which is now reminiscent of an expert hunter and we moved on.</p>
 
 <p>I didn’t get that job - the feedback I received was that I was too quiet in group settings - and looking back I think I gave the wrong answer. There is no correct answer to that question but saying I’m a perfectionist leaves a bad taste in my mouth. Perfectionism is a terrible flaw. You will waste your life on tasks which don’t matter. The standard cultural story is that a perfectionist is somebody who gets everything done to an impossibly high standard. Now I see why the HR rep smiled in the way she did: My desire for professional competence created a psychological trap which made me exploitable. It took me a decade to realise that some professionalism was not killing myself over every detail. Professionalism is ruthlessly distinguishing when what deserves excellence from what should be just good enough.</p>
 
@@ -478,65 +959,4 @@ mean)</li>
 
 <p>[^4] Ambler, Wayne. “Aristotle on nature and politics: The case of slavery.” Political Theory 15.3 (1987): 390-410</p>
 
-<p>[^5] Smith, Nicholas D. “Aristotle’s theory of natural slavery.” Phoenix 37.2 (1983): 109-122.</p>]]></content><author><name>Thomas Kealy</name></author><summary type="html"><![CDATA[The Politics was a sequel to the Nicomanchean Ethics; or rather, they were all one treatise. The Ethics concerned itself with how an individual could achieve eudaimonia, the Politics was which institutions could even allow an individual to achieve eudaimonia. One can therefore see the Ethics as a sort of applied politics, whereas we moderns see Politics as applied Ethics.]]></summary></entry><entry><title type="html">I watched (nearly) all of Paul Thomas Anderson’s films and this is what I learned</title><link href="https://tomkealy.github.io/blog/2025/09/21/I-watched-(nearly)-all-of-Paul-Thomas-Anderson-s-films-and-this-is-what-I-learned/" rel="alternate" type="text/html" title="I watched (nearly) all of Paul Thomas Anderson’s films and this is what I learned" /><published>2025-09-21T00:00:00+00:00</published><updated>2025-09-21T00:00:00+00:00</updated><id>https://tomkealy.github.io/blog/2025/09/21/I%20watched%20(nearly)%20all%20of%20Paul%20Thomas%20Anderson%E2%80%99s%20films%20and%20this%20is%20what%20I%20learned</id><content type="html" xml:base="https://tomkealy.github.io/blog/2025/09/21/I-watched-(nearly)-all-of-Paul-Thomas-Anderson-s-films-and-this-is-what-I-learned/"><![CDATA[<p>This week a new PT Anderson film comes out. To celebrate a local cinema programmed his entire backlog. I had nothing better to do, so I went along. Here are some ordered notes I collected, mostly after midnight. They are raw and unsophisticated and I think pretty good. At least they capture something of the initial rush of seeing new films with new cinematic voices.</p>
-
-<ol>
-  <li>Your characters should be alone in frames. If you can’t manage this then characters in the same frame can’t look at each other. This materialises (I can’t think of a better word) the essential loneliness of the American experience. Some good examples:</li>
-</ol>
-
-<p>a. Sydney, with his aged and grizzled face stares directly at John Finnegan in Hard Eight. Sydney’s face fills the frame with an aged concern. When the camera pans to John, he’s looking at the floor. When they get together in a motel after John has assaulted a perp, they don’t look at each other; instead, they look offscreen.</p>
-
-<p>b. Or the opening shot of Punch Drunk Love. Barry is pushed to the edge of the frame, which is mostly empty like his life.</p>
-
-<p>2.Have long shots, long scenes. Have fewer cuts. PTA likes a gynmastic camera. In Boogie Nights there are a lot of shots which float between characters as they sit around a pool and party. We see each characters story, but it’s all one big thing. But more generally, he doesn’t cut that much. There’s no quick fire dialogue between cahracters in the normal shot-reverse shot mode we’ve been tought to become accustomed to. The camera lingers. This has the effect on the body of being slightly medatative, slightly relaxing. But we also can’t look away. We’re forced to look, really look, at the underbelly of American society (in Hard Eight and Boogie Nights especially).</p>
-
-<ol>
-  <li>
-    <p>Everyone wants money. They don’t know what to do without it, but when they get it they don’t know what to do with it. “Youv’e got money’ is a constant refrain in Hard Eight. In Boogie Nights everyone has so much money they don’t know what to do with it. It all gets spent on drugs.</p>
-  </li>
-  <li>
-    <p>At the end of Boogie nights we’re now in the 80s and we find Dirk (originally Eddie) in the same room talking to the same mirror he talked at when he started his porn career in the 70s. He’s about to film his big comeback after a period of drug use. It’s implied that we’ll see all of this again, sometime in the 90s when Dirk has completed another cycle of sex, money, and drugs.</p>
-  </li>
-  <li>
-    <p>There’s a real movement between Hard Eight, where people are mean and look only for themsevles and Boogie Nights. Here the consequences of their actions are allowed to follow characters.</p>
-  </li>
-</ol>
-
-<p>a. Dirk enters a world of hard partying, starts on soft drugs, ends up taking meth, and in one tight scene his meth-fuelled paranoia tanks his career.</p>
-
-<p>b. Maggie (played by Julianne Moore) has a son offscreen. She never sees him, since her ex-husband has sole custody. When the custody agreement is renewed, she can’t find a lawyer to represent her, or can’t afford one, so she represents herself. But her lifestyle cathces up with her, and her ex gets sole custody. We get to see the aftermath, her crying outside the courthouse, and then snorting a mound of cocaine to numb her distress.</p>
-
-<p>c. Most notoriously The Colnel ends brutalised in prison. He was the main financier (in the 70s) of Jack Horner’s movies, and every time he appears with another precocious girl (none of whom he cares for). Everntually he’s tried and locked up for peadophillia, and everyone who depended on him abandons him to his ignomy.</p>
-
-<ol>
-  <li>
-    <p>Money ruins everything, even Jack Horner’s ‘art.’ He starts Boogie Nights looking to elevate porn to the level of art—to make a real film where people ‘stay for the story.’ But time marches on, and video replaces film. To remain solvent Jack has to just push one out one after the other. ‘It is what it is,’ his cameraman and editor tells him. ‘Your films have gotten shit,’ one fan tells Jack. There is nothing that the pursuit of money, no matter how small, will not destroy. We have to live for something else.</p>
-  </li>
-  <li>
-    <p>Boogie Nights tries to imply that all the porn stars and starlets form some kind of extended Found Family. Everyone has been, in some way, failed and abandoned by their biological, real, parents, and all they have each other. But they cannot really function as a real family: there are no bonds of love and mutual respect and dependency, only an uncesaing appetite to use each other. Late in the film, Jack and Rollergirl head out in a limo looking to entice a college boy into having sex on videotape. The whole episode is horrible and tawdry.</p>
-  </li>
-  <li>
-    <p>Punch Drunk Love is a satire of sorts. It’s a satire of an Adam Sandler film, starring Adam Sandler. Just that this time Sandler isn’t some puppy looking for love, but a deeply lonely agressive man who’s unable to reach for love, even when it comes literally right up to him. Ultimately, the love interest, Lena, is just a fantasy, becuase all these films are just fantasies, and she’s only there as a catalyst for a small kind of change on the part of Barry. I mean, he doens’t really love her, int he end he leaves her in a hospital after a car accident to go and settle a feud that his own desperation had set in motion. The soundtrack is matches the camerawork; a sort of percussive undertone of anxiety present in every frame.</p>
-  </li>
-  <li>
-    <p>Sandler is the best part of Punch Drunk Love (I mean a deconstructed Adam Sandler movie wouldn’t work without Adam Sandler), but I think he was in on the joke. You really feel the (passive) agression towards his sisters and the subliminal hatred in Barry. His sisters call him gaylord, and his brothers in law think he’s a failure. And you know what, he is. Barry’s isolation is completely self created, and he festers in it. No wonder he calls a phone sex line instead of going to a shirnk. We can see where Howard Ratner or Danny Meyerowitz came from.</p>
-  </li>
-  <li>
-    <p>Punch Drunk Love doesn’t really spell out it’s meaning, preferring instead to work through a network of symbols:</p>
-  </li>
-</ol>
-
-<p>a. Colour (red and blue). The very first shot in the film is of Barry Egan in his office. The office is blue, Barry is blue, and he dissappears into the background (helpd by the framing of the shot, where he’s pushed to one corner of the screen). Then there’s Lena and her colour: red. One touch I liked was Barry in the supermarket saying ‘what am I looking for’ whilst a splash of red follows him, out of focus, in the background.</p>
-
-<p>b. The moving van/travel. Love arrives in Barry’s world via a removal van. It’s seen right at the beginning, just after the harmonium is dropped off in his life; it’s seen again after Barry and Lena’s date,</p>
-
-<p>c. The Harmonium. This is the least subtle thing in the film. Initially, Barry can’t play the ‘instrument of harmony.’ At the end he takes it to Lena and plays it.</p>
-
-<ol>
-  <li>
-    <p>What’s there to say about There Will Be Blood that hasn’t already been said? It’s just really, really, fucking good. All of PT Anderson’s films have been concerned with how people (reall, how men) live. What was the animated ethos of their life, and how it both drove the forward into glory and then ruin. Boogie Nights had Dirk and his desire for fame, Hard Eight ahd Jon and his desire for money, Punch Drunk Love had Barry and his desire to fade away. There Will Be Blood has Daniel Plainview and his desire to win. This is a fully amoral man, driven by greed. There’s a moment about halfway through the film, the oil well has exploded and Plainview’s son lost his hearing. Plainview has a rictous grin as he stares at the flaming well: he is rich. Richer than his wildest imagination. A colleague asks him if his son will be okay, and Plainview says, plainly, ‘no he won’t.’</p>
-  </li>
-  <li>
-    <p>The long shots get longer. In this film you really get a sense of the camera purposefully lingering on Daniel Plainview, forcing us to stare, to not flinch and look away. Daniel Day Lewis gives an all time career performance (maybe even the best performance on film). At the end, after he has banished the preacher Eli Sunday, God truly speaks through him.</p>
-  </li>
-</ol>]]></content><author><name>Thomas Kealy</name></author><summary type="html"><![CDATA[This week a new PT Anderson film comes out. To celebrate a local cinema programmed his entire backlog. I had nothing better to do, so I went along. Here are some ordered notes I collected, mostly after midnight. They are raw and unsophisticated and I think pretty good. At least they capture something of the initial rush of seeing new films with new cinematic voices.]]></summary></entry></feed>
+<p>[^5] Smith, Nicholas D. “Aristotle’s theory of natural slavery.” Phoenix 37.2 (1983): 109-122.</p>]]></content><author><name>Thomas Kealy</name></author><summary type="html"><![CDATA[The Politics was a sequel to the Nicomanchean Ethics; or rather, they were all one treatise. The Ethics concerned itself with how an individual could achieve eudaimonia, the Politics was which institutions could even allow an individual to achieve eudaimonia. One can therefore see the Ethics as a sort of applied politics, whereas we moderns see Politics as applied Ethics.]]></summary></entry></feed>
